@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>La Gran Aventura Espacial - Hermanos Díaz</title>
 <meta name="description" content="Juego educativo para Emiliano y Emmanuel">
 <link rel="manifest" href="manifest.json">
@@ -14,9 +14,16 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
-html,body{width:100%;height:100%;overflow:hidden;font-family:'Trebuchet MS','Comic Sans MS',sans-serif;background:#0a0020;color:#fff;touch-action:manipulation}
-body{background:radial-gradient(ellipse at center,#1a0033 0%,#0a0020 70%,#000 100%);position:relative}
+/* Permitir copiar texto en zonas de contenido (diccionario, wiki, enciclopedia) */
+.dict-result,.wiki-content,#wikiResult,#miniDetail,.mini-content,#parentsContent,p,h1,h2,h3{user-select:text;-webkit-user-select:text}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Trebuchet MS','Comic Sans MS',system-ui,-apple-system,sans-serif;background:#0a0020;color:#fff;touch-action:manipulation}
+body{background:radial-gradient(ellipse at center,#1a0033 0%,#0a0020 70%,#000 100%);position:relative;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(2px 2px at 20% 30%,#fff,transparent),radial-gradient(2px 2px at 60% 70%,#fff,transparent),radial-gradient(1px 1px at 50% 50%,#fff,transparent),radial-gradient(1px 1px at 80% 10%,#fff,transparent),radial-gradient(2px 2px at 90% 80%,#fff,transparent),radial-gradient(1px 1px at 10% 90%,#fff,transparent),radial-gradient(1px 1px at 33% 25%,#fff,transparent),radial-gradient(2px 2px at 75% 45%,#fff,transparent);background-size:300px 300px;animation:starfield 100s linear infinite;opacity:.6;pointer-events:none;z-index:0}
+/* Pausar starfield si la pestaña está oculta o el usuario quiere menos movimiento */
+@media (prefers-reduced-motion: reduce){
+  body::before{animation:none}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
 @keyframes starfield{from{background-position:0 0}to{background-position:300px 300px}}
 #app{position:relative;width:100%;height:100%;z-index:1;overflow:hidden}
 .screen{position:absolute;inset:0;display:none;flex-direction:column;padding:20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
@@ -31,8 +38,10 @@ h1 .emoji,h2 .emoji{-webkit-text-fill-color:initial;background:none;-webkit-back
 @keyframes shine{from{background-position:0 0}to{background-position:300% 0}}
 h2{font-size:clamp(20px,4vw,30px);color:#ffd700;margin-bottom:15px}
 h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
-.btn{padding:14px 26px;border:none;border-radius:18px;font-size:clamp(14px,3.5vw,18px);font-weight:bold;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a0033;box-shadow:0 6px 0 #b8860b,0 8px 14px rgba(0,0,0,.4);font-family:inherit;min-width:120px;text-shadow:none;outline:none}
+.btn{padding:14px 26px;border:none;border-radius:18px;font-size:clamp(14px,3.5vw,18px);font-weight:bold;cursor:pointer;transition:transform .15s,box-shadow .15s,filter .15s;background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a0033;box-shadow:0 6px 0 #b8860b,0 8px 14px rgba(0,0,0,.4);font-family:inherit;min-width:120px;min-height:48px;text-shadow:none;outline:none;letter-spacing:.3px}
+.btn:hover{filter:brightness(1.08)}
 .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b8860b,0 4px 8px rgba(0,0,0,.4)}
+.btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
 .btn-purple{background:linear-gradient(135deg,#9c27b0,#673ab7);color:#fff;box-shadow:0 6px 0 #4a148c,0 8px 14px rgba(0,0,0,.4)}
 .btn-purple:active{box-shadow:0 2px 0 #4a148c,0 4px 8px rgba(0,0,0,.4)}
 .btn-green{background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;box-shadow:0 6px 0 #1b5e20,0 8px 14px rgba(0,0,0,.4)}
@@ -109,6 +118,9 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .achievement .name{font-size:13px;font-weight:bold;color:#ffd700}
 .achievement .desc{font-size:11px;opacity:.8;margin-top:4px}
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);border:2px solid #ffd700;border-radius:14px;padding:12px 20px;color:#ffd700;font-weight:bold;z-index:2000;animation:slideDown .4s ease-out;pointer-events:none;text-align:center;font-size:14px}
+/* Burbuja XP flotante: aparece junto al HUD y sube/desvanece */
+.xp-float{position:fixed;color:#ffd700;font-weight:bold;font-size:18px;text-shadow:0 0 8px rgba(255,215,0,.8),0 0 2px #000;pointer-events:none;z-index:1900;animation:xpFloat 1.4s ease-out forwards}
+@keyframes xpFloat{0%{opacity:0;transform:translateY(0) scale(.8)}15%{opacity:1;transform:translateY(-6px) scale(1.1)}100%{opacity:0;transform:translateY(-50px) scale(1)}}
 @keyframes slideDown{from{transform:translate(-50%,-100px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 .boss-stage{background:radial-gradient(circle at 50% 30%,rgba(244,67,54,.3),rgba(0,0,0,.8))}
 .boss-info{text-align:center;margin:10px 0}
@@ -134,10 +146,10 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .tictac-cell.x{color:#2196f3;text-shadow:0 0 15px #2196f3}
 .tictac-cell.o{color:#f44336;text-shadow:0 0 15px #f44336}
 .tictac-cell.win{background:rgba(255,215,0,.3);border-color:#ffd700;animation:pulse 1s infinite}
-.memory-grid{display:grid;gap:6px;margin:10px auto;width:min(95vw,500px)}
-.mem-card{aspect-ratio:1;background:linear-gradient(135deg,#9c27b0,#673ab7);border:3px solid #ffd700;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:clamp(20px,5vw,32px);cursor:pointer;transition:all .3s;color:transparent;font-weight:bold}
-.mem-card.flipped{background:linear-gradient(135deg,#fff,#e0e0e0);color:#1a0033;transform:rotateY(180deg)}
-.mem-card.matched{background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;animation:correctPulse .5s ease-out}
+.memory-grid{display:grid;gap:6px;margin:10px auto;width:min(95vw,500px);perspective:1000px}
+.mem-card{aspect-ratio:1;background:linear-gradient(135deg,#9c27b0,#673ab7);border:3px solid #ffd700;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:clamp(20px,5vw,32px);cursor:pointer;transition:transform .35s ease-out,background .25s,box-shadow .25s;color:transparent;font-weight:bold;will-change:transform;position:relative}
+.mem-card.flipped{background:linear-gradient(135deg,#fff,#e0e0e0);color:#1a0033;transform:scale(1.05);box-shadow:0 0 18px rgba(255,215,0,.65)}
+.mem-card.matched{background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;animation:correctPulse .5s ease-out;box-shadow:0 0 14px rgba(76,175,80,.7)}
 .controls{display:flex;justify-content:center;gap:20px;margin:14px 0;flex-wrap:wrap}
 .dpad{display:grid;grid-template-areas:". up ." "left . right" ". down .";gap:6px;width:180px;margin:0 auto}
 .dpad-btn{width:55px;height:55px;background:linear-gradient(135deg,#9c27b0,#673ab7);border:none;border-radius:14px;color:#fff;font-size:26px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 0 #4a148c}
@@ -164,11 +176,15 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .planet-dot.s3{background:linear-gradient(135deg,#ffd700,#ff8c00);border-color:#fff;box-shadow:0 0 10px #ffd700}
 /* CONECTA 4 */
 .c4-board{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;background:linear-gradient(135deg,#1565c0,#0d47a1);padding:10px;border-radius:14px;margin:14px auto;width:min(90vw,420px);box-shadow:0 0 20px rgba(33,150,243,.4)}
-.c4-cell{aspect-ratio:1;background:rgba(0,0,0,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0;cursor:pointer;transition:transform .15s;border:2px solid rgba(255,255,255,.1)}
+.c4-cell{aspect-ratio:1;background:rgba(0,0,0,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0;cursor:pointer;transition:transform .15s,background .2s;border:2px solid rgba(255,255,255,.1);position:relative}
 .c4-cell:hover{transform:scale(1.08)}
+.c4-cell.col-hover{background:rgba(255,215,0,.18);box-shadow:inset 0 0 0 1px rgba(255,215,0,.35)}
 .c4-cell.r{background:radial-gradient(circle at 30% 30%,#ff6b6b,#c62828);box-shadow:inset -2px -4px 6px rgba(0,0,0,.4),0 0 8px rgba(255,107,107,.5)}
 .c4-cell.y{background:radial-gradient(circle at 30% 30%,#ffeb3b,#f57f17);box-shadow:inset -2px -4px 6px rgba(0,0,0,.4),0 0 8px rgba(255,235,59,.5)}
-.c4-cell.win{animation:c4Win 1s infinite;outline:3px solid #fff}
+.c4-cell.win{animation:c4Win 1s infinite;outline:3px solid #fff;outline-offset:1px}
+.c4-cell.ghost{opacity:.35!important;animation:none}
+.c4-cell.drop{animation:c4Drop .35s cubic-bezier(.5,0,.5,1.4)}
+@keyframes c4Drop{0%{transform:translateY(-380%)}80%{transform:translateY(8%)}100%{transform:translateY(0)}}
 @keyframes c4Win{0%,100%{transform:scale(1)}50%{transform:scale(1.15);outline-color:#ffd700}}
 /* 2048 */
 .g2048-board{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:#3a2860;padding:10px;border-radius:14px;margin:14px auto;width:min(90vw,400px);aspect-ratio:1;box-shadow:0 0 20px rgba(156,39,176,.4)}
@@ -212,6 +228,10 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .chess-cell.sel{background:#ffd700!important;box-shadow:inset 0 0 0 3px #ff6b9d}
 .chess-cell.move-hint{position:relative}
 .chess-cell.move-hint::after{content:'';position:absolute;width:30%;height:30%;background:rgba(76,175,80,.6);border-radius:50%}
+/* Resalta movimientos legales (puntito verde) y rey en jaque (anillo rojo pulsante) */
+.chess-cell.legal{position:relative}
+.chess-cell.legal::after{content:'';position:absolute;width:35%;height:35%;background:rgba(76,175,80,.55);border-radius:50%;box-shadow:0 0 8px rgba(76,175,80,.7);pointer-events:none}
+.chess-cell.check{box-shadow:inset 0 0 0 3px #f44336;animation:pulse 1s infinite}
 /* MARIO */
 #mario-canvas{display:block;margin:10px auto;background:radial-gradient(ellipse at 30% 30%,#3a1f5e,#1a0033 60%,#0a0020 100%);border:3px solid #ffd700;border-radius:8px;box-shadow:0 0 18px rgba(255,215,0,.4);max-width:95vw;height:auto}
 /* DINO RUNNER */
@@ -359,9 +379,9 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   .stat-box .num{font-size:24px}
   .stat-box .label{font-size:10px}
   .row{gap:8px}
-  .dpad{width:140px;gap:5px}
-  .dpad-btn{width:42px;height:42px;font-size:18px;border-radius:10px}
-  .back-btn,.sound-btn{width:38px;height:38px;font-size:18px;top:8px}
+  .dpad{width:160px;gap:6px}
+  .dpad-btn{width:48px;height:48px;font-size:20px;border-radius:12px}
+  .back-btn,.sound-btn{width:44px;height:44px;font-size:20px;top:8px}
   .back-btn{left:8px}.sound-btn{right:8px}
   /* Canvas y tableros móvil */
   #snake-canvas{width:min(95vw,300px)}
@@ -560,6 +580,7 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
       <span id="hudName">-</span>
     </div>
     <div class="hud-stat" id="hudLevel" title="Tu nivel">🚀 L1</div>
+    <div class="hud-stat" id="hudGrade" title="Tu grado escolar">🎓 -</div>
     <div class="hud-stat">⭐ <span id="hudStars">0</span></div>
     <div class="hud-stat">💰 <span id="hudCoins">0</span></div>
     <div class="hud-stat">🏆 <span id="hudPlanets">0</span>/30</div>
@@ -726,14 +747,20 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
       <div class="hud-stat">Líneas: <span id="tetrisLines">0</span></div>
       <div class="hud-stat">Nivel: <span id="tetrisLevel">1</span></div>
     </div>
-    <canvas id="tetris-canvas" width="240" height="480"></canvas>
+    <div style="display:flex;gap:10px;justify-content:center;align-items:flex-start;flex-wrap:wrap">
+      <canvas id="tetris-canvas" width="240" height="480"></canvas>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div style="font-size:12px;opacity:.8">Próxima</div>
+        <canvas id="tetris-next-canvas" width="80" height="80" style="background:#0a0020;border:2px solid #ffd700;border-radius:6px"></canvas>
+      </div>
+    </div>
     <div id="tetrisStatus" style="text-align:center;font-size:14px;margin:6px 0;opacity:.85">Flechas o botones</div>
     <div class="dpad" style="grid-template-areas:'rot up rot2' 'left down right'">
       <button class="dpad-btn" style="grid-area:rot" onclick="tetrisRotate()" title="Rotar">🔄</button>
-      <button class="dpad-btn dpad-up" onclick="tetrisDrop()" title="Caída rápida">⬇⬇</button>
+      <button class="dpad-btn dpad-up" onclick="tetrisDrop()" title="Caída rápida (hard drop)">⬇⬇</button>
       <button class="dpad-btn" style="grid-area:rot2" onclick="tetrisRotate()">🔄</button>
       <button class="dpad-btn dpad-left" onclick="tetrisMove(-1)">◀</button>
-      <button class="dpad-btn dpad-down" onclick="tetrisStep()">⬇</button>
+      <button class="dpad-btn dpad-down" onclick="tetrisSoftDrop()" title="Bajar 1 (soft drop)">⬇</button>
       <button class="dpad-btn dpad-right" onclick="tetrisMove(1)">▶</button>
     </div>
     <div class="row">
@@ -769,9 +796,9 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
     <canvas id="mario-canvas" width="720" height="420"></canvas>
     <div id="marioStatus" style="text-align:center;font-size:13px;margin:6px 0;opacity:.85">Flechas o botones · Salta a las plataformas y recoge estrellas</div>
     <div class="dpad">
-      <button class="dpad-btn dpad-up" onclick="marioJump()">▲ Saltar</button>
-      <button class="dpad-btn dpad-left" onmousedown="marioPress('left',1)" onmouseup="marioPress('left',0)" ontouchstart="marioPress('left',1)" ontouchend="marioPress('left',0)">◀</button>
-      <button class="dpad-btn dpad-right" onmousedown="marioPress('right',1)" onmouseup="marioPress('right',0)" ontouchstart="marioPress('right',1)" ontouchend="marioPress('right',0)">▶</button>
+      <button class="dpad-btn dpad-up" onmousedown="marioPress('jump',1)" onmouseup="marioPress('jump',0)" onmouseleave="marioPress('jump',0)" ontouchstart="event.preventDefault();marioPress('jump',1)" ontouchend="marioPress('jump',0)" ontouchcancel="marioPress('jump',0)">▲ Saltar</button>
+      <button class="dpad-btn dpad-left" onmousedown="marioPress('left',1)" onmouseup="marioPress('left',0)" onmouseleave="marioPress('left',0)" ontouchstart="event.preventDefault();marioPress('left',1)" ontouchend="marioPress('left',0)" ontouchcancel="marioPress('left',0)">◀</button>
+      <button class="dpad-btn dpad-right" onmousedown="marioPress('right',1)" onmouseup="marioPress('right',0)" onmouseleave="marioPress('right',0)" ontouchstart="event.preventDefault();marioPress('right',1)" ontouchend="marioPress('right',0)" ontouchcancel="marioPress('right',0)">▶</button>
     </div>
     <div class="row">
       <button class="btn btn-green" onclick="marioStart()">🔄 Reiniciar</button>
@@ -815,6 +842,7 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
     </div>
     <div class="row">
       <button class="btn btn-green" onclick="g2048Start()">🔄 Nueva partida</button>
+      <button class="btn btn-blue" onclick="g2048Undo()">⏪ Deshacer</button>
       <button class="btn btn-purple" onclick="goBack()">← Volver</button>
     </div>
   </div>
@@ -828,6 +856,7 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
       <button class="dict-cat-btn" onclick="minesSetDifficulty('facil')">🟢 Fácil 8×8</button>
       <button class="dict-cat-btn" onclick="minesSetDifficulty('medio')">🟡 Medio 10×10</button>
       <button class="dict-cat-btn" onclick="minesSetDifficulty('dificil')">🔴 Difícil 12×12</button>
+      <button class="dict-cat-btn" id="minesFlagModeBtn" onclick="minesToggleFlagMode()">🚩 Modo bandera</button>
     </div>
     <div class="hud" style="max-width:340px;width:100%">
       <div class="hud-stat">Minas: <span id="minesLeft">10</span></div>
@@ -901,6 +930,22 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 </div>
 
 <script>
+// ========== HiDPI / Canvas ==========
+// Configura el canvas para pantallas Retina/HiDPI: el backing store es N veces más grande
+// que el tamaño CSS, pero el contexto se escala así no tienes que tocar nada del código de dibujo.
+function setupHiDPI(canvas, cssW, cssH){
+  if(!canvas)return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  if(canvas._dprApplied === dpr && canvas._cssW === cssW && canvas._cssH === cssH)return;
+  canvas.width = cssW * dpr;
+  canvas.height = cssH * dpr;
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  canvas._dprApplied = dpr; canvas._cssW = cssW; canvas._cssH = cssH;
+}
+
 // ========== STORAGE ==========
 const STORAGE_KEY = 'aventura_espacial_v1';
 function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){}}
@@ -951,37 +996,56 @@ function freshState(){
 }
 function migrateState(s){
   if(!s)return freshState();
-  s.version=s.version||1;
-  // v1 → v2: añadir analytics, customQuestions, customDict, normalizar jugadores
-  if(s.version<2){
-    s.analytics=s.analytics||{sessions:[],gamesPlayed:{},questionsByGalaxy:{},questionsByPlanet:{},firstSeen:Date.now(),lastSeen:Date.now()};
-    s.customQuestions=s.customQuestions||{};
-    s.customDict=s.customDict||[];
-    s.version=2;
-  }
-  // v2 → v3: añadir campo `grade` a cada jugador (sistema escolar francés CP→3ème)
-  if(s.version<3){
-    if(s.emmanuel&&!s.emmanuel.grade)s.emmanuel.grade='cm1';
-    if(s.emiliano&&!s.emiliano.grade)s.emiliano.grade='ce1';
-    s.version=3;
-  }
-  // Asegurar campos de jugadores (compat con v1 y migra player fields)
-  ['emmanuel','emiliano'].forEach(k=>{
-    if(!s[k]){
-      s[k]=JSON.parse(JSON.stringify(initialPlayer));
-      s[k].grade=k==='emmanuel'?'cm1':'ce1';
+  try{
+    s.version=s.version||1;
+    // v1 → v2: añadir analytics, customQuestions, customDict, normalizar jugadores
+    if(s.version<2){
+      s.analytics=s.analytics||{sessions:[],gamesPlayed:{},questionsByGalaxy:{},questionsByPlanet:{},firstSeen:Date.now(),lastSeen:Date.now()};
+      s.customQuestions=s.customQuestions||{};
+      s.customDict=s.customDict||[];
+      s.version=2;
     }
-    const p=s[k];
-    if(p.xp===undefined)p.xp=0;
-    if(!p.grade)p.grade=k==='emmanuel'?'cm1':'ce1';
-    if(!p.planetStars)p.planetStars={};
-    if(!p.dailyDate)p.dailyDate='';
-    if(p.dailyCorrect===undefined)p.dailyCorrect=0;
-    if(p.dailyStreak===undefined)p.dailyStreak=0;
-    (p.planetsBeaten||[]).forEach(k2=>{if(!p.planetStars[k2])p.planetStars[k2]=1});
-  });
-  if(s.ttsAuto===undefined)s.ttsAuto=true;
-  return s;
+    // v2 → v3: añadir campo `grade` a cada jugador (sistema escolar francés CP→3ème)
+    if(s.version<3){
+      if(s.emmanuel&&!s.emmanuel.grade)s.emmanuel.grade='cm1';
+      if(s.emiliano&&!s.emiliano.grade)s.emiliano.grade='ce1';
+      s.version=3;
+    }
+    // Asegurar campos de jugadores (compat con v1 y migra player fields)
+    ['emmanuel','emiliano'].forEach(k=>{
+      if(!s[k]){
+        s[k]=JSON.parse(JSON.stringify(initialPlayer));
+        s[k].grade=k==='emmanuel'?'cm1':'ce1';
+      }
+      const p=s[k];
+      if(typeof p.xp!=='number'||!isFinite(p.xp))p.xp=0;
+      if(typeof p.coins!=='number'||!isFinite(p.coins))p.coins=0;
+      if(typeof p.stars!=='number'||!isFinite(p.stars))p.stars=0;
+      if(!Array.isArray(p.planetsBeaten))p.planetsBeaten=[];
+      if(!Array.isArray(p.bossesBeaten))p.bossesBeaten=[];
+      if(!Array.isArray(p.items))p.items=[];
+      if(!Array.isArray(p.achievements))p.achievements=[];
+      if(!p.grade)p.grade=k==='emmanuel'?'cm1':'ce1';
+      if(!p.planetStars||typeof p.planetStars!=='object')p.planetStars={};
+      if(!p.replayLog||typeof p.replayLog!=='object')p.replayLog={};
+      if(!p.dailyDate)p.dailyDate='';
+      if(typeof p.dailyCorrect!=='number')p.dailyCorrect=0;
+      if(typeof p.dailyStreak!=='number')p.dailyStreak=0;
+      if(typeof p.totalAnswered!=='number')p.totalAnswered=0;
+      if(typeof p.totalCorrect!=='number')p.totalCorrect=0;
+      if(typeof p.currentStreak!=='number')p.currentStreak=0;
+      if(typeof p.bestStreak!=='number')p.bestStreak=0;
+      // Migra planetStars sin sobrescribir valores existentes
+      p.planetsBeaten.forEach(k2=>{if(!p.planetStars[k2])p.planetStars[k2]=1});
+    });
+    if(s.ttsAuto===undefined)s.ttsAuto=true;
+    return s;
+  }catch(e){
+    console.error('Error migrando estado, usando freshState:',e);
+    // En vez de borrar silenciosamente, guardamos backup
+    try{localStorage.setItem('aventura_espacial_backup_'+Date.now(),JSON.stringify(s))}catch(_){}
+    return freshState();
+  }
 }
 let state=migrateState(load())||freshState();
 // Track sesión cada vez que se carga
@@ -1085,12 +1149,30 @@ const LEVELS=[
   {n:11,name:'Estrella Suprema',emoji:'✨',xp:15000},
   {n:12,name:'Cósmico Eterno',emoji:'🌌',xp:25000}
 ];
-function getLevel(xp){let cur=LEVELS[0];for(const l of LEVELS){if(xp>=l.xp)cur=l;else break}return cur}
-function getNextLevel(xp){for(const l of LEVELS){if(xp<l.xp)return l}return null}
+function getLevel(xp){if(typeof xp!=='number'||!isFinite(xp))xp=0;let cur=LEVELS[0];for(const l of LEVELS){if(xp>=l.xp)cur=l;else break}return cur}
+function getNextLevel(xp){if(typeof xp!=='number'||!isFinite(xp))xp=0;for(const l of LEVELS){if(xp<l.xp)return l}return null}
 function addXP(amount){
   const p=getPlayer();if(!p)return;
+  // Guard: amount debe ser número finito ≥0; si no lo es, no hacemos nada
+  if(typeof amount!=='number'||!isFinite(amount)||amount<0)return;
+  // Si el XP actual está corrupto (NaN/string), lo reseteamos a 0
+  if(typeof p.xp!=='number'||!isFinite(p.xp))p.xp=0;
   const before=getLevel(p.xp);
   p.xp+=amount;
+  // Racha diaria: día actual ISO. Si es nuevo día, incrementa o reinicia racha
+  const today=new Date().toISOString().slice(0,10);
+  if(p.dailyDate!==today){
+    // Si jugó ayer, sigue racha; si no, reset
+    if(p.dailyDate){
+      const ayer=new Date(Date.now()-86400000).toISOString().slice(0,10);
+      p.dailyStreak=(p.dailyDate===ayer?(p.dailyStreak||0)+1:1);
+    }else{p.dailyStreak=1}
+    p.dailyDate=today;p.dailyCorrect=0;
+    if(p.dailyStreak>=3)toast('🔥 Racha de '+p.dailyStreak+' días seguidos!',2500);
+  }
+  p.dailyCorrect=(p.dailyCorrect||0)+1;
+  // Animación XP flotante junto al HUD
+  showXpFloat('+'+amount+' XP');
   const after=getLevel(p.xp);
   save();
   if(after.n>before.n){
@@ -1155,7 +1237,7 @@ math:[
 {q:'156 + 84 = ?',o:['230','240','250','220'],a:1,level:'cm1'},
 {q:'234 + 56 = ?',o:['280','290','300','310'],a:1,level:'cm1'},
 {q:'567 + 433 = ?',o:['900','990','1000','1100'],a:2,level:'cm1'},
-{q:'1234 + 567 = ?',o:['1701','1801','1901','1701'],a:1,level:'cm1'},
+{q:'1234 + 567 = ?',o:['1701','1801','1901','1601'],a:1,level:'cm1'},
 {q:'250 + 175 + 75 = ?',o:['450','475','500','525'],a:2,level:'cm1'},
 {q:'47 + 23 + 30 = ?',o:['90','100','110','85'],a:1,level:'cm1'},
 {q:'99 + 99 = ?',o:['188','198','199','200'],a:1,level:'cm1'},
@@ -1416,7 +1498,7 @@ math:[
 {q:'¿Cuántos lados tiene un cuadrado?',o:['3','4','5','6'],a:1,level:'ce1'},
 {q:'¿Cuántas patas tienen 3 perros?',o:['9','10','12','15'],a:2,level:'ce1'},
 {q:'Tienes 7 cromos y te dan 5. ¿Cuántos?',o:['11','12','13','10'],a:1,level:'ce1'},
-{q:'Hay 10 dedos en 1 mano. ¿Cuántos en 2 manos?',o:['10','15','20','12'],a:0,level:'ce1'}, // truco: una mano son 5
+{q:'Si en cada mano hay 5 dedos, ¿cuántos en 2 manos?',o:['8','10','12','15'],a:1,level:'ce1'},
 // CM1: problemas comparación (NA), longitudes (NA), proporcionalidad
 {q:'Si un libro cuesta 5€, ¿cuánto cuestan 4 libros?',o:['18€','20€','24€','15€'],a:1,level:'cm1'},
 {q:'Hay 24 caramelos para 6 niños. ¿Cuántos toca a cada uno?',o:['3','4','5','6'],a:1,level:'cm1'},
@@ -1659,7 +1741,7 @@ fr:[
 {q:'Pronombre relativo en "le livre QUE je lis":',o:['qui','que','dont','où'],a:1,level:'6e'},
 {q:'Pronombre relativo en "la maison OÙ j\'habite":',o:['qui','que','dont','où'],a:3,level:'6e'},
 {q:'Antónimo de "généreux":',o:['gentil','avare','poli','riche'],a:1,level:'6e'},
-{q:'Sinónimo de "intelligent":',o:['stupide','intélligent','malin','beau'],a:2,level:'6e'},
+{q:'Sinónimo de "intelligent":',o:['stupide','lent','malin','beau'],a:2,level:'6e'},
 {q:'¿Quién escribió "Le Petit Prince"?',o:['Victor Hugo','Saint-Exupéry','Molière','Voltaire'],a:1,level:'6e'}
 ]
 ],
@@ -1885,10 +1967,10 @@ ca:[
 {q:'En català, ¿qué letra va delante de V y F? (regla)',o:['m','n','ambas','ninguna'],a:1,level:'cm1'},
 {q:'¿Cuál es correcta? (también)',o:['tanbé','tambè','també','tanbe'],a:2,level:'cm1'},
 {q:'¿Cuál es correcta? (enviar)',o:['emviar','enviar','enbiar','emiar'],a:1,level:'cm1'},
-{q:'¿Cuál es correcta? (cambiar)',o:['cambiar','cambiar','canviar','camviar'],a:2,level:'cm1'},
+{q:'¿Cuál es correcta? (cambiar al català)',o:['canbiar','cambiar','canviar','camviar'],a:2,level:'cm1'},
 // Ortografía r / rr (Emmanuel CM1: PA en r/rr)
 {q:'¿Cuál es correcta? (caro - perro en català = gos)',o:['caro','carro','qarro','quarro'],a:0,level:'cm1'},
-{q:'¿Cuál es correcta? (mare = madre)',o:['marre','mare','mère','mère'],a:1,level:'cm1'},
+{q:'¿Cuál es correcta? (mare = madre, en català)',o:['marre','mare','màre','mara'],a:1,level:'cm1'},
 {q:'En català, RR entre vocales suena:',o:['Suave','Fuerte','Igual que R','No suena'],a:1,level:'cm1'},
 {q:'¿Cómo se dice "perro" (animal) en català?',o:['perro','gos','can','goz'],a:1,level:'ce1'},
 // CP (6 años) — catalán muy básico
@@ -1920,7 +2002,7 @@ ca:[
 {q:'Sinònim de "bonic":',o:['lleig','formós','trist','vell'],a:1,level:'6e'},
 {q:'Article "el" + "home" → ?',o:['el home','l\'home','lo home','la home'],a:1,level:'6e'},
 {q:'Subjuntiu present de "ser", jo:',o:['sóc','sigui','seré','era'],a:1,level:'6e'},
-{q:'¿Quins són els 7 cons d\'Andorra (parròquies)?',o:['5','6','7','8'],a:2,level:'6e'}
+{q:'¿Quantes parròquies té Andorra?',o:['5','6','7','8'],a:2,level:'6e'}
 ]
 ]
 };
@@ -2102,6 +2184,10 @@ function show(id){
   if(id!=='dino'&&dinoLoop){cancelAnimationFrame(dinoLoop);dinoLoop=null}
 }
 function goBack(){
+  // Si estás a mitad de una partida con vidas restantes, pide confirmación
+  if((game.screen==='question'||game.screen==='boss')&&game.lives>0&&game.qIdx>0&&game.qIdx<(game.qPool||[]).length){
+    if(!confirm('¿Salir? Perderás el progreso de este planeta.'))return;
+  }
   if(game.history.length>1){game.history.pop();const prev=game.history[game.history.length-1];game.history.pop();show(prev)}
   else show('intro');
 }
@@ -2110,6 +2196,18 @@ function toast(msg,duration=2500){
   const t=document.createElement('div');t.className='toast';t.textContent=msg;
   document.body.appendChild(t);
   setTimeout(()=>t.remove(),duration);
+}
+function showXpFloat(txt){
+  // Burbuja flotante de XP que sale del HUD. Si no existe el HUD, no hace nada.
+  const hud=document.getElementById('hudLevel');
+  if(!hud)return;
+  const rect=hud.getBoundingClientRect();
+  const el=document.createElement('div');
+  el.className='xp-float';el.textContent=txt;
+  el.style.left=(rect.right+8)+'px';
+  el.style.top=(rect.top)+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1400);
 }
 function feedback(msg,type='success'){
   const f=document.createElement('div');f.className='feedback '+type;f.textContent=msg;
@@ -2172,6 +2270,13 @@ function renderMap(){
   const lvl=getLevel(p.xp);const next=getNextLevel(p.xp);
   document.getElementById('hudLevel').innerHTML=`${lvl.emoji} L${lvl.n}`;
   document.getElementById('hudLevel').title=`${lvl.name} (Nivel ${lvl.n})`;
+  // Grado escolar visible para que el padre vea de un vistazo si el niño juega su nivel
+  const gradeEl=document.getElementById('hudGrade');
+  if(gradeEl){
+    const g=GRADES.find(x=>x.id===p.grade)||GRADES[0];
+    gradeEl.innerHTML=`${g.emoji} ${g.name}`;
+    gradeEl.title=`${g.name} (${g.age} años) · ${g.desc}`;
+  }
   if(next){
     const span=next.xp-lvl.xp;const have=p.xp-lvl.xp;
     document.getElementById('xpFill').style.width=Math.min(100,Math.round(have/span*100))+'%';
@@ -2230,6 +2335,12 @@ function startPlanet(galIdx,planetIdx){
   game.galaxy=galIdx;game.planet=planetIdx;
   game.qIdx=0;game.lives=3;game.correct=0;game.wrong=[];
   game.qPool=[]; // forzar nuevo sorteo de pool en cada partida
+  game.hintsUsed=0;
+  // Verifica que haya preguntas antes de mostrar la pantalla
+  const g=GALAXIES[galIdx];
+  const test=pickQuestions(g.id,planetIdx,state.currentPlayer);
+  if(!test.length){toast('⚠️ Este planeta aún no tiene preguntas. Vuelve pronto.',3000);return}
+  game.qPool=test;
   show('question');
   renderQuestion();
 }
@@ -2276,48 +2387,85 @@ function getQuestionsForCurrent(){
 }
 
 function renderQuestion(){
+  // Cancelar timeout pendiente si lo hubiera
+  if(game.answerTimeout){clearTimeout(game.answerTimeout);game.answerTimeout=null}
+  if(game.screen!=='question')return; // Si el usuario navegó fuera, no renderizar
   const g=GALAXIES[game.galaxy];
   const qs=getQuestionsForCurrent();
+  if(!qs.length){toast('⚠️ Sin preguntas disponibles');goToMap();return}
   if(game.qIdx>=qs.length){endPlanet();return}
   const q=qs[game.qIdx];
+  // Validación defensiva: la pregunta debe tener exactamente 4 opciones y respuesta válida
+  if(!q.o||q.o.length<2||q.a<0||q.a>=q.o.length){
+    console.warn('Pregunta mal formada, saltando',q);
+    game.qIdx++;renderQuestion();return;
+  }
+  // SHUFFLE: aleatoriza el orden de opciones para evitar sesgo de posición
+  // Solo si no hay un orden ya generado para esta pregunta en esta partida
+  if(!q._shuffled){
+    const order=q.o.map((_,i)=>i).sort(()=>Math.random()-.5);
+    q._oShuf=order.map(i=>q.o[i]);
+    q._aShuf=order.indexOf(q.a);
+    q._shuffled=true;
+  }
   document.getElementById('qPlanet').textContent=`${g.emoji} ${g.planets[game.planet]}`;
   document.getElementById('qNum').textContent=`${game.qIdx+1}/${qs.length}`;
   document.getElementById('lives').innerHTML=Array.from({length:3},(_,i)=>`<span class="heart${i>=game.lives?' lost':''}">❤️</span>`).join('');
   document.getElementById('qText').textContent=q.q;
-  document.getElementById('hintBtn').style.display=getPlayer().coins>=5?'inline-block':'none';
+  // Botón pista: visible solo si quedan pistas Y el jugador puede pagar
+  const hintBtn=document.getElementById('hintBtn');
+  if(hintBtn){
+    const hintsLeft=2-(game.hintsUsed||0);
+    const canAfford=getPlayer().coins>=5;
+    hintBtn.style.display=(hintsLeft>0&&canAfford)?'inline-block':'none';
+    hintBtn.title='Pistas restantes: '+hintsLeft;
+  }
   const ans=document.getElementById('answers');ans.innerHTML='';
-  q.o.forEach((opt,i)=>{
+  q._oShuf.forEach((opt,i)=>{
     const b=document.createElement('button');
     b.className='answer-btn';b.textContent=opt;
     b.onclick=()=>answer(i,q,b);
     ans.appendChild(b);
   });
-  if(isYoung())speak(q.q,g.lang);
+  if(isYoung()){try{speechSynthesis.cancel()}catch(e){}speak(q.q,g.lang)}
 }
 
 function useHint(){
   const p=getPlayer();
   if(p.coins<5)return;
+  if((game.hintsUsed||0)>=2){toast('Solo 2 pistas por planeta');return}
+  game.hintsUsed=(game.hintsUsed||0)+1;
   p.coins-=5;save();
   document.getElementById('hudCoins').textContent=p.coins;
-  document.getElementById('hintBtn').style.display='none';
+  game.hintUsedInQuestion=true; // marca que esta pregunta no cuenta como "perfecta"
   const qs=getQuestionsForCurrent();
   const q=qs[game.qIdx];
   const buttons=document.querySelectorAll('#answers .answer-btn');
   let removed=0;
+  const correctIdx=q._aShuf!=null?q._aShuf:q.a;
   for(let i=0;i<buttons.length&&removed<2;i++){
-    if(i!==q.a&&!buttons[i].classList.contains('hint-eliminated')){
+    if(i!==correctIdx&&!buttons[i].classList.contains('hint-eliminated')){
       buttons[i].classList.add('hint-eliminated');removed++;
     }
   }
-  toast('Pista usada -5💰');
+  // Refrescar visibilidad del botón
+  const hintBtn=document.getElementById('hintBtn');
+  if(hintBtn){
+    const hintsLeft=2-game.hintsUsed;
+    hintBtn.style.display=(hintsLeft>0&&p.coins>=5)?'inline-block':'none';
+    hintBtn.title='Pistas restantes: '+hintsLeft;
+  }
+  toast('Pista usada -5💰 ('+(2-game.hintsUsed)+' restantes)');
 }
 
 function answer(idx,q,btn){
+  if(game.answerLock)return; // anti doble-tap
+  game.answerLock=true;
   document.querySelectorAll('#answers .answer-btn').forEach(b=>b.disabled=true);
   const p=getPlayer();
   p.totalAnswered++;
-  const isCorrect=idx===q.a;
+  const correctIdx=q._aShuf!=null?q._aShuf:q.a;
+  const isCorrect=idx===correctIdx;
   trackAnswer(GALAXIES[game.galaxy].id,game.planet,isCorrect,state.currentPlayer);
   if(isCorrect){
     btn.classList.add('correct');
@@ -2327,10 +2475,12 @@ function answer(idx,q,btn){
     p.coins+=isYoung()?3:5;
     addXP(isYoung()?1:2); // +XP por cada acierto
     game.correct++;
-    feedback('✓ ¡Correcto!','success');
+    if(!game.hintUsedInQuestion)game.perfectAnswers=(game.perfectAnswers||0)+1;
+    feedback('✓ ¡Correcto! +'+(isYoung()?1:2)+' XP','success');
   }else{
     btn.classList.add('wrong');
-    document.querySelectorAll('#answers .answer-btn')[q.a].classList.add('correct');
+    const correctBtn=document.querySelectorAll('#answers .answer-btn')[correctIdx];
+    if(correctBtn)correctBtn.classList.add('correct');
     sndWrong();
     p.currentStreak=0;
     game.lives--;
@@ -2338,7 +2488,10 @@ function answer(idx,q,btn){
     feedback('✗ Incorrecto','fail');
   }
   save();
-  setTimeout(()=>{
+  game.hintUsedInQuestion=false;
+  game.answerTimeout=setTimeout(()=>{
+    game.answerTimeout=null;game.answerLock=false;
+    if(game.screen!=='question')return; // el usuario salió, no avanzar
     if(game.lives<=0){endPlanet(true);return}
     game.qIdx++;
     renderQuestion();
@@ -2350,6 +2503,8 @@ function endPlanet(failed=false){
   const planetKey=g.id+'-'+game.planet;
   const p=getPlayer();
   const total=getQuestionsForCurrent().length;
+  // Guard: si total es 0, no debería pasar (startPlanet ya valida) pero por si acaso
+  if(total===0){toast('Error: planeta sin preguntas');goToMap();return}
   show('result');
   if(failed){
     sndLose();
@@ -2359,7 +2514,12 @@ function endPlanet(failed=false){
     document.getElementById('nextBtn').style.display='none';
   }else{
     const passed=game.correct>=Math.ceil(total*.6);
-    const newStars=game.correct>=total?3:game.correct>=Math.ceil(total*.8)?2:passed?1:0;
+    // 3⭐ requiere TODAS correctas Y sin pistas. 2⭐ con 80%. 1⭐ con 60%.
+    const usedHints=(game.hintsUsed||0)>0;
+    let newStars=0;
+    if(game.correct>=total&&!usedHints)newStars=3;
+    else if(game.correct>=Math.ceil(total*.8))newStars=2;
+    else if(passed)newStars=1;
     const prevStars=p.planetStars[planetKey]||0;
     const isFirst=!p.planetsBeaten.includes(planetKey);
     const improved=newStars>prevStars;
@@ -2371,13 +2531,28 @@ function endPlanet(failed=false){
         p.planetStars[planetKey]=newStars;
         addXP(isFirst?(newStars*20):(newStars-prevStars)*10);
       }
-      p.coins+=isFirst?(20+newStars*10):(5+newStars*5);
+      // Anti-farmeo: rejugar sin mejorar da pocas monedas y solo una vez al día
+      let coinReward;
+      if(isFirst){
+        coinReward=20+newStars*10;
+      }else if(improved){
+        coinReward=10+newStars*5;
+      }else{
+        // No mejoró: max 1 vez al día por planeta
+        const today=new Date().toISOString().slice(0,10);
+        if(!p.replayLog)p.replayLog={};
+        if(p.replayLog[planetKey]===today){coinReward=0}
+        else{p.replayLog[planetKey]=today;coinReward=3}
+      }
+      p.coins+=coinReward;
       sndWin();confetti();
       document.getElementById('resultEmoji').textContent='🎉';
       document.getElementById('resultTitle').textContent=isFirst?'¡Planeta conquistado!':improved?'¡Nuevo récord!':'Planeta superado';
       const starStr='⭐'.repeat(newStars)+'☆'.repeat(3-newStars);
       const flavor=newStars===3?'¡Perfecto absoluto!':newStars===2?'¡Genial!':'¡Bien!';
-      document.getElementById('resultText').textContent=`${starStr} ${flavor} · Aciertos: ${game.correct}/${total}${improved&&!isFirst?' · ¡Mejoraste tu récord!':''}`;
+      const coinMsg=coinReward>0?` · +${coinReward}💰`:' · sin recompensa hoy';
+      const hintNote=usedHints&&newStars<3?' (sin pistas = posibilidad 3⭐)':'';
+      document.getElementById('resultText').textContent=`${starStr} ${flavor} · Aciertos: ${game.correct}/${total}${coinMsg}${improved&&!isFirst?' · ¡Mejoraste tu récord!':''}${hintNote}`;
     }else{
       sndLose();
       document.getElementById('resultEmoji').textContent='😅';
@@ -2396,72 +2571,127 @@ function nextPlanet(){
   // find next unconquered planet in this galaxy
   let next=g.planets.findIndex((_,i)=>!p.planetsBeaten.includes(g.id+'-'+i));
   if(next>=0){startPlanet(game.galaxy,next)}
-  else if(p.planetsBeaten.filter(k=>k.startsWith(g.id+'-')).length>=5&&!p.bossesBeaten.includes(g.id)){
-    startBoss(game.galaxy);
-  }else{goToMap()}
+  else{
+    // Match exacto del prefijo de galaxia (no startsWith para evitar prefijos solapados)
+    const conqueredInGal=p.planetsBeaten.filter(k=>k.split('-')[0]===g.id).length;
+    if(conqueredInGal>=g.planets.length&&!p.bossesBeaten.includes(g.id)){
+      startBoss(game.galaxy);
+    }else{goToMap()}
+  }
 }
 
 // ========== BOSS ==========
 function startBoss(galIdx){
   const g=GALAXIES[galIdx];
   game.galaxy=galIdx;
-  game.bossHp=100;game.playerHp=100;
-  // Mix questions from all 5 planets, 12 random
+  // HP escalado por edad: niño pequeño tiene más HP, jefe más débil. Adolescente al revés.
+  const young=isYoung();
+  game.playerHp=young?120:100;
+  const baseBossHp=young?80:100;
+  // Si vienes de una derrota previa, el jefe empieza con HP reducido (entre 50% y 100%)
+  const p0=getPlayer();
+  const savedPct=p0.bossProgress&&p0.bossProgress[g.id];
+  game.bossHp=savedPct?Math.round(baseBossHp*savedPct/100):baseBossHp;
+  game.bossInitialHp=baseBossHp;
+  game.bossDmgPerHit=young?10:13; // daño que recibe el jefe por acierto
+  game.bossDmgToPlayer=young?12:15; // daño del jefe por fallo
+  // Mix questions from ALL planets de la galaxia (no hardcoded 5)
   let pool=[];
-  for(let i=0;i<5;i++)pool=pool.concat(QUESTIONS[g.id][i]);
-  if(isYoung())pool=pool.filter(q=>q.easy).length>=10?pool.filter(q=>q.easy):pool;
+  for(let i=0;i<g.planets.length;i++){
+    const node=QUESTIONS[g.id]&&QUESTIONS[g.id][i];
+    if(node)pool=pool.concat(Array.isArray(node)?node:(node.pool||[]));
+  }
+  // Filtrar por grado del jugador (sistema nuevo) en lugar del legacy `easy`
+  pool=pickBossPool(pool,state.currentPlayer);
+  if(!pool.length){toast('⚠️ El jefe no tiene preguntas. Vuelve cuando haya contenido.');goToMap();return}
   pool=pool.sort(()=>Math.random()-.5).slice(0,12);
-  game.bossQs=pool;game.bossQIdx=0;
+  game.bossQs=pool;game.bossQIdx=0;game.bossAnswerLock=false;game.bossCorrectCount=0;
+  if(game.bossAnswerTimeout){clearTimeout(game.bossAnswerTimeout);game.bossAnswerTimeout=null}
   show('boss');
   document.getElementById('bossEmoji').textContent=g.boss.emoji;
   document.getElementById('bossName').textContent=g.boss.name;
   renderBossQ();
 }
 
+function pickBossPool(pool,who){
+  // Reusa la lógica de pickQuestions (rangos por grado) pero aplicada al pool combinado
+  if(!pool.length)return[];
+  const grade=gradeOf(who);
+  const gIdx=gradeIndex(grade);
+  const eff=q=>q.level||(q.easy?'ce1':null);
+  const inRange=(q,delta)=>{const lvl=eff(q);if(!lvl)return true;return Math.abs(gradeIndex(lvl)-gIdx)<=delta};
+  let f=pool.filter(q=>inRange(q,1));
+  if(f.length<12)f=pool.filter(q=>inRange(q,2));
+  if(f.length<12)f=pool.slice();
+  return f;
+}
+
 function renderBossQ(){
+  if(game.bossAnswerTimeout){clearTimeout(game.bossAnswerTimeout);game.bossAnswerTimeout=null}
+  if(game.screen!=='boss')return;
   if(game.bossHp<=0){bossWin();return}
   if(game.playerHp<=0){bossLose();return}
   if(game.bossQIdx>=game.bossQs.length){
-    if(game.bossHp<=game.playerHp)bossWin();else bossLose();
+    // Fin de preguntas: gana quien tenga más HP relativo o más aciertos
+    const correctRatio=game.bossCorrectCount/game.bossQs.length;
+    if(correctRatio>=0.6)bossWin(); else bossLose();
     return;
   }
   const q=game.bossQs[game.bossQIdx];
-  document.getElementById('bossHp').style.width=game.bossHp+'%';
-  document.getElementById('playerHp').style.width=game.playerHp+'%';
+  // Shuffle anti-sesgo igual que en preguntas normales
+  if(!q._bossShuffled){
+    const order=q.o.map((_,i)=>i).sort(()=>Math.random()-.5);
+    q._bossOShuf=order.map(i=>q.o[i]);
+    q._bossAShuf=order.indexOf(q.a);
+    q._bossShuffled=true;
+  }
+  game.bossAnswerLock=false;
+  document.getElementById('bossHp').style.width=Math.max(0,game.bossHp)+'%';
+  document.getElementById('playerHp').style.width=Math.max(0,game.playerHp)+'%';
   document.getElementById('bossQText').textContent=q.q;
   const ans=document.getElementById('bossAnswers');ans.innerHTML='';
-  q.o.forEach((opt,i)=>{
+  q._bossOShuf.forEach((opt,i)=>{
     const b=document.createElement('button');b.className='answer-btn';b.textContent=opt;
     b.onclick=()=>bossAnswer(i,q,b);
     ans.appendChild(b);
   });
-  if(isYoung())speak(q.q,GALAXIES[game.galaxy].lang);
+  if(isYoung()){try{speechSynthesis.cancel()}catch(e){}speak(q.q,GALAXIES[game.galaxy].lang)}
 }
 
 function bossAnswer(idx,q,btn){
+  if(game.bossAnswerLock)return;game.bossAnswerLock=true;
   document.querySelectorAll('#bossAnswers .answer-btn').forEach(b=>b.disabled=true);
   const p=getPlayer();p.totalAnswered++;
-  trackAnswer(GALAXIES[game.galaxy].id,'boss',idx===q.a,state.currentPlayer);
-  if(idx===q.a){
+  const correctIdx=q._bossAShuf!=null?q._bossAShuf:q.a;
+  const isCorrect=idx===correctIdx;
+  trackAnswer(GALAXIES[game.galaxy].id,'boss',isCorrect,state.currentPlayer);
+  if(isCorrect){
     btn.classList.add('correct');sndCorrect();
     p.totalCorrect++;p.currentStreak++;if(p.currentStreak>p.bestStreak)p.bestStreak=p.currentStreak;
-    game.bossHp-=12;
-    feedback('⚔️ Golpe certero!','success');
+    game.bossHp=Math.max(0,game.bossHp-game.bossDmgPerHit);
+    game.bossCorrectCount++;
+    addXP(isYoung()?2:3);
+    feedback('⚔️ Golpe certero! -'+game.bossDmgPerHit+' al jefe','success');
   }else{
-    btn.classList.add('wrong');
-    document.querySelectorAll('#bossAnswers .answer-btn')[q.a].classList.add('correct');
+    const correctBtn=document.querySelectorAll('#bossAnswers .answer-btn')[correctIdx];
+    btn.classList.add('wrong');if(correctBtn)correctBtn.classList.add('correct');
     sndWrong();
     p.currentStreak=0;
-    game.playerHp-=15;
-    feedback('💥 Te golpearon','fail');
+    game.playerHp=Math.max(0,game.playerHp-game.bossDmgToPlayer);
+    feedback('💥 Te golpearon -'+game.bossDmgToPlayer,'fail');
   }
+  // Actualizar barras inmediatamente para feedback visual
+  document.getElementById('bossHp').style.width=Math.max(0,game.bossHp)+'%';
+  document.getElementById('playerHp').style.width=Math.max(0,game.playerHp)+'%';
   save();
-  setTimeout(()=>{game.bossQIdx++;renderBossQ()},1300);
+  game.bossAnswerTimeout=setTimeout(()=>{game.bossAnswerTimeout=null;if(game.screen!=='boss')return;game.bossQIdx++;renderBossQ()},1300);
 }
 
 function bossWin(){
   const g=GALAXIES[game.galaxy];
   const p=getPlayer();
+  // Reset progreso de derrota al vencer (próximo intento empieza limpio)
+  if(p.bossProgress&&p.bossProgress[g.id])delete p.bossProgress[g.id];
   if(!p.bossesBeaten.includes(g.id)){
     p.bossesBeaten.push(g.id);
     p.stars+=10;p.coins+=100;
@@ -2478,15 +2708,23 @@ function bossWin(){
   document.getElementById('resultText').textContent=`Has vencido a ${g.boss.name}. +10⭐ +100💰. Galaxia conquistada!`;
   document.getElementById('nextBtn').style.display='none';
   checkAchievements();
-  if(p.bossesBeaten.length>=6)setTimeout(()=>show('cert'),2500);
+  if(p.bossesBeaten.length>=6&&!p.certShown){p.certShown=true;save();setTimeout(()=>show('cert'),2500)}
 }
 
 function bossLose(){
+  // Conserva % de daño hecho al jefe para el próximo intento (motivación)
+  const p=getPlayer();const g=GALAXIES[game.galaxy];
+  if(!p.bossProgress)p.bossProgress={};
+  // Guarda el HP del jefe para que el próximo intento empiece con esa ventaja (mín 50% del inicial)
+  const remainingPct=Math.max(50,Math.round((game.bossHp/game.bossInitialHp)*100));
+  p.bossProgress[g.id]=remainingPct;
+  save();
   sndLose();
+  checkAchievements(); // chequea logros también en derrota
   show('result');
   document.getElementById('resultEmoji').textContent='💀';
   document.getElementById('resultTitle').textContent='Derrota';
-  document.getElementById('resultText').textContent='El jefe fue más fuerte esta vez. ¡Inténtalo de nuevo!';
+  document.getElementById('resultText').textContent='El jefe fue más fuerte. Próximo intento empezará con su HP en '+remainingPct+'%. ¡Vamos!';
   document.getElementById('nextBtn').style.display='none';
 }
 
@@ -2577,11 +2815,12 @@ function confirmReset(){
   }
 }
 
-// ========== SNAKE (con velocidad creciente y manzana dorada especial) ==========
-let snakeState={x:5,y:5,dx:1,dy:0,body:[],food:{x:10,y:10},golden:null,score:0,grid:16,size:20,speed:140,goldenTimer:0};
+// ========== SNAKE (con velocidad creciente, manzana dorada y partículas) ==========
+let snakeState={x:5,y:5,dx:1,dy:0,pendingDx:1,pendingDy:0,body:[],food:{x:10,y:10},golden:null,goldenExpireAt:0,score:0,grid:16,size:20,speed:140,particles:[],paused:false};
 let snakeLoop=null;
 function snakeStart(){
-  snakeState={x:5,y:5,dx:1,dy:0,body:[{x:5,y:5}],food:{x:10,y:10},golden:null,score:0,grid:16,size:20,speed:160,goldenTimer:0};
+  setupHiDPI(document.getElementById('snake-canvas'),320,320);
+  snakeState={x:5,y:5,dx:1,dy:0,pendingDx:1,pendingDy:0,body:[{x:5,y:5}],food:{x:10,y:10},golden:null,goldenExpireAt:0,score:0,grid:16,size:20,speed:160,particles:[],paused:false};
   document.getElementById('snakeScore').textContent=0;
   document.getElementById('snakeBest').textContent=state.snakeBest||0;
   snakeRestartLoop();
@@ -2592,82 +2831,122 @@ function snakeRestartLoop(){
   snakeLoop=setInterval(snakeStep,snakeState.speed);
 }
 function snakeDir(dx,dy){
+  // Bloquea 180° mirando dirección actual aplicada (dx/dy), no la pendiente — evita bug de cambiar 2 veces antes del próximo step
   if(dx===-snakeState.dx&&dy===-snakeState.dy)return;
-  snakeState.dx=dx;snakeState.dy=dy;
+  snakeState.pendingDx=dx;snakeState.pendingDy=dy;
 }
+function snakeTogglePause(){if(snakeLoop){clearInterval(snakeLoop);snakeLoop=null;snakeState.paused=true;document.getElementById('snakeScore').parentNode.style.opacity=.5}else{snakeState.paused=false;snakeRestartLoop();document.getElementById('snakeScore').parentNode.style.opacity=1}}
 function snakeStep(){
-  snakeState.x+=snakeState.dx;snakeState.y+=snakeState.dy;
-  if(snakeState.x<0||snakeState.x>=snakeState.grid||snakeState.y<0||snakeState.y>=snakeState.grid){snakeOver();return}
-  if(snakeState.body.some(s=>s.x===snakeState.x&&s.y===snakeState.y)){snakeOver();return}
-  snakeState.body.unshift({x:snakeState.x,y:snakeState.y});
+  // Aplica la dirección pendiente al inicio del tick
+  snakeState.dx=snakeState.pendingDx;snakeState.dy=snakeState.pendingDy;
+  const newX=snakeState.x+snakeState.dx, newY=snakeState.y+snakeState.dy;
+  if(newX<0||newX>=snakeState.grid||newY<0||newY>=snakeState.grid){snakeOver();return}
+  // Verifica colisión con cuerpo: si NO va a comer, la cola se moverá → no contar último segmento
+  const willEat=(newX===snakeState.food.x&&newY===snakeState.food.y)||(snakeState.golden&&newX===snakeState.golden.x&&newY===snakeState.golden.y);
+  const bodyToCheck=willEat?snakeState.body:snakeState.body.slice(0,-1);
+  if(bodyToCheck.some(s=>s.x===newX&&s.y===newY)){snakeOver();return}
+  snakeState.x=newX;snakeState.y=newY;
+  snakeState.body.unshift({x:newX,y:newY});
   // Comer manzana normal
-  if(snakeState.x===snakeState.food.x&&snakeState.y===snakeState.food.y){
+  if(newX===snakeState.food.x&&newY===snakeState.food.y){
     snakeState.score++;sndCoin();
+    snakeSpawnParticles(newX,newY,'#ff5252');
     document.getElementById('snakeScore').textContent=snakeState.score;
     do{
       snakeState.food={x:Math.floor(Math.random()*snakeState.grid),y:Math.floor(Math.random()*snakeState.grid)};
     }while(snakeState.body.some(s=>s.x===snakeState.food.x&&s.y===snakeState.food.y));
-    // Cada 5 manzanas: acelera la velocidad
     if(snakeState.score%5===0&&snakeState.speed>60){
       snakeState.speed=Math.max(60,snakeState.speed-10);
       snakeRestartLoop();
     }
-    // Cada 7 manzanas: spawnea dorada (dura 8 segundos, vale 3)
     if(snakeState.score%7===0&&!snakeState.golden){
       do{
         snakeState.golden={x:Math.floor(Math.random()*snakeState.grid),y:Math.floor(Math.random()*snakeState.grid)};
       }while(snakeState.body.some(s=>s.x===snakeState.golden.x&&s.y===snakeState.golden.y)||(snakeState.golden.x===snakeState.food.x&&snakeState.golden.y===snakeState.food.y));
-      snakeState.goldenTimer=Math.round(8000/snakeState.speed); // ~8s en ticks
+      // Tiempo real (8s) — no depende de la velocidad
+      snakeState.goldenExpireAt=performance.now()+8000;
     }
-  }
-  // Comer dorada
-  else if(snakeState.golden&&snakeState.x===snakeState.golden.x&&snakeState.y===snakeState.golden.y){
+  }else if(snakeState.golden&&newX===snakeState.golden.x&&newY===snakeState.golden.y){
     snakeState.score+=3;sndWin();confetti(15);
+    snakeSpawnParticles(newX,newY,'#ffd700');
     document.getElementById('snakeScore').textContent=snakeState.score;
-    snakeState.golden=null;snakeState.goldenTimer=0;
+    snakeState.golden=null;snakeState.goldenExpireAt=0;
   }else snakeState.body.pop();
-  // Decaer dorada
-  if(snakeState.goldenTimer>0){
-    snakeState.goldenTimer--;
-    if(snakeState.goldenTimer<=0)snakeState.golden=null;
-  }
+  // Caduca dorada por tiempo real
+  if(snakeState.golden&&performance.now()>snakeState.goldenExpireAt){snakeState.golden=null;snakeState.goldenExpireAt=0}
   snakeRender();
+}
+function snakeSpawnParticles(gx,gy,color){
+  const cx=gx*snakeState.size+10,cy=gy*snakeState.size+10;
+  for(let i=0;i<10;i++){
+    const a=Math.random()*Math.PI*2,sp=1+Math.random()*2;
+    snakeState.particles.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:24,color});
+  }
 }
 function snakeRender(){
   const c=document.getElementById('snake-canvas'),ctx=c.getContext('2d');
-  // fondo galáctico
   const g=ctx.createRadialGradient(c.width/2,c.height/2,20,c.width/2,c.height/2,c.width/2);
   g.addColorStop(0,'#1a0033');g.addColorStop(1,'#0a0020');
   ctx.fillStyle=g;ctx.fillRect(0,0,c.width,c.height);
-  // Manzana normal (roja)
+  // Cuadrícula sutil
+  ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;
+  for(let i=0;i<=snakeState.grid;i++){ctx.beginPath();ctx.moveTo(i*snakeState.size,0);ctx.lineTo(i*snakeState.size,c.height);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i*snakeState.size);ctx.lineTo(c.width,i*snakeState.size);ctx.stroke()}
+  // Manzana normal
   ctx.shadowColor='#ff5252';ctx.shadowBlur=10;
   ctx.fillStyle='#ff5252';
   ctx.beginPath();ctx.arc(snakeState.food.x*snakeState.size+10,snakeState.food.y*snakeState.size+10,8,0,Math.PI*2);ctx.fill();
-  // Manzana dorada con halo pulsante
+  // Manzana dorada con halo pulsante + barra de tiempo
   if(snakeState.golden){
     const pulse=1+Math.sin(performance.now()/150)*0.15;
     ctx.shadowColor='#ffd700';ctx.shadowBlur=20;
     ctx.fillStyle='#ffd700';
     ctx.beginPath();ctx.arc(snakeState.golden.x*snakeState.size+10,snakeState.golden.y*snakeState.size+10,8*pulse,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+    // Barra de tiempo restante encima de la dorada
+    const remaining=Math.max(0,(snakeState.goldenExpireAt-performance.now())/8000);
+    ctx.fillStyle='#ffd700';
+    ctx.fillRect(snakeState.golden.x*snakeState.size+2,snakeState.golden.y*snakeState.size-2,(snakeState.size-4)*remaining,2);
   }
   ctx.shadowBlur=0;
-  // Cuerpo de la serpiente
+  // Cuerpo: gradiente cabeza→cola
+  const len=snakeState.body.length;
   snakeState.body.forEach((s,i)=>{
-    ctx.fillStyle=i===0?'#ffd700':(i%2?'#4caf50':'#388e3c');
-    ctx.fillRect(s.x*snakeState.size+1,s.y*snakeState.size+1,snakeState.size-2,snakeState.size-2);
-    // Ojos en la cabeza
     if(i===0){
-      ctx.fillStyle='#000';
-      ctx.fillRect(s.x*snakeState.size+5,s.y*snakeState.size+5,3,3);
-      ctx.fillRect(s.x*snakeState.size+12,s.y*snakeState.size+5,3,3);
+      ctx.shadowColor='#7cf';ctx.shadowBlur=8;
+      ctx.fillStyle='#ffd700';
+    }else{
+      ctx.shadowBlur=0;
+      // Interpola verde brillante → verde oscuro de cabeza a cola
+      const t=i/len;
+      const r=Math.round(76-t*30),gC=Math.round(175-t*100),b=Math.round(80-t*30);
+      ctx.fillStyle=`rgb(${r},${gC},${b})`;
+    }
+    ctx.fillRect(s.x*snakeState.size+1,s.y*snakeState.size+1,snakeState.size-2,snakeState.size-2);
+    if(i===0){
+      ctx.shadowBlur=0;ctx.fillStyle='#000';
+      // Ojos orientados según dirección
+      const eyeOff=snakeState.dx===1?13:snakeState.dx===-1?4:8;
+      const eyeOff2=snakeState.dy===1?13:snakeState.dy===-1?4:8;
+      ctx.fillRect(s.x*snakeState.size+(snakeState.dx?eyeOff:5),s.y*snakeState.size+(snakeState.dy?eyeOff2:5),3,3);
+      ctx.fillRect(s.x*snakeState.size+(snakeState.dx?eyeOff:12),s.y*snakeState.size+(snakeState.dy?eyeOff2:12),3,3);
     }
   });
+  ctx.shadowBlur=0;
+  // Partículas
+  snakeState.particles=snakeState.particles.filter(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.life--;
+    if(p.life<=0)return false;
+    ctx.fillStyle=p.color;ctx.globalAlpha=p.life/24;
+    ctx.fillRect(p.x,p.y,3,3);
+    return true;
+  });
+  ctx.globalAlpha=1;
 }
 function snakeOver(){
   clearInterval(snakeLoop);snakeLoop=null;sndLose();
   if(snakeState.score>(state.snakeBest||0)){state.snakeBest=snakeState.score;save()}
   document.getElementById('snakeBest').textContent=state.snakeBest||0;
-  toast('¡Game Over! Puntos: '+snakeState.score);
+  toast('¡Game Over! Puntos: '+snakeState.score+(snakeState.score===state.snakeBest?' 🏆 ¡Récord!':''),3500);
 }
 
 // ========== TIC TAC TOE (con minimax y 3 dificultades) ==========
@@ -2802,7 +3081,7 @@ const MEM_THEMES={
   banderas:['🇦🇩','🇪🇸','🇫🇷','🇬🇧','🇮🇹','🇩🇪','🇯🇵','🇧🇷','🇲🇽','🇨🇦','🇺🇸','🇨🇳','🇮🇳','🇰🇷','🇦🇺','🇪🇬','🇿🇦','🇨🇴']
 };
 function memStart(){
-  if(!memBest)memBest={};
+  if(!memBest||!Object.keys(memBest).length){try{memBest=JSON.parse(localStorage.getItem('mem_best')||'{}')}catch(e){memBest={}}}
   memCards=[];memFlipped=[];memMatched=0;memMoves=0;memBusy=false;
   document.getElementById('memMoves').textContent=0;
   document.getElementById('memPairs').textContent='0/'+memLevel;
@@ -2855,9 +3134,16 @@ function memFlip(c){
       memTimer=setTimeout(()=>{
         memFlipped.forEach(c=>{c.classList.add('matched');c.classList.remove('flipped')});
         memMatched++;sndCorrect();
-        document.getElementById('memPairs').textContent=memMatched;
+        document.getElementById('memPairs').textContent=memMatched+'/'+memLevel;
         memFlipped=[];memBusy=false;
-        if(memMatched===12){confetti(40);sndWin();toast('¡Completado en '+memMoves+' movs!')}
+        if(memMatched===memLevel){
+          confetti(60);sndWin();
+          const key=memTheme+'_'+memLevel;
+          const prev=memBest[key];
+          const isBest=!prev||memMoves<prev;
+          if(isBest){memBest[key]=memMoves;try{localStorage.setItem('mem_best',JSON.stringify(memBest))}catch(e){}}
+          toast('¡Completado en '+memMoves+' movs!'+(isBest?' 🏆 ¡Récord!':' (récord: '+(prev||memMoves)+')'),3500);
+        }
       },500);
     }else{
       memTimer=setTimeout(()=>{
@@ -2869,26 +3155,41 @@ function memFlip(c){
 }
 
 // ========== CONECTA 4 ==========
-let c4Board=[],c4Turn='r',c4Done=false,c4Wins={r:0,y:0};
+let c4Board=[],c4Turn='r',c4Done=false,c4Wins={r:0,y:0},c4HoverCol=-1,c4Difficulty='medium',c4WinCells=null;
 const C4_R=6,C4_C=7;
+const C4_DEPTHS={easy:2,medium:5,hard:7};
+function c4SetDifficulty(d){c4Difficulty=d;c4Start()}
 function c4Start(){
   c4Board=Array.from({length:C4_R},()=>Array(C4_C).fill(0));
-  c4Turn='r';c4Done=false;
-  document.getElementById('c4Status').textContent='Tu turno 🔴';
+  c4Turn='r';c4Done=false;c4WinCells=null;c4HoverCol=-1;
+  const lbl={easy:'😊 Fácil',medium:'🤔 Medio',hard:'😈 Difícil'}[c4Difficulty];
+  document.getElementById('c4Status').innerHTML='Tu turno 🔴 · <button class="btn-small btn-blue" style="padding:4px 10px;font-size:11px;border:none;border-radius:8px;cursor:pointer;background:#2196f3;color:#fff" onclick="c4CycleDifficulty()">'+lbl+'</button>';
   document.getElementById('c4Human').textContent=c4Wins.r;
   document.getElementById('c4Comp').textContent=c4Wins.y;
   c4Render();
 }
+function c4CycleDifficulty(){const order=['easy','medium','hard'];const i=order.indexOf(c4Difficulty);c4SetDifficulty(order[(i+1)%3])}
 function c4Render(){
   const b=document.getElementById('c4Board');b.innerHTML='';
+  // Fila pre-cabecera con ghost piece + hover de columna
+  const ghostRow=c4HoverCol>=0?c4LowestEmpty(c4Board,c4HoverCol):-1;
   for(let r=0;r<C4_R;r++)for(let c=0;c<C4_C;c++){
     const cell=document.createElement('div');
     cell.className='c4-cell';
     const v=c4Board[r][c];
     if(v==='r')cell.classList.add('r');
     else if(v==='y')cell.classList.add('y');
+    if(c4WinCells&&c4WinCells.some(([wr,wc])=>wr===r&&wc===c))cell.classList.add('win');
+    // Ghost piece: muestra dónde caerá la ficha si haces clic
+    if(!c4Done&&c4Turn==='r'&&c===c4HoverCol&&r===ghostRow&&v===0){
+      cell.classList.add('ghost');cell.classList.add('r');
+    }
+    // Resalta toda la columna en hover
+    if(c===c4HoverCol&&!c4Done)cell.classList.add('col-hover');
     cell.dataset.col=c;
     cell.onclick=()=>c4Drop(c);
+    cell.onmouseenter=()=>{c4HoverCol=c;c4Render()};
+    cell.onmouseleave=()=>{if(c4HoverCol===c){c4HoverCol=-1;c4Render()}};
     b.appendChild(cell);
   }
 }
@@ -2896,21 +3197,33 @@ function c4Drop(col){
   if(c4Done||c4Turn!=='r')return;
   const row=c4LowestEmpty(c4Board,col);
   if(row<0)return;
+  c4HoverCol=-1;
   c4Board[row][col]='r';
   sndCoin();
-  c4Render();
+  c4AnimateDrop(row,col,'r');
   if(c4CheckWin(c4Board,row,col,'r')){c4End('r');return}
   if(c4Full(c4Board)){c4End('draw');return}
   c4Turn='y';
-  document.getElementById('c4Status').textContent='Turno PC 🟡...';
+  const lbl={easy:'😊 Fácil',medium:'🤔 Medio',hard:'😈 Difícil'}[c4Difficulty];
+  document.getElementById('c4Status').innerHTML='Turno PC 🟡 pensando… <span style="font-size:11px;opacity:.6">('+lbl+')</span>';
   setTimeout(c4PCMove,650);
+}
+function c4AnimateDrop(row,col,player){
+  // Re-render y añade clase de animación a la ficha que acaba de caer
+  c4Render();
+  const cells=document.querySelectorAll('#c4Board .c4-cell');
+  const idx=row*C4_C+col;
+  if(cells[idx])cells[idx].classList.add('drop');
 }
 function c4PCMove(){
   if(c4Done)return;
-  // IA con minimax + alpha-beta pruning (depth 5). Mucho más fuerte que heurística simple.
+  // IA con minimax + alpha-beta pruning. Profundidad según dificultad.
   let move=c4FindWinMove(c4Board,'y');
   if(move<0)move=c4FindWinMove(c4Board,'r');
-  if(move<0)move=c4Minimax(c4Board,5);
+  if(move<0){
+    const depth=C4_DEPTHS[c4Difficulty]||5;
+    move=c4Minimax(c4Board,depth);
+  }
   if(move<0){
     const order=[3,2,4,1,5,0,6];
     for(const c of order){if(c4LowestEmpty(c4Board,c)>=0){move=c;break}}
@@ -2919,11 +3232,12 @@ function c4PCMove(){
   const row=c4LowestEmpty(c4Board,move);
   c4Board[row][move]='y';
   sndCoin();
-  c4Render();
+  c4AnimateDrop(row,move,'y');
   if(c4CheckWin(c4Board,row,move,'y')){c4End('y');return}
   if(c4Full(c4Board)){c4End('draw');return}
   c4Turn='r';
-  document.getElementById('c4Status').textContent='Tu turno 🔴';
+  const lbl={easy:'😊 Fácil',medium:'🤔 Medio',hard:'😈 Difícil'}[c4Difficulty];
+  document.getElementById('c4Status').innerHTML='Tu turno 🔴 · <button class="btn-small btn-blue" style="padding:4px 10px;font-size:11px;border:none;border-radius:8px;cursor:pointer;background:#2196f3;color:#fff" onclick="c4CycleDifficulty()">'+lbl+'</button>';
 }
 // Evalúa una posición. Positivo = bueno para PC (y), negativo = bueno para humano (r).
 function c4Score(b){
@@ -2952,9 +3266,9 @@ function c4Score(b){
   for(let r=0;r<C4_R;r++)if(b[r][3]==='y')score+=4;else if(b[r][3]==='r')score-=4;
   return score;
 }
-function c4Minimax(b,depth,alpha=-Infinity,beta=Infinity,maximizing=true){
+function c4Minimax(b,depth,alpha=-Infinity,beta=Infinity,maximizing=true,_isRoot=true){
   // Si la profundidad es 0 o el tablero está lleno, evaluamos
-  if(depth===0||c4Full(b))return depth===5?-1:c4Score(b);
+  if(depth===0||c4Full(b))return _isRoot?-1:c4Score(b);
   const order=[3,2,4,1,5,0,6];
   let bestMove=-1;
   if(maximizing){
@@ -2963,21 +3277,21 @@ function c4Minimax(b,depth,alpha=-Infinity,beta=Infinity,maximizing=true){
       const r=c4LowestEmpty(b,c);if(r<0)continue;
       b[r][c]='y';
       // Si esta jugada gana, no hace falta seguir explorando
-      if(c4CheckWin(b,r,c,'y',false)){b[r][c]=0;return depth===5?c:100000+depth}
-      const val=c4Minimax(b,depth-1,alpha,beta,false);
+      if(c4CheckWin(b,r,c,'y',false)){b[r][c]=0;return _isRoot?c:100000+depth}
+      const val=c4Minimax(b,depth-1,alpha,beta,false,false);
       b[r][c]=0;
       if(val>maxVal){maxVal=val;bestMove=c}
       alpha=Math.max(alpha,val);
       if(beta<=alpha)break;
     }
-    return depth===5?bestMove:maxVal;
+    return _isRoot?bestMove:maxVal;
   }else{
     let minVal=Infinity;
     for(const c of order){
       const r=c4LowestEmpty(b,c);if(r<0)continue;
       b[r][c]='r';
       if(c4CheckWin(b,r,c,'r',false)){b[r][c]=0;return -100000-depth}
-      const val=c4Minimax(b,depth-1,alpha,beta,true);
+      const val=c4Minimax(b,depth-1,alpha,beta,true,false);
       b[r][c]=0;
       if(val<minVal){minVal=val;bestMove=c}
       beta=Math.min(beta,val);
@@ -3006,11 +3320,8 @@ function c4CheckWin(b,r,c,p,markCells=true){
     for(let s=1;s<4;s++){const nr=r-dr*s,nc=c-dc*s;if(nr<0||nr>=C4_R||nc<0||nc>=C4_C||b[nr][nc]!==p)break;count++;cells.push([nr,nc])}
     if(count>=4){
       if(markCells){
-        cells.forEach(([rr,cc])=>{
-          const idx=rr*C4_C+cc;
-          const el=document.getElementById('c4Board').children[idx];
-          if(el)el.classList.add('win');
-        });
+        c4WinCells=cells;
+        c4Render(); // re-render para que .win se aplique a las celdas (sobrevive a animación)
       }
       return true;
     }
@@ -3027,10 +3338,10 @@ function c4End(winner){
 }
 
 // ========== 2048 ==========
-let g2048Grid=[],g2048Score=0,g2048Best=0,g2048Touch={x:0,y:0};
+let g2048Grid=[],g2048Prev=[],g2048Score=0,g2048Best=0,g2048Touch={x:0,y:0},g2048Reached=false,g2048LastSpawn=null,g2048ScoreBeforeMove=0,g2048GridBeforeMove=null;
 function g2048Start(){
   g2048Grid=Array.from({length:4},()=>Array(4).fill(0));
-  g2048Score=0;
+  g2048Score=0;g2048Reached=false;g2048LastSpawn=null;g2048GridBeforeMove=null;
   g2048Best=parseInt(localStorage.getItem('g2048_best')||'0',10);
   g2048AddRandom();g2048AddRandom();
   g2048Render();
@@ -3042,6 +3353,7 @@ function g2048AddRandom(){
   if(!empty.length)return false;
   const[r,c]=empty[Math.floor(Math.random()*empty.length)];
   g2048Grid[r][c]=Math.random()<.9?2:4;
+  g2048LastSpawn=r+'_'+c;
   return true;
 }
 function g2048Render(){
@@ -3050,19 +3362,34 @@ function g2048Render(){
     const cell=document.createElement('div');
     cell.className='g2048-cell';
     const v=g2048Grid[r][c];
-    if(v){cell.dataset.v=v;cell.textContent=v;cell.classList.add('spawn')}
+    if(v){
+      cell.dataset.v=v;cell.textContent=v;
+      // Solo la celda recién aparecida lleva la animación spawn
+      if(g2048LastSpawn===r+'_'+c)cell.classList.add('spawn');
+    }
     b.appendChild(cell);
   }
   document.getElementById('g2048Score').textContent=g2048Score;
   document.getElementById('g2048Best').textContent=g2048Best;
 }
+function g2048Undo(){
+  if(!g2048GridBeforeMove)return;
+  g2048Grid=g2048GridBeforeMove.map(r=>r.slice());
+  g2048Score=g2048ScoreBeforeMove;
+  g2048GridBeforeMove=null;g2048LastSpawn=null;
+  g2048Render();
+  document.getElementById('g2048Status').textContent='⏪ Movimiento deshecho';
+}
 function g2048Move(dir){
   if(game.screen!=='g2048')return;
   const before=JSON.stringify(g2048Grid);
+  const snapshot=g2048Grid.map(r=>r.slice());
+  const scoreSnap=g2048Score;
+  let reachedNow=false;
   const slide=row=>{
     const arr=row.filter(v=>v);
     for(let i=0;i<arr.length-1;i++){
-      if(arr[i]===arr[i+1]){arr[i]*=2;g2048Score+=arr[i];if(arr[i]===2048){toast('🎉 ¡Llegaste a 2048!')}arr.splice(i+1,1)}
+      if(arr[i]===arr[i+1]){arr[i]*=2;g2048Score+=arr[i];if(arr[i]===2048&&!g2048Reached){reachedNow=true;g2048Reached=true}arr.splice(i+1,1)}
     }
     while(arr.length<4)arr.push(0);
     return arr;
@@ -3075,9 +3402,12 @@ function g2048Move(dir){
     for(let c=0;c<4;c++){const col=[g2048Grid[3][c],g2048Grid[2][c],g2048Grid[1][c],g2048Grid[0][c]];const ns=slide(col);for(let r=0;r<4;r++)g2048Grid[3-r][c]=ns[r]}
   }
   if(JSON.stringify(g2048Grid)===before)return; // no se movió nada
+  // Guardar snapshot para undo
+  g2048GridBeforeMove=snapshot;g2048ScoreBeforeMove=scoreSnap;
   g2048AddRandom();
-  if(g2048Score>g2048Best){g2048Best=g2048Score;localStorage.setItem('g2048_best',g2048Best)}
+  if(g2048Score>g2048Best){g2048Best=g2048Score;try{localStorage.setItem('g2048_best',g2048Best)}catch(e){}}
   g2048Render();
+  if(reachedNow){confetti(80);sndWin();toast('🎉 ¡Llegaste a 2048!',3000)}
   // Game over check
   if(!g2048CanMove()){document.getElementById('g2048Status').textContent='💀 Sin movimientos · '+g2048Score+' pts';sndLose()}
 }
@@ -3093,20 +3423,26 @@ function g2048CanMove(){
 // ========== BUSCAMINAS (con 3 dificultades) ==========
 let minesGrid=[],minesRevealed=[],minesFlagged=[],minesRows=10,minesCols=10,minesCount=15,minesGameOver=false,minesStartTime=0,minesTimer=null;
 let minesDifficulty='medio'; // facil/medio/dificil
+let minesFirstClick=true; // primera celda nunca es mina
+let minesFlagMode=false; // toggle bandera con un solo tap
+let minesFlagsCount=0; // contador incremental, no recalculado
+let minesLastTap={}; // {r_c: timestamp} sobrevive a re-renders
 const MINES_DIFFS={facil:{r:8,c:8,m:10},medio:{r:10,c:10,m:15},dificil:{r:12,c:12,m:25}};
 function minesSetDifficulty(d){minesDifficulty=d;minesStart()}
-function minesStart(){
-  const d=MINES_DIFFS[minesDifficulty]||MINES_DIFFS.medio;
-  minesRows=d.r;minesCols=d.c;minesCount=d.m;
-  minesGrid=Array.from({length:minesRows},()=>Array(minesCols).fill(0));
-  minesRevealed=Array.from({length:minesRows},()=>Array(minesCols).fill(false));
-  minesFlagged=Array.from({length:minesRows},()=>Array(minesCols).fill(false));
-  minesGameOver=false;
-  // Coloca minas al azar
-  let placed=0;
-  while(placed<minesCount){
+function minesToggleFlagMode(){minesFlagMode=!minesFlagMode;const b=document.getElementById('minesFlagModeBtn');if(b){b.classList.toggle('active',minesFlagMode);b.textContent=minesFlagMode?'🚩 Modo bandera ON':'🚩 Modo bandera'}}
+function minesPlaceMines(safeR,safeC){
+  // limpia y coloca minas evitando la celda segura y sus 8 vecinos
+  for(let r=0;r<minesRows;r++)for(let c=0;c<minesCols;c++)minesGrid[r][c]=0;
+  const safe=new Set();
+  for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+    const nr=safeR+dr,nc=safeC+dc;
+    if(nr>=0&&nr<minesRows&&nc>=0&&nc<minesCols)safe.add(nr+'_'+nc);
+  }
+  let placed=0,maxTries=minesRows*minesCols*4;
+  while(placed<minesCount&&maxTries-->0){
     const r=Math.floor(Math.random()*minesRows),c=Math.floor(Math.random()*minesCols);
-    if(minesGrid[r][c]!==-1){minesGrid[r][c]=-1;placed++}
+    if(minesGrid[r][c]===-1||safe.has(r+'_'+c))continue;
+    minesGrid[r][c]=-1;placed++;
   }
   // Calcula números (vecinos)
   for(let r=0;r<minesRows;r++)for(let c=0;c<minesCols;c++){
@@ -3118,6 +3454,14 @@ function minesStart(){
     }
     minesGrid[r][c]=n;
   }
+}
+function minesStart(){
+  const d=MINES_DIFFS[minesDifficulty]||MINES_DIFFS.medio;
+  minesRows=d.r;minesCols=d.c;minesCount=d.m;
+  minesGrid=Array.from({length:minesRows},()=>Array(minesCols).fill(0));
+  minesRevealed=Array.from({length:minesRows},()=>Array(minesCols).fill(false));
+  minesFlagged=Array.from({length:minesRows},()=>Array(minesCols).fill(false));
+  minesGameOver=false;minesFirstClick=true;minesFlagsCount=0;minesLastTap={};
   document.getElementById('minesLeft').textContent=minesCount;
   minesStartTime=Date.now();
   if(minesTimer)clearInterval(minesTimer);
@@ -3125,13 +3469,12 @@ function minesStart(){
     if(minesGameOver){clearInterval(minesTimer);return}
     document.getElementById('minesTime').textContent=Math.floor((Date.now()-minesStartTime)/1000);
   },1000);
-  document.getElementById('minesStatus').textContent='Toca para descubrir · 2 toques rápidos = 🚩';
+  document.getElementById('minesStatus').textContent='😀 Toca para descubrir · doble-tap o 🚩 = bandera';
   minesRender();
 }
 function minesRender(){
   const b=document.getElementById('minesBoard');b.innerHTML='';
   b.style.gridTemplateColumns=`repeat(${minesCols},1fr)`;
-  let flags=0;
   for(let r=0;r<minesRows;r++)for(let c=0;c<minesCols;c++){
     const cell=document.createElement('div');
     cell.className='mine-cell';
@@ -3139,28 +3482,37 @@ function minesRender(){
       cell.classList.add('open');
       if(minesGrid[r][c]===-1){cell.classList.add('boom');cell.textContent='💣'}
       else if(minesGrid[r][c]>0){cell.dataset.n=minesGrid[r][c];cell.textContent=minesGrid[r][c]}
-    }else if(minesFlagged[r][c]){cell.classList.add('flag');cell.textContent='🚩';flags++}
+    }else if(minesFlagged[r][c]){cell.classList.add('flag');cell.textContent='🚩'}
     cell.dataset.r=r;cell.dataset.c=c;
-    let lastTap=0;
+    const key=r+'_'+c;
+    let pressTimer=null;
     cell.onclick=()=>{
+      if(minesGameOver)return;
+      if(minesFlagMode){minesToggleFlag(r,c);return}
       const now=Date.now();
-      if(now-lastTap<350){minesToggleFlag(r,c)}else{minesReveal(r,c)}
-      lastTap=now;
+      if(minesLastTap[key]&&(now-minesLastTap[key])<350){minesToggleFlag(r,c);minesLastTap[key]=0}
+      else{minesLastTap[key]=now;minesReveal(r,c)}
     };
-    cell.oncontextmenu=e=>{e.preventDefault();minesToggleFlag(r,c)};
+    cell.oncontextmenu=e=>{e.preventDefault();if(!minesGameOver)minesToggleFlag(r,c)};
+    // long-press para móvil (400ms)
+    cell.ontouchstart=e=>{pressTimer=setTimeout(()=>{if(!minesGameOver){minesToggleFlag(r,c);if(navigator.vibrate)navigator.vibrate(40)}},420)};
+    cell.ontouchend=()=>{if(pressTimer)clearTimeout(pressTimer)};
+    cell.ontouchmove=()=>{if(pressTimer)clearTimeout(pressTimer)};
     b.appendChild(cell);
   }
-  document.getElementById('minesLeft').textContent=Math.max(0,minesCount-flags);
+  document.getElementById('minesLeft').textContent=Math.max(0,minesCount-minesFlagsCount);
 }
 function minesReveal(r,c){
   if(minesGameOver||minesRevealed[r][c]||minesFlagged[r][c])return;
+  // Primera celda: garantiza que no es mina (re-coloca minas)
+  if(minesFirstClick){minesPlaceMines(r,c);minesFirstClick=false}
   minesRevealed[r][c]=true;
   if(minesGrid[r][c]===-1){
     sndLose();
     minesGameOver=true;
     // revela todas las minas
     for(let rr=0;rr<minesRows;rr++)for(let cc=0;cc<minesCols;cc++)if(minesGrid[rr][cc]===-1)minesRevealed[rr][cc]=true;
-    document.getElementById('minesStatus').textContent='💥 ¡Boom! Pisaste una mina';
+    document.getElementById('minesStatus').textContent='😵 ¡Boom! Pisaste una mina';
     minesRender();
     return;
   }
@@ -3186,6 +3538,7 @@ function minesReveal(r,c){
 function minesToggleFlag(r,c){
   if(minesGameOver||minesRevealed[r][c])return;
   minesFlagged[r][c]=!minesFlagged[r][c];
+  minesFlagsCount+=minesFlagged[r][c]?1:-1;
   minesRender();
 }
 
@@ -3200,13 +3553,27 @@ const TETRIS_PIECES=[
   {color:'#4caf50',shape:[[0,1,1],[1,1,0]]}, // S
   {color:'#f44336',shape:[[1,1,0],[0,1,1]]}  // Z
 ];
-let tetrisGrid,tetrisPiece,tetrisX,tetrisY,tetrisScore,tetrisLines,tetrisLevel,tetrisLoop=null,tetrisDone=false;
+let tetrisGrid,tetrisPiece,tetrisNext,tetrisX,tetrisY,tetrisScore,tetrisLines,tetrisLevel,tetrisLoop=null,tetrisDone=false,tetrisBag=[];
+function tetrisRefillBag(){
+  // 7-bag clásico: cada 7 piezas, todas distintas en orden aleatorio
+  const idx=[0,1,2,3,4,5,6];
+  for(let i=idx.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}
+  tetrisBag.push(...idx);
+}
+function tetrisDrawPiece(){
+  if(!tetrisBag.length)tetrisRefillBag();
+  const p=TETRIS_PIECES[tetrisBag.shift()];
+  return {color:p.color,shape:p.shape.map(r=>r.slice())};
+}
 function tetrisStart(){
+  setupHiDPI(document.getElementById('tetris-canvas'),240,480);
+  setupHiDPI(document.getElementById('tetris-next-canvas'),80,80);
   tetrisGrid=Array.from({length:TETRIS_H},()=>Array(TETRIS_W).fill(0));
-  tetrisScore=0;tetrisLines=0;tetrisLevel=1;tetrisDone=false;
+  tetrisScore=0;tetrisLines=0;tetrisLevel=1;tetrisDone=false;tetrisBag=[];
+  tetrisNext=tetrisDrawPiece();
   tetrisSpawn();
   tetrisSetSpeed();
-  document.getElementById('tetrisStatus').textContent='Flechas o botones';
+  document.getElementById('tetrisStatus').textContent='Flechas o botones · ↓ soft-drop · Espacio hard-drop';
   tetrisRender();
 }
 function tetrisSetSpeed(){
@@ -3214,11 +3581,11 @@ function tetrisSetSpeed(){
   tetrisLoop=setInterval(tetrisStep,Math.max(80,520-tetrisLevel*40));
 }
 function tetrisSpawn(){
-  const p=TETRIS_PIECES[Math.floor(Math.random()*TETRIS_PIECES.length)];
-  tetrisPiece={color:p.color,shape:p.shape.map(r=>r.slice())};
+  tetrisPiece=tetrisNext;
+  tetrisNext=tetrisDrawPiece();
   tetrisX=Math.floor(TETRIS_W/2)-Math.floor(tetrisPiece.shape[0].length/2);
   tetrisY=0;
-  if(tetrisCollides(tetrisX,tetrisY,tetrisPiece.shape))tetrisGameOver();
+  if(tetrisCollides(tetrisX,tetrisY,tetrisPiece.shape)){tetrisPiece=null;tetrisGameOver();return}
 }
 function tetrisCollides(x,y,shape){
   for(let r=0;r<shape.length;r++)for(let c=0;c<shape[r].length;c++){
@@ -3267,15 +3634,28 @@ function tetrisMove(dir){
   if(!tetrisCollides(tetrisX+dir,tetrisY,tetrisPiece.shape)){tetrisX+=dir;tetrisRender()}
 }
 function tetrisDrop(){
-  if(tetrisDone||game.screen!=='tetris')return;
-  while(!tetrisCollides(tetrisX,tetrisY+1,tetrisPiece.shape))tetrisY++;
+  // hard-drop: hasta el fondo + bonus de puntos por celda recorrida
+  if(tetrisDone||game.screen!=='tetris'||!tetrisPiece)return;
+  let cells=0;
+  while(!tetrisCollides(tetrisX,tetrisY+1,tetrisPiece.shape)){tetrisY++;cells++}
+  tetrisScore+=cells*2;
   tetrisStep();
 }
+function tetrisSoftDrop(){
+  // soft-drop: una celda + 1 punto
+  if(tetrisDone||game.screen!=='tetris'||!tetrisPiece)return;
+  if(!tetrisCollides(tetrisX,tetrisY+1,tetrisPiece.shape)){tetrisY++;tetrisScore++;tetrisRender()}
+  else{tetrisStep()}
+}
 function tetrisRotate(){
-  if(tetrisDone||game.screen!=='tetris')return;
+  if(tetrisDone||game.screen!=='tetris'||!tetrisPiece)return;
   const s=tetrisPiece.shape;
   const rot=Array.from({length:s[0].length},(_,c)=>s.map(r=>r[c]).reverse());
-  if(!tetrisCollides(tetrisX,tetrisY,rot)){tetrisPiece.shape=rot;tetrisRender()}
+  // Wall kick: prueba offsets antes de rechazar la rotación
+  const offsets=[0,-1,1,-2,2];
+  for(const dx of offsets){
+    if(!tetrisCollides(tetrisX+dx,tetrisY,rot)){tetrisX+=dx;tetrisPiece.shape=rot;tetrisRender();return}
+  }
 }
 function tetrisRender(){
   const c=document.getElementById('tetris-canvas');if(!c)return;
@@ -3290,7 +3670,7 @@ function tetrisRender(){
     if(tetrisGrid[r][cc]){ctx.fillStyle=tetrisGrid[r][cc];ctx.fillRect(cc*cs+1,r*cs+1,cs-2,cs-2)}
     else{ctx.strokeStyle='rgba(255,255,255,.05)';ctx.strokeRect(cc*cs,r*cs,cs,cs)}
   }
-  if(tetrisPiece){
+  if(tetrisPiece&&!tetrisDone){
     // GHOST PIECE: muestra dónde caería la pieza si haces drop
     let ghostY=tetrisY;
     while(!tetrisCollides(tetrisX,ghostY+1,tetrisPiece.shape))ghostY++;
@@ -3324,6 +3704,22 @@ function tetrisRender(){
   document.getElementById('tetrisScore').textContent=tetrisScore;
   document.getElementById('tetrisLines').textContent=tetrisLines;
   document.getElementById('tetrisLevel').textContent=tetrisLevel;
+  // NEXT PIECE preview (canvas pequeño en sidebar)
+  const nc=document.getElementById('tetris-next-canvas');
+  if(nc&&tetrisNext){
+    const nctx=nc.getContext('2d');
+    nctx.fillStyle='#0a0020';nctx.fillRect(0,0,nc.width,nc.height);
+    const ns=tetrisNext.shape, ncs=Math.min(nc.width/4,nc.height/4);
+    const offX=(nc.width-ns[0].length*ncs)/2, offY=(nc.height-ns.length*ncs)/2;
+    nctx.fillStyle=tetrisNext.color;
+    for(let r=0;r<ns.length;r++)for(let cc=0;cc<ns[r].length;cc++){
+      if(ns[r][cc]){
+        nctx.fillRect(offX+cc*ncs+1,offY+r*ncs+1,ncs-2,ncs-2);
+        nctx.fillStyle='rgba(255,255,255,.3)';nctx.fillRect(offX+cc*ncs+2,offY+r*ncs+2,ncs-4,3);
+        nctx.fillStyle=tetrisNext.color;
+      }
+    }
+  }
 }
 function tetrisGameOver(){
   tetrisDone=true;if(tetrisLoop){clearInterval(tetrisLoop);tetrisLoop=null}
@@ -3351,16 +3747,34 @@ function chessIsWhite(p){return p>='A'&&p<='Z'}
 function chessIsBlack(p){return p>='a'&&p<='z'}
 function chessRender(){
   const b=document.getElementById('chess-board');if(!b)return;b.innerHTML='';
+  // Pre-calcular movimientos legales si hay pieza seleccionada
+  const legalTargets=new Set();
+  if(chessSelected){
+    const[sr,sc]=chessSelected;
+    for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(chessValidMove(sr,sc,r,c))legalTargets.add(r+'_'+c);
+  }
+  // Detecta si el rey blanco/negro está en jaque (sólo para resaltar visualmente)
+  const wInCheck=chessKingInCheck(chessBoard,true);
+  const bInCheck=chessKingInCheck(chessBoard,false);
   for(let r=0;r<8;r++)for(let c=0;c<8;c++){
     const cell=document.createElement('div');
     cell.className='chess-cell '+((r+c)%2?'dark':'light');
     if(chessSelected&&chessSelected[0]===r&&chessSelected[1]===c)cell.classList.add('sel');
+    if(legalTargets.has(r+'_'+c))cell.classList.add('legal');
     const p=chessBoard[r][c];
-    if(p!==' ')cell.textContent=CHESS_EMOJI[p];
+    if(p!==' '){
+      cell.textContent=CHESS_EMOJI[p];
+      // Resalta el rey en jaque
+      if((p==='K'&&wInCheck)||(p==='k'&&bInCheck))cell.classList.add('check');
+    }
     cell.onclick=()=>chessClick(r,c);
     b.appendChild(cell);
   }
-  document.getElementById('chess-turn').textContent=chessDone?'':(chessTurn==='w'?'Tu turno ⚪':'Turno PC ⚫');
+  let status='';
+  if(chessDone){status=''}
+  else if(chessTurn==='w'){status=wInCheck?'⚠️ ¡Jaque! Mueve tu rey a salvo':'Tu turno ⚪'}
+  else{status=bInCheck?'⚠️ ¡Jaque! La PC piensa…':'Turno PC ⚫'}
+  document.getElementById('chess-turn').textContent=status;
 }
 function chessClick(r,c){
   if(chessDone||chessTurn!=='w')return;
@@ -3377,6 +3791,18 @@ function chessClick(r,c){
       setTimeout(chessAI,650);
     }else if(chessIsWhite(p)){chessSelected=[r,c];chessRender()}
   }else if(chessIsWhite(p)){chessSelected=[r,c];chessRender()}
+}
+
+// ¿Está el rey de `forWhite` en jaque?
+function chessKingInCheck(b,forWhite){
+  // Encuentra el rey
+  const kingChar=forWhite?'K':'k';
+  let kr=-1,kc=-1;
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(b[r][c]===kingChar){kr=r;kc=c}
+  if(kr<0)return false;
+  // ¿Algún movimiento del rival puede capturarlo?
+  const enemyMoves=chessAllMoves(b,forWhite); // movimientos del bando contrario al rey
+  return enemyMoves.some(m=>m[2]===kr&&m[3]===kc);
 }
 function chessMove(sr,sc,r,c){
   const captured=chessBoard[r][c];
@@ -3654,22 +4080,27 @@ const MARIO_LEVELS=[
     goal:{x:2840,y:MARIO_GROUND_Y-50}
   }
 ];
-let marioPlayer,marioLevel,marioLives,marioScore,marioWorld,marioCam,marioPickups,marioEnemies;
+let marioPlayer,marioLevel,marioLives,marioScore,marioWorld,marioCam,marioPickups,marioEnemies,marioMovePlats=[];
 let marioLoop=null,marioKeys={left:0,right:0,jump:0,jumpEdge:0},marioBgStars=[];
 function marioStart(){
+  setupHiDPI(document.getElementById('mario-canvas'),MARIO_VW,MARIO_VH);
   if(!marioBgStars.length){for(let i=0;i<70;i++)marioBgStars.push({x:Math.random()*MARIO_VW*2,y:Math.random()*(MARIO_GROUND_Y-20),s:Math.random()*1.5+.3})}
   marioLevel=0;marioScore=0;marioLives=3;
+  marioKeys={left:0,right:0,jump:0,jumpEdge:0}; // reset siempre
   marioLoadLevel();
   if(marioLoop)cancelAnimationFrame(marioLoop);
   marioLoop=requestAnimationFrame(marioStep);
-  document.getElementById('marioStatus').textContent='⬅➡ correr · ▲ saltar · 👽 saltarles encima · 🏁 llega a la meta';
+  document.getElementById('marioStatus').textContent='⬅➡ correr · ▲ saltar (mantén para subir más) · 👽 saltarles encima · 🏁 llega a la meta';
 }
 function marioLoadLevel(){
   const L=MARIO_LEVELS[marioLevel];
   marioWorld=L;
-  marioPlayer={x:30,y:MARIO_GROUND_Y-30,vx:0,vy:0,onGround:false,facing:1,invincible:0,doubleJumpAvail:false,doubleJumpUsed:false};
-  marioCam={x:0};
+  marioPlayer={x:30,y:MARIO_GROUND_Y-30,vx:0,vy:0,onGround:false,facing:1,invincible:0,doubleJumpAvail:false,doubleJumpUsed:false,doubleJumpExpireAt:0};
+  marioCam={x:0}; // reset siempre — evita interpolación desde la posición vieja
+  marioKeys={left:0,right:0,jump:0,jumpEdge:0}; // reset al cargar nivel
   marioEnemies=L.enemies.map(e=>({...e,vx:.8,alive:true}));
+  // Plataformas móviles: copia con estado independiente
+  marioMovePlats=(L.movePlats||[]).map(mp=>({...mp,vx:mp.vx||1.2}));
   marioPickups=[];
   L.coins.forEach(c=>marioPickups.push({...c,kind:'coin',taken:false}));
   L.stars.forEach(s=>marioPickups.push({...s,kind:'star',taken:false}));
@@ -3682,7 +4113,9 @@ function marioPress(dir,on){
   else if(dir==='right')marioKeys.right=on?1:0;
   else if(dir==='jump'){if(on&&!marioKeys.jump)marioKeys.jumpEdge=1;marioKeys.jump=on?1:0}
 }
-function marioJump(){marioPress('jump',1);setTimeout(()=>marioPress('jump',0),250)}
+// Salto desde teclado: simulamos "tap" (jump pulsado un par de frames y luego liberado).
+// Para tablet usamos los handlers ontouch directamente (mantén = altura variable).
+function marioJump(){marioPress('jump',1);setTimeout(()=>marioPress('jump',0),200)}
 function marioStep(){
   if(game.screen!=='mario'){marioLoop=null;return}
   const W=marioWorld,p=marioPlayer;
@@ -3731,6 +4164,17 @@ function marioStep(){
       p.y=pt.y-30;p.vy=0;p.onGround=true;
     }
   }
+  // Plataformas móviles: mueven primero, luego colisionan
+  for(const mp of marioMovePlats){
+    mp.x+=mp.vx;
+    if(mp.x<=mp.minX){mp.x=mp.minX;mp.vx=Math.abs(mp.vx)}
+    if(mp.x+mp.w>=mp.maxX){mp.x=mp.maxX-mp.w;mp.vx=-Math.abs(mp.vx)}
+    if(p.x+24>mp.x&&p.x<mp.x+mp.w&&p.y+30>=mp.y&&p.y+30<=mp.y+14&&p.vy>=0){
+      p.y=mp.y-30;p.vy=0;p.onGround=true;
+      // Arrastra al jugador con la plataforma
+      p.x+=mp.vx;
+    }
+  }
   // Top de tubos (caminar encima)
   for(const pipe of W.pipes){
     const py=MARIO_GROUND_Y-pipe.h;
@@ -3752,10 +4196,11 @@ function marioStep(){
       if(pk.kind==='coin'){marioScore+=10;sndCoin()}
       else if(pk.kind==='star'){
         marioLives++;marioScore+=50;sndWin();confetti(20);
-        // La estrella ahora también activa el doble salto durante 15 segundos
+        // La estrella ahora también activa el doble salto durante 15 segundos (timestamp,
+        // no setTimeout, así no sigue activo si el usuario sale del juego)
         marioPlayer.doubleJumpAvail=true;
-        toast('🌟 +1 vida · Doble salto activado!');
-        setTimeout(()=>{if(marioPlayer)marioPlayer.doubleJumpAvail=false},15000);
+        marioPlayer.doubleJumpExpireAt=performance.now()+15000;
+        toast('🌟 +1 vida · Doble salto activado 15s!');
       }
       document.getElementById('marioScore').textContent=marioScore;
       document.getElementById('marioLives').textContent=marioLives;
@@ -3782,6 +4227,8 @@ function marioStep(){
     }
   }
   if(p.invincible>0)p.invincible--;
+  // Caduca el doble salto del power-up estrella
+  if(p.doubleJumpAvail&&p.doubleJumpExpireAt&&performance.now()>p.doubleJumpExpireAt){p.doubleJumpAvail=false;p.doubleJumpExpireAt=0}
   // Cámara
   const target=Math.max(0,Math.min(W.width-MARIO_VW,p.x-MARIO_VW/2+12));
   marioCam.x+=(target-marioCam.x)*0.18;
@@ -3869,6 +4316,19 @@ function marioRender(){
     ctx.fillStyle='rgba(0,0,0,.4)';ctx.fillRect(pt.x,pt.y+15,pt.w,3);
     ctx.fillStyle='rgba(255,215,0,.7)';
     for(let i=8;i<pt.w-4;i+=18){ctx.beginPath();ctx.arc(pt.x+i,pt.y+9,1.5,0,Math.PI*2);ctx.fill()}
+  }
+  // Plataformas móviles (anaranjadas, brillantes)
+  for(const mp of marioMovePlats){
+    if(mp.x+mp.w<cam-10||mp.x>cam+MARIO_VW+10)continue;
+    const grad=ctx.createLinearGradient(0,mp.y,0,mp.y+16);
+    grad.addColorStop(0,'#ffe082');grad.addColorStop(.5,'#ff8a00');grad.addColorStop(1,'#bf360c');
+    ctx.fillStyle=grad;ctx.fillRect(mp.x,mp.y,mp.w,16);
+    ctx.fillStyle='#fff'; // borde superior brillante
+    ctx.fillRect(mp.x,mp.y,mp.w,2);
+    // Indicadores de movimiento (flechas pequeñas)
+    ctx.fillStyle='rgba(255,255,255,.6)';
+    const arrow=mp.vx>0?'▶':'◀';
+    ctx.font='10px sans-serif';ctx.fillText(arrow,mp.x+mp.w/2-4,mp.y+12);
   }
   // Tubos (verde estilo Mario)
   for(const pipe of W.pipes){
@@ -3976,6 +4436,16 @@ function marioRender(){
   ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(10,10,200,12);
   ctx.fillStyle='#ffd700';ctx.fillRect(12,12,196*prog,8);
   ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.fillText('🚀',12+196*prog-6,20);
+  // Indicador de power-up estrella (doble salto) si activo
+  if(p.doubleJumpAvail&&p.doubleJumpExpireAt){
+    const remaining=Math.max(0,(p.doubleJumpExpireAt-performance.now())/15000);
+    if(remaining>0){
+      ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(MARIO_VW-110,10,100,18);
+      ctx.fillStyle='#ffd700';ctx.fillRect(MARIO_VW-108,12,96*remaining,14);
+      ctx.fillStyle='#000';ctx.font='bold 11px sans-serif';
+      ctx.fillText('🌟 Doble salto',MARIO_VW-104,24);
+    }
+  }
 }
 function marioDrawAstronaut(ctx,p){
   if(p.invincible>0&&Math.floor(p.invincible/4)%2)return;
@@ -4031,8 +4501,9 @@ function marioDrawAstronaut(ctx,p){
 const DINO_W=900,DINO_H=320,DINO_GROUND=260;
 let dinoPlayer,dinoSpeed,dinoScore,dinoBest=0,dinoLoop=null,dinoObstacles=[],dinoSpawnT=0,dinoDone=false,dinoClouds=[],dinoGroundOffset=0,dinoMountains=[],dinoStars=[],dinoPowerups=[],dinoPowerupSpawn=0;
 function dinoStart(){
+  setupHiDPI(document.getElementById('dino-canvas'),DINO_W,DINO_H);
   dinoBest=parseInt(localStorage.getItem('dino_best')||'0',10);
-  dinoPlayer={x:80,y:DINO_GROUND-66,vy:0,onGround:true,crouch:false,shield:0};
+  dinoPlayer={x:80,y:DINO_GROUND-66,vy:0,onGround:true,crouch:false,shield:0,shieldExpireAt:0,combo:0,comboTimer:0};
   dinoSpeed=5;dinoScore=0;dinoObstacles=[];dinoPowerups=[];dinoSpawnT=90;dinoPowerupSpawn=400;dinoDone=false;dinoGroundOffset=0;
   dinoClouds=[];
   for(let i=0;i<5;i++)dinoClouds.push({x:Math.random()*DINO_W,y:Math.random()*80+25,size:Math.random()*0.6+0.7});
@@ -4052,7 +4523,11 @@ function dinoJump(){
     sndCoin();
   }
 }
-function dinoCrouch(on){if(dinoPlayer&&!dinoDone)dinoPlayer.crouch=!!on}
+function dinoCrouch(on){
+  // Bloquea agacharse en el aire (impedía evitar pájaros sin pagar coste)
+  if(dinoPlayer&&!dinoDone&&dinoPlayer.onGround)dinoPlayer.crouch=!!on;
+  else if(dinoPlayer&&!on)dinoPlayer.crouch=false;
+}
 function dinoStep(){
   if(game.screen!=='dino'||dinoDone){dinoLoop=null;return}
   const p=dinoPlayer;
@@ -4080,12 +4555,15 @@ function dinoStep(){
     if(r<0.72||dinoSpeed<6){
       const sz=Math.random()<0.45?'sm':(Math.random()<0.55?'lg':'group');
       const h=sz==='lg'?60:(sz==='group'?42:42);
-      dinoObstacles.push({type:'cactus',sz,x:DINO_W,y:DINO_GROUND-h});
+      dinoObstacles.push({type:'cactus',sz,x:DINO_W,y:DINO_GROUND-h,passed:false});
     }else{
-      // Pterodáctilo (3 alturas)
-      const yChoices=[DINO_GROUND-46,DINO_GROUND-90,DINO_GROUND-130];
+      // Pterodáctilo: alturas REVISADAS para que el pájaro bajo sea esquivable agachándose
+      // Alto = saltable; medio = agachable; bajo solo si hay tiempo de reacción
+      const yChoices=dinoSpeed<10
+        ? [DINO_GROUND-90,DINO_GROUND-130]   // velocidad media: solo alturas saltables/agachables fáciles
+        : [DINO_GROUND-60,DINO_GROUND-90,DINO_GROUND-130]; // velocidad alta: incluye bajo
       const y=yChoices[Math.floor(Math.random()*yChoices.length)];
-      dinoObstacles.push({type:'bird',x:DINO_W,y,frame:0});
+      dinoObstacles.push({type:'bird',x:DINO_W,y,frame:0,passed:false});
     }
     dinoSpawnT=Math.max(36,Math.floor(95+Math.random()*70-dinoSpeed*3.5));
   }
@@ -4095,6 +4573,9 @@ function dinoStep(){
     o.x-=dinoSpeed;
     if(o.type==='bird'){o.frame=(o.frame+1)%30}
     if(o.x<-80){dinoObstacles.splice(i,1);continue}
+    // Combo: contar al pasar al obstáculo (sólo una vez)
+    if(!o.passed&&o.x+50<p.x){o.passed=true;p.combo++;p.comboTimer=120;
+      if(p.combo>0&&p.combo%5===0){confetti(8);toast('🔥 Combo x'+p.combo+'!',1500)}}
     const pw=p.crouch?56:38,ph=p.crouch?38:62;
     const px=p.x+6,py=p.y+4;
     let ow,oh,ox,oy;
@@ -4103,11 +4584,13 @@ function dinoStep(){
     else if(o.sz==='group'){ow=52;oh=38;ox=o.x;oy=o.y+4}
     else{ow=20;oh=38;ox=o.x+2;oy=o.y+4}
     if(px+pw>ox&&px<ox+ow&&py+ph>oy&&py<oy+oh){
-      // Si tiene escudo, lo consume y elimina obstáculo
-      if(p.shield>0){p.shield=0;dinoObstacles.splice(i,1);sndWin();confetti(15);continue}
+      // Si tiene escudo activo, lo consume y elimina obstáculo
+      if(p.shield>0){p.shield=0;p.shieldExpireAt=0;dinoObstacles.splice(i,1);sndWin();confetti(15);continue}
       dinoFail();return;
     }
   }
+  // Decaer timer del combo (si no esquivamos en X frames, reset)
+  if(p.comboTimer>0){p.comboTimer--;if(p.comboTimer===0)p.combo=0}
   // Spawn power-ups (escudo) cada cierto tiempo
   if(--dinoPowerupSpawn<=0){
     dinoPowerups.push({x:DINO_W,y:DINO_GROUND-100-Math.random()*40,frame:0});
@@ -4118,20 +4601,21 @@ function dinoStep(){
     const pu=dinoPowerups[i];
     pu.x-=dinoSpeed;pu.frame++;
     if(pu.x<-30){dinoPowerups.splice(i,1);continue}
-    // Colisión con jugador
     const dx=Math.abs((p.x+22)-(pu.x+12));
     const dy=Math.abs((p.y+30)-(pu.y+12));
     if(dx<25&&dy<25){
-      p.shield=600; // ~10 segundos a 60fps
+      // Tiempo real (10s) — no depende de FPS
+      p.shield=1;p.shieldExpireAt=performance.now()+10000;
       dinoPowerups.splice(i,1);
       sndWin();confetti(20);
     }
   }
-  // Decrementa escudo
-  if(p.shield>0)p.shield--;
-  // Score y velocidad
-  dinoScore++;
-  if(dinoScore%180===0&&dinoSpeed<16){dinoSpeed+=0.5}
+  // Caduca escudo por tiempo real
+  if(p.shield>0&&p.shieldExpireAt&&performance.now()>p.shieldExpireAt){p.shield=0;p.shieldExpireAt=0}
+  // Score y velocidad (multiplicador por combo)
+  const mult=1+Math.min(p.combo,10)*0.1;
+  dinoScore+=mult;
+  if(Math.floor(dinoScore)%180===0&&dinoSpeed<16){dinoSpeed+=0.5}
   document.getElementById('dinoScore').textContent=Math.floor(dinoScore/3);
   dinoRender();
   dinoLoop=requestAnimationFrame(dinoStep);
@@ -4269,13 +4753,21 @@ function dinoRender(){
     if(o.type==='cactus')drawCactus(ctx,o);
     else drawBird(ctx,o);
   }
-  // Indicador de escudo activo arriba a la izquierda
-  if(dinoPlayer&&dinoPlayer.shield>0){
-    const seconds=Math.ceil(dinoPlayer.shield/60);
-    ctx.fillStyle='rgba(0,212,255,.85)';
-    ctx.fillRect(15,15,80,28);
+  // Indicador de escudo activo con barra de tiempo decreciente
+  if(dinoPlayer&&dinoPlayer.shield>0&&dinoPlayer.shieldExpireAt){
+    const remaining=Math.max(0,(dinoPlayer.shieldExpireAt-performance.now())/10000);
+    const seconds=Math.ceil(remaining*10);
+    ctx.fillStyle='rgba(0,0,0,.45)';ctx.fillRect(15,15,110,32);
+    ctx.fillStyle='rgba(0,212,255,.95)';ctx.fillRect(17,17,106*remaining,28);
     ctx.fillStyle='#fff';ctx.font='bold 15px sans-serif';
-    ctx.fillText('🛡️ '+seconds+'s',22,34);
+    ctx.fillText('🛡️ '+seconds+'s',24,36);
+  }
+  // Indicador de combo (debajo del escudo)
+  if(dinoPlayer&&dinoPlayer.combo>=2){
+    const cy=dinoPlayer.shield>0?52:15;
+    ctx.fillStyle='rgba(255,107,0,.9)';ctx.fillRect(15,cy,90,28);
+    ctx.fillStyle='#fff';ctx.font='bold 15px sans-serif';
+    ctx.fillText('🔥 x'+dinoPlayer.combo,24,cy+19);
   }
   // Score
   ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(DINO_W-220,12,200,32);
@@ -4794,7 +5286,13 @@ function dictInit(){
 }
 
 // ========== ENCICLOPEDIA WIKIPEDIA ==========
-let wikiLang='es',wikiCurrent=null;
+let wikiLang='es',wikiCurrent=null,wikiAbortCtrl=null;
+const WIKI_CACHE={}; // {lang_query: {entry, ts}}
+const WIKI_CACHE_TTL=24*3600*1000; // 24h
+const WIKI_TIMEOUT=8000; // 8s antes de rendirse
+// Helper para escapar texto antes de meterlo en innerHTML
+function escapeHtml(s){if(s==null)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function escapeAttr(s){if(s==null)return '';return String(s).replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
 const WIKI_TTSLANGS={es:'es-ES',fr:'fr-FR',en:'en-US',ca:'ca-ES'};
 const WIKI_SUGG={
   es:['Andorra','Marte','Dinosaurios','Pirámides','Volcán','Mozart','Egipto','Espacio','Pokémon','Pirineos','Cervantes','Sol'],
@@ -4829,50 +5327,75 @@ async function wikiDoSearch(){
   const q=document.getElementById('wikiInput').value.trim();
   const result=document.getElementById('wikiResult');
   if(!q){result.innerHTML='<div class="dict-empty">Escribe un tema arriba.</div>';return}
-  result.innerHTML='<div class="wiki-loader">🔄 Buscando en Wikipedia '+wikiLang.toUpperCase()+'</div>';
+  // Cache hit
+  const cacheKey=wikiLang+'_'+q.toLowerCase();
+  const cached=WIKI_CACHE[cacheKey];
+  if(cached&&Date.now()-cached.ts<WIKI_CACHE_TTL){wikiRender(cached.entry);return}
+  // Cancela petición previa si la hubiera
+  if(wikiAbortCtrl)wikiAbortCtrl.abort();
+  wikiAbortCtrl=new AbortController();
+  result.innerHTML='<div class="wiki-loader">🔄 Buscando en Wikipedia '+wikiLang.toUpperCase()+'…</div>';
+  // Timeout de 8s
+  const timer=setTimeout(()=>{if(wikiAbortCtrl)wikiAbortCtrl.abort()},WIKI_TIMEOUT);
   try{
-    let entry=await wikiFetchSummary(q,wikiLang);
-    if(!entry){entry=await wikiSearchAndFetch(q,wikiLang)}
-    if(entry)wikiRender(entry);
+    let entry=await wikiFetchSummary(q,wikiLang,wikiAbortCtrl.signal);
+    if(!entry){entry=await wikiSearchAndFetch(q,wikiLang,wikiAbortCtrl.signal)}
+    clearTimeout(timer);
+    if(entry){WIKI_CACHE[cacheKey]={entry,ts:Date.now()};wikiRender(entry)}
     else wikiNotFound(q);
   }catch(e){
-    result.innerHTML='<div class="wiki-card"><div class="dict-empty">❌ Error de conexión.<br>La enciclopedia necesita internet para funcionar.</div></div>';
-  }
+    clearTimeout(timer);
+    if(e.name==='AbortError'){
+      result.innerHTML='<div class="wiki-card"><div class="dict-empty">⏱️ La búsqueda tardó demasiado. Prueba la <b>mini-enciclopedia offline</b> o reintenta.</div></div>';
+    }else{
+      result.innerHTML='<div class="wiki-card"><div class="dict-empty">❌ Error de conexión.<br>La enciclopedia necesita internet para funcionar.</div></div>';
+    }
+  }finally{wikiAbortCtrl=null}
 }
-async function wikiFetchSummary(query,lang){
+async function wikiFetchSummary(query,lang,signal){
   const url='https://'+lang+'.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(query);
-  const r=await fetch(url,{headers:{'Accept':'application/json'}});
+  const r=await fetch(url,{headers:{'Accept':'application/json'},signal});
   if(!r.ok)return null;
   const data=await r.json();
-  if(data.type==='disambiguation')return null; // ambigüedad: pasamos a opensearch
+  if(data.type==='disambiguation')return null;
   return data;
 }
-async function wikiSearchAndFetch(query,lang){
+async function wikiSearchAndFetch(query,lang,signal){
   const url='https://'+lang+'.wikipedia.org/w/api.php?action=opensearch&search='+encodeURIComponent(query)+'&limit=6&namespace=0&format=json&origin=*';
-  const r=await fetch(url);
+  const r=await fetch(url,{signal});
   if(!r.ok)return null;
   const data=await r.json();
   if(!data[1]||!data[1].length)return null;
-  const r2=await fetch('https://'+lang+'.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(data[1][0]));
-  if(!r2.ok)return null;
-  const result=await r2.json();
-  result.alternates=data[1].slice(1);
-  return result;
+  // Evita bucle: si el primer resultado es el mismo término que ya devolvió desambiguación, intenta el siguiente
+  const candidates=data[1].slice();
+  for(const cand of candidates){
+    const r2=await fetch('https://'+lang+'.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(cand),{signal});
+    if(!r2.ok)continue;
+    const result=await r2.json();
+    if(result.type==='disambiguation')continue; // sigue probando
+    result.alternates=candidates.filter(c=>c!==cand);
+    return result;
+  }
+  return null;
 }
 function wikiRender(entry){
   wikiCurrent=entry;
   const result=document.getElementById('wikiResult');
   const thumb=(entry.thumbnail&&entry.thumbnail.source)||(entry.originalimage&&entry.originalimage.source)||'';
   const url=(entry.content_urls&&entry.content_urls.desktop&&entry.content_urls.desktop.page)||'#';
-  const alt=entry.alternates&&entry.alternates.length?'<div style="margin-top:14px"><div class="dict-suggestion-title">¿Quizás te interesa también?</div><div class="dict-sugg-list">'+entry.alternates.map(a=>'<span class="dict-sugg" onclick="wikiPick(\''+a.replace(/'/g,'&apos;').replace(/"/g,'&quot;')+'\')">'+a+'</span>').join('')+'</div></div>':'';
+  const safeTitle=escapeHtml(entry.title);
+  const safeDesc=escapeHtml(entry.description||'');
+  const safeExtract=escapeHtml(entry.extract||'(Sin información disponible)');
+  const safeUrl=escapeAttr(url);
+  const alt=entry.alternates&&entry.alternates.length?'<div style="margin-top:14px"><div class="dict-suggestion-title">¿Quizás te interesa también?</div><div class="dict-sugg-list">'+entry.alternates.map(a=>'<span class="dict-sugg" onclick="wikiPick(\''+escapeAttr(a)+'\')">'+escapeHtml(a)+'</span>').join('')+'</div></div>':'';
   result.innerHTML='<div class="wiki-card">'+
-    (thumb?'<img class="wiki-thumb" src="'+thumb+'" alt="'+entry.title+'" onerror="this.style.display=\'none\'">':'')+
-    '<div class="wiki-title">'+entry.title+'</div>'+
-    (entry.description?'<div class="wiki-desc">'+entry.description+'</div>':'')+
-    '<div class="wiki-extract">'+(entry.extract||'(Sin información disponible)')+'</div>'+
+    (thumb?'<img class="wiki-thumb" src="'+escapeAttr(thumb)+'" alt="'+safeTitle+'" onerror="this.style.display=\'none\'">':'')+
+    '<div class="wiki-title">'+safeTitle+'</div>'+
+    (safeDesc?'<div class="wiki-desc">'+safeDesc+'</div>':'')+
+    '<div class="wiki-extract">'+safeExtract+'</div>'+
     '<div class="wiki-actions">'+
       '<button class="dict-tts" style="width:auto;padding:0 14px" onclick="wikiSpeak()" title="Escuchar">🔊 Escuchar</button>'+
-      '<button class="dict-online-btn" onclick="window.open(\''+url+'\',\'_blank\',\'noopener\')">🌐 Leer artículo completo</button>'+
+      '<button class="dict-online-btn" onclick="window.open(\''+safeUrl+'\',\'_blank\',\'noopener\')">🌐 Leer artículo completo</button>'+
     '</div>'+
     alt+
   '</div>';
@@ -5155,8 +5678,11 @@ function adminRender(){
       <select class="admin-select" id="dictAddCat">
         ${(typeof DICT_CATS!=='undefined'?DICT_CATS:[]).filter(c=>c.id!=='all').map(c=>`<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('')}
       </select>
-      <label>Ejemplo en español (los demás se autocompletan iguales)</label>
-      <input type="text" class="admin-input" id="dictAddExEs" placeholder="Ej: El perro es bonito.">
+      <label>Ejemplo (uno por idioma, opcionales)</label>
+      <input type="text" class="admin-input" id="dictAddExEs" placeholder="🇪🇸 Ejemplo en español">
+      <input type="text" class="admin-input" id="dictAddExFr" placeholder="🇫🇷 Exemple en français">
+      <input type="text" class="admin-input" id="dictAddExEn" placeholder="🇬🇧 English example">
+      <input type="text" class="admin-input" id="dictAddExCa" placeholder="🎗️ Exemple en català">
       <button class="btn btn-green" style="margin-top:14px;width:100%" onclick="adminAddDictWord()">➕ Añadir palabra</button>
     </div>
     <div class="admin-form">
@@ -5186,6 +5712,9 @@ function adminAddQuestion(){
   const o=[0,1,2,3].map(i=>document.getElementById('adminOpt'+i).value.trim());
   const a=parseInt(document.querySelector('input[name="correct"]:checked').value,10);
   if(!q||o.some(x=>!x)){toast('⚠️ Rellena la pregunta y las 4 opciones');return}
+  // Validar duplicados (case-insensitive)
+  const norm=o.map(x=>x.toLowerCase().trim());
+  if(new Set(norm).size<4){toast('⚠️ Las 4 opciones deben ser distintas');return}
   state.customQuestions=state.customQuestions||{};
   state.customQuestions[gid]=state.customQuestions[gid]||[[],[],[],[],[]];
   while(state.customQuestions[gid].length<=pi)state.customQuestions[gid].push([]);
@@ -5204,13 +5733,17 @@ function adminAddDictWord(){
   const en=document.getElementById('dictAddEn').value.trim();
   const ca=document.getElementById('dictAddCa').value.trim();
   const cat=document.getElementById('dictAddCat').value;
-  const exEs=document.getElementById('dictAddExEs').value.trim()||(es+' es bonito.');
+  const exEs=document.getElementById('dictAddExEs').value.trim();
+  const exFr=document.getElementById('dictAddExFr').value.trim();
+  const exEn=document.getElementById('dictAddExEn').value.trim();
+  const exCa=document.getElementById('dictAddExCa').value.trim();
   if(!es||!fr||!en||!ca){toast('⚠️ Rellena las 4 traducciones');return}
   state.customDict=state.customDict||[];
-  state.customDict.push({es,fr,en,ca,cat,ex:{es:exEs,fr:exEs,en:exEs,ca:exEs}});
+  // Cada idioma con su propio ejemplo (vacío si no se rellenó)
+  state.customDict.push({es,fr,en,ca,cat,ex:{es:exEs,fr:exFr,en:exEn,ca:exCa}});
   save();
   toast('✅ Palabra añadida al diccionario');
-  ['dictAddEs','dictAddFr','dictAddEn','dictAddCa','dictAddExEs'].forEach(id=>document.getElementById(id).value='');
+  ['dictAddEs','dictAddFr','dictAddEn','dictAddCa','dictAddExEs','dictAddExFr','dictAddExEn','dictAddExCa'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
   adminRender();
 }
 function adminClearCustom(){
@@ -5299,9 +5832,9 @@ function init(){
     }else if(game.screen==='tetris'){
       if(e.key==='ArrowLeft'){e.preventDefault();tetrisMove(-1)}
       else if(e.key==='ArrowRight'){e.preventDefault();tetrisMove(1)}
-      else if(e.key==='ArrowDown'){e.preventDefault();tetrisStep()}
-      else if(e.key==='ArrowUp'||e.key===' '){e.preventDefault();tetrisRotate()}
-      else if(e.key==='Enter'){e.preventDefault();tetrisDrop()}
+      else if(e.key==='ArrowDown'){e.preventDefault();tetrisSoftDrop()}
+      else if(e.key==='ArrowUp'){e.preventDefault();tetrisRotate()}
+      else if(e.key===' '||e.key==='Enter'){e.preventDefault();tetrisDrop()}
     }else if(game.screen==='mario'){
       if(e.key==='ArrowLeft'||e.key==='a'){e.preventDefault();marioPress('left',1)}
       else if(e.key==='ArrowRight'||e.key==='d'){e.preventDefault();marioPress('right',1)}
