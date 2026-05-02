@@ -243,6 +243,19 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .dict-sugg:hover,.dict-sugg:active{background:rgba(33,150,243,.5)}
 .dict-empty{text-align:center;padding:24px;color:rgba(255,255,255,.7);font-size:14px;line-height:1.6}
 .dict-online-btn{margin-top:10px;padding:10px 16px;background:linear-gradient(135deg,#9c27b0,#673ab7);border:none;border-radius:14px;color:#fff;font-weight:bold;cursor:pointer;font-family:inherit}
+/* ENCICLOPEDIA */
+.wiki-langs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px auto 6px;max-width:600px}
+.wiki-lang-btn{padding:8px 14px;background:rgba(255,255,255,.08);border:2px solid rgba(255,215,0,.3);border-radius:14px;color:#fff;font-size:13px;font-weight:bold;cursor:pointer;font-family:inherit}
+.wiki-lang-btn.active{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a0033;border-color:#ffd700}
+.wiki-card{background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.04));border:3px solid #ffd700;border-radius:22px;padding:20px;backdrop-filter:blur(10px);box-shadow:0 0 24px rgba(255,215,0,.3)}
+.wiki-thumb{display:block;margin:0 auto 14px;max-width:200px;max-height:200px;border-radius:14px;border:3px solid #ffd700;box-shadow:0 0 16px rgba(255,215,0,.4);object-fit:cover}
+.wiki-title{font-size:clamp(20px,4.5vw,28px);font-weight:bold;color:#ffd700;text-align:center;margin-bottom:8px;text-shadow:0 0 12px rgba(255,215,0,.5)}
+.wiki-desc{font-size:13px;opacity:.85;text-align:center;font-style:italic;margin-bottom:14px;color:#ff6b9d}
+.wiki-extract{font-size:14px;line-height:1.7;color:#fff;text-align:justify;padding:0 4px}
+.wiki-actions{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.wiki-loader{text-align:center;padding:30px;color:#ffd700;font-size:14px}
+.wiki-loader::after{content:'';display:inline-block;width:14px;height:14px;border:3px solid #ffd700;border-top-color:transparent;border-radius:50%;animation:spin 0.7s linear infinite;margin-left:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
 /* ============= RESPONSIVE ============= */
 /* Tablet (≤1024px) */
 @media (max-width:1024px){
@@ -399,6 +412,28 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
     <button class="btn" onclick="startGame()">▶ EMPEZAR</button>
     <button class="btn btn-purple" onclick="show('classic')">🎮 Juegos Clásicos</button>
     <button class="btn btn-blue" onclick="show('dict')">📖 Diccionario</button>
+    <button class="btn btn-green" onclick="show('wiki')">🌐 Enciclopedia</button>
+  </div>
+</div>
+
+<!-- ENCICLOPEDIA WIKIPEDIA -->
+<div class="screen" id="wiki">
+  <div class="center">
+    <h1><span class="emoji">🌐</span> Enciclopedia</h1>
+    <p style="text-align:center;font-size:13px;opacity:.85;max-width:600px">Escribe cualquier tema (animal, planeta, país, deporte, persona, comida…) y te explico qué es, su origen y datos curiosos. Usa Wikipedia y necesita internet.</p>
+    <div class="wiki-langs">
+      <button class="wiki-lang-btn active" data-lang="es" onclick="wikiSetLang('es')">🇪🇸 Español</button>
+      <button class="wiki-lang-btn" data-lang="fr" onclick="wikiSetLang('fr')">🇫🇷 Français</button>
+      <button class="wiki-lang-btn" data-lang="en" onclick="wikiSetLang('en')">🇬🇧 English</button>
+      <button class="wiki-lang-btn" data-lang="ca" onclick="wikiSetLang('ca')">🎗️ Català</button>
+    </div>
+    <div class="dict-search-row">
+      <input type="text" id="wikiInput" class="dict-input" placeholder="Escribe un tema (Marte, dinosaurio, Andorra...)..." autocomplete="off" autocapitalize="off">
+      <button class="btn btn-green" onclick="wikiDoSearch()">🔍 Buscar</button>
+    </div>
+    <div id="wikiResult" class="dict-result"></div>
+    <div id="wikiSuggestions" class="dict-suggestions"></div>
+    <button class="btn btn-purple" onclick="show('intro')">← Volver</button>
   </div>
 </div>
 
@@ -1552,6 +1587,7 @@ function show(id){
   if(id==='mario')marioStart();
   if(id==='dino')dinoStart();
   if(id==='dict')dictInit();
+  if(id==='wiki')wikiInit();
   // stop minigames if leaving
   if(id!=='snake'&&snakeLoop){clearInterval(snakeLoop);snakeLoop=null}
   if(id!=='memo'&&memTimer){clearTimeout(memTimer);memTimer=null}
@@ -3815,6 +3851,108 @@ function dictInit(){
     inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();dictSearch()}});
     inp.dataset.bound='1';
   }
+}
+
+// ========== ENCICLOPEDIA WIKIPEDIA ==========
+let wikiLang='es',wikiCurrent=null;
+const WIKI_TTSLANGS={es:'es-ES',fr:'fr-FR',en:'en-US',ca:'ca-ES'};
+const WIKI_SUGG={
+  es:['Andorra','Marte','Dinosaurios','Pirámides','Volcán','Mozart','Egipto','Espacio','Pokémon','Pirineos','Cervantes','Sol'],
+  fr:['Andorre','Mars','Dinosaures','Pyramides','Volcan','Mozart','Égypte','Espace','Pokémon','Pyrénées','Napoléon','Soleil'],
+  en:['Andorra','Mars','Dinosaurs','Pyramids','Volcano','Mozart','Egypt','Space','Pokemon','Pyrenees','Einstein','Sun'],
+  ca:['Andorra','Mart','Dinosaures','Piràmides','Volcà','Mozart','Egipte','Espai','Pokémon','Pirineus','Salvador Dalí','Sol']
+};
+function wikiInit(){
+  document.getElementById('wikiInput').value='';
+  document.getElementById('wikiResult').innerHTML='<div class="dict-empty">Escribe un tema arriba (animal, planeta, país, persona...) o toca una sugerencia.</div>';
+  wikiRenderSuggestions();
+  const inp=document.getElementById('wikiInput');
+  if(inp&&!inp.dataset.bound){
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();wikiDoSearch()}});
+    inp.dataset.bound='1';
+  }
+}
+function wikiRenderSuggestions(){
+  const list=WIKI_SUGG[wikiLang]||WIKI_SUGG.es;
+  document.getElementById('wikiSuggestions').innerHTML=`<div class="dict-suggestion-title">💡 Pruebas rápidas en ${wikiLang.toUpperCase()}</div><div class="dict-sugg-list">${list.map(w=>`<span class="dict-sugg" onclick="wikiPick('${w.replace(/'/g,'&apos;')}')">${w}</span>`).join('')}</div>`;
+}
+function wikiSetLang(l){
+  wikiLang=l;
+  document.querySelectorAll('.wiki-lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===l));
+  wikiRenderSuggestions();
+}
+function wikiPick(q){
+  document.getElementById('wikiInput').value=q;
+  wikiDoSearch();
+}
+async function wikiDoSearch(){
+  const q=document.getElementById('wikiInput').value.trim();
+  const result=document.getElementById('wikiResult');
+  if(!q){result.innerHTML='<div class="dict-empty">Escribe un tema arriba.</div>';return}
+  result.innerHTML='<div class="wiki-loader">🔄 Buscando en Wikipedia '+wikiLang.toUpperCase()+'</div>';
+  try{
+    let entry=await wikiFetchSummary(q,wikiLang);
+    if(!entry){entry=await wikiSearchAndFetch(q,wikiLang)}
+    if(entry)wikiRender(entry);
+    else wikiNotFound(q);
+  }catch(e){
+    result.innerHTML='<div class="wiki-card"><div class="dict-empty">❌ Error de conexión.<br>La enciclopedia necesita internet para funcionar.</div></div>';
+  }
+}
+async function wikiFetchSummary(query,lang){
+  const url='https://'+lang+'.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(query);
+  const r=await fetch(url,{headers:{'Accept':'application/json'}});
+  if(!r.ok)return null;
+  const data=await r.json();
+  if(data.type==='disambiguation')return null; // ambigüedad: pasamos a opensearch
+  return data;
+}
+async function wikiSearchAndFetch(query,lang){
+  const url='https://'+lang+'.wikipedia.org/w/api.php?action=opensearch&search='+encodeURIComponent(query)+'&limit=6&namespace=0&format=json&origin=*';
+  const r=await fetch(url);
+  if(!r.ok)return null;
+  const data=await r.json();
+  if(!data[1]||!data[1].length)return null;
+  const r2=await fetch('https://'+lang+'.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(data[1][0]));
+  if(!r2.ok)return null;
+  const result=await r2.json();
+  result.alternates=data[1].slice(1);
+  return result;
+}
+function wikiRender(entry){
+  wikiCurrent=entry;
+  const result=document.getElementById('wikiResult');
+  const thumb=(entry.thumbnail&&entry.thumbnail.source)||(entry.originalimage&&entry.originalimage.source)||'';
+  const url=(entry.content_urls&&entry.content_urls.desktop&&entry.content_urls.desktop.page)||'#';
+  const alt=entry.alternates&&entry.alternates.length?'<div style="margin-top:14px"><div class="dict-suggestion-title">¿Quizás te interesa también?</div><div class="dict-sugg-list">'+entry.alternates.map(a=>'<span class="dict-sugg" onclick="wikiPick(\''+a.replace(/'/g,'&apos;').replace(/"/g,'&quot;')+'\')">'+a+'</span>').join('')+'</div></div>':'';
+  result.innerHTML='<div class="wiki-card">'+
+    (thumb?'<img class="wiki-thumb" src="'+thumb+'" alt="'+entry.title+'" onerror="this.style.display=\'none\'">':'')+
+    '<div class="wiki-title">'+entry.title+'</div>'+
+    (entry.description?'<div class="wiki-desc">'+entry.description+'</div>':'')+
+    '<div class="wiki-extract">'+(entry.extract||'(Sin información disponible)')+'</div>'+
+    '<div class="wiki-actions">'+
+      '<button class="dict-tts" style="width:auto;padding:0 14px" onclick="wikiSpeak()" title="Escuchar">🔊 Escuchar</button>'+
+      '<button class="dict-online-btn" onclick="window.open(\''+url+'\',\'_blank\',\'noopener\')">🌐 Leer artículo completo</button>'+
+    '</div>'+
+    alt+
+  '</div>';
+}
+function wikiSpeak(){
+  if(!wikiCurrent||!('speechSynthesis' in window))return;
+  const text=(wikiCurrent.title?wikiCurrent.title+'. ':'')+(wikiCurrent.extract||'');
+  try{
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang=WIKI_TTSLANGS[wikiLang]||'es-ES';
+    u.rate=0.95;u.pitch=1;u.volume=1;
+    const voices=window.speechSynthesis.getVoices();
+    const m=voices.find(v=>v.lang===u.lang)||voices.find(v=>v.lang.startsWith(u.lang.split('-')[0]));
+    if(m)u.voice=m;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+function wikiNotFound(q){
+  document.getElementById('wikiResult').innerHTML='<div class="wiki-card"><div class="dict-empty">No encontré "<b>'+q+'</b>" en Wikipedia '+wikiLang.toUpperCase()+'.<br>Intenta con otro término o cambia de idioma.</div></div>';
 }
 
 // ========== INIT ==========
