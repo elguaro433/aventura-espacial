@@ -149,6 +149,14 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .certificate h1{background:linear-gradient(90deg,#9c27b0,#f44336);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:32px;margin-bottom:12px}
 .certificate p{font-size:16px;line-height:1.6;color:#1a0033;margin:8px 0}
 .certificate .name{font-size:28px;font-weight:bold;color:#9c27b0;margin:14px 0}
+.xp-bar-wrap{margin:0 0 14px;text-align:center}
+.xp-bar{width:100%;max-width:600px;height:14px;background:rgba(255,255,255,.08);border:2px solid rgba(255,215,0,.4);border-radius:10px;margin:0 auto;overflow:hidden;position:relative}
+.xp-fill{height:100%;background:linear-gradient(90deg,#00d4ff,#9c27b0,#ffd700);transition:width .6s ease;border-radius:8px;box-shadow:0 0 12px rgba(255,215,0,.6)}
+.xp-text{font-size:11px;opacity:.8;margin-top:4px}
+.galaxy-card .stars-row{font-size:10px;letter-spacing:1px;margin-top:2px;color:#ffd700;text-shadow:0 0 6px rgba(255,215,0,.7)}
+.planet-dot.s1{background:#cd7f32;border-color:#fff}
+.planet-dot.s2{background:#c0c0c0;border-color:#fff}
+.planet-dot.s3{background:linear-gradient(135deg,#ffd700,#ff8c00);border-color:#fff;box-shadow:0 0 10px #ffd700}
 @media (max-width:480px){.galaxy-grid{grid-template-columns:repeat(2,1fr)}.player-card{width:45vw}.btn{padding:12px 18px;font-size:14px}.hud{font-size:12px}.tabs{font-size:11px}.tab{padding:8px 12px}}
 </style>
 </head>
@@ -203,9 +211,14 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
       <span class="avatar-mini" id="hudAvatar"></span>
       <span id="hudName">-</span>
     </div>
+    <div class="hud-stat" id="hudLevel" title="Tu nivel">🚀 L1</div>
     <div class="hud-stat">⭐ <span id="hudStars">0</span></div>
     <div class="hud-stat">💰 <span id="hudCoins">0</span></div>
     <div class="hud-stat">🏆 <span id="hudPlanets">0</span>/30</div>
+  </div>
+  <div class="xp-bar-wrap" title="Progreso al siguiente nivel">
+    <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+    <div class="xp-text" id="xpText">0 / 50 XP</div>
   </div>
   <div class="tabs">
     <div class="tab active" onclick="switchTab('mapTab',event)">🗺️ Mapa</div>
@@ -254,7 +267,10 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   </div>
   <div class="center" style="flex:1">
     <div class="question-box" id="qText"></div>
-    <button class="btn btn-purple btn-small" onclick="useHint()" id="hintBtn">💡 Pista (5💰)</button>
+    <div class="row">
+      <button class="btn btn-blue btn-small" onclick="speakCurrentQuestion()" id="speakBtn" title="Leer en voz alta">🔊 Escuchar</button>
+      <button class="btn btn-purple btn-small" onclick="useHint()" id="hintBtn">💡 Pista (5💰)</button>
+    </div>
     <div class="answers" id="answers"></div>
   </div>
 </div>
@@ -285,6 +301,7 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   </div>
   <div class="center" style="flex:1">
     <div class="question-box" id="bossQText"></div>
+    <button class="btn btn-blue btn-small" onclick="speakCurrentBossQuestion()" title="Leer en voz alta">🔊 Escuchar</button>
     <div class="answers" id="bossAnswers"></div>
   </div>
 </div>
@@ -383,28 +400,72 @@ function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catc
 function load(){try{const d=localStorage.getItem(STORAGE_KEY);if(d)return JSON.parse(d)}catch(e){}return null}
 
 // ========== STATE ==========
-const initialPlayer={stars:0,coins:0,planetsBeaten:[],bossesBeaten:[],items:[],achievements:[],totalCorrect:0,totalAnswered:0,bestStreak:0,currentStreak:0,welcomed:false};
-let state=load()||{currentPlayer:null,emmanuel:JSON.parse(JSON.stringify(initialPlayer)),emiliano:JSON.parse(JSON.stringify(initialPlayer)),snakeBest:0,soundOn:true};
-let game={screen:'intro',galaxy:0,planet:0,qIdx:0,lives:3,correct:0,wrong:[],bossHp:100,playerHp:100,bossQs:[],bossQIdx:0,history:['intro']};
+const initialPlayer={stars:0,coins:0,xp:0,planetsBeaten:[],planetStars:{},bossesBeaten:[],items:[],achievements:[],totalCorrect:0,totalAnswered:0,bestStreak:0,currentStreak:0,welcomed:false,dailyDate:'',dailyCorrect:0,dailyStreak:0};
+let state=load()||{currentPlayer:null,emmanuel:JSON.parse(JSON.stringify(initialPlayer)),emiliano:JSON.parse(JSON.stringify(initialPlayer)),snakeBest:0,soundOn:true,ttsAuto:true};
+// Migración: completa campos nuevos en partidas guardadas antes de la v3
+['emmanuel','emiliano'].forEach(k=>{
+  if(!state[k])state[k]=JSON.parse(JSON.stringify(initialPlayer));
+  const p=state[k];
+  if(p.xp===undefined)p.xp=0;
+  if(!p.planetStars)p.planetStars={};
+  if(!p.dailyDate)p.dailyDate='';
+  if(p.dailyCorrect===undefined)p.dailyCorrect=0;
+  if(p.dailyStreak===undefined)p.dailyStreak=0;
+  // Si tenía planetas conquistados sin estrellas, dales 1⭐ por defecto
+  (p.planetsBeaten||[]).forEach(k2=>{if(!p.planetStars[k2])p.planetStars[k2]=1});
+});
+if(state.ttsAuto===undefined)state.ttsAuto=true;
+let game={screen:'intro',galaxy:0,planet:0,qIdx:0,lives:3,correct:0,wrong:[],bossHp:100,playerHp:100,bossQs:[],bossQIdx:0,history:['intro'],qPool:[]};
+
+// ========== LEVELS / RANGOS ==========
+// Sistema de progresión a largo plazo. XP se gana respondiendo bien y completando planetas/jefes.
+const LEVELS=[
+  {n:1,name:'Cadete',emoji:'🚀',xp:0},
+  {n:2,name:'Recluta',emoji:'🛸',xp:50},
+  {n:3,name:'Piloto',emoji:'👨‍🚀',xp:150},
+  {n:4,name:'Navegante',emoji:'🧭',xp:350},
+  {n:5,name:'Oficial',emoji:'🎖️',xp:700},
+  {n:6,name:'Capitán',emoji:'⭐',xp:1200},
+  {n:7,name:'Almirante',emoji:'🌟',xp:2000},
+  {n:8,name:'Comandante',emoji:'💫',xp:3500},
+  {n:9,name:'Maestro Astronauta',emoji:'👑',xp:6000},
+  {n:10,name:'Leyenda Galáctica',emoji:'🏆',xp:10000},
+  {n:11,name:'Estrella Suprema',emoji:'✨',xp:15000},
+  {n:12,name:'Cósmico Eterno',emoji:'🌌',xp:25000}
+];
+function getLevel(xp){let cur=LEVELS[0];for(const l of LEVELS){if(xp>=l.xp)cur=l;else break}return cur}
+function getNextLevel(xp){for(const l of LEVELS){if(xp<l.xp)return l}return null}
+function addXP(amount){
+  const p=getPlayer();if(!p)return;
+  const before=getLevel(p.xp);
+  p.xp+=amount;
+  const after=getLevel(p.xp);
+  save();
+  if(after.n>before.n){
+    sndWin();
+    toast(`🎉 ¡Subiste a ${after.emoji} ${after.name} (Nivel ${after.n})!`,3500);
+    confetti(40);
+  }
+}
 
 // ========== GALAXIES & QUESTIONS ==========
 const GALAXIES=[
-{id:'math',name:'Galaxia Matemática',emoji:'🔢',color:'#2196f3',
+{id:'math',name:'Galaxia Matemática',emoji:'🔢',color:'#2196f3',lang:'es-ES',
   planets:['Sumas','Restas','Multiplicación','División','Problemas'],
   boss:{name:'Robot Calculador',emoji:'🤖'}},
-{id:'logic',name:'Galaxia Lógica',emoji:'🧩',color:'#9c27b0',
+{id:'logic',name:'Galaxia Lógica',emoji:'🧩',color:'#9c27b0',lang:'es-ES',
   planets:['Secuencias','Patrones','Acertijos','Memoria','Adivinanzas'],
   boss:{name:'Esfinge Cósmica',emoji:'🦁'}},
-{id:'fr',name:'Galaxia Francesa',emoji:'🇫🇷',color:'#3f51b5',
+{id:'fr',name:'Galaxia Francesa',emoji:'🇫🇷',color:'#3f51b5',lang:'es-ES',
   planets:['Couleurs','Animaux','Nombres','Famille','Phrases'],
   boss:{name:'Le Grand Méchant',emoji:'👹'}},
-{id:'es',name:'Galaxia Española',emoji:'🇪🇸',color:'#ff5722',
+{id:'es',name:'Galaxia Española',emoji:'🇪🇸',color:'#ff5722',lang:'es-ES',
   planets:['Ortografía','Sinónimos','Antónimos','Frases','Adivinanzas'],
   boss:{name:'Dragón de Letras',emoji:'🐲'}},
-{id:'en',name:'Galaxia Inglesa',emoji:'🇬🇧',color:'#f44336',
+{id:'en',name:'Galaxia Inglesa',emoji:'🇬🇧',color:'#f44336',lang:'es-ES',
   planets:['Colors','Animals','Numbers','Verbs','Phrases'],
   boss:{name:'The Word Wizard',emoji:'🧙'}},
-{id:'ca',name:'Galaxia Catalana',emoji:'🎗️',color:'#ffc107',
+{id:'ca',name:'Galaxia Catalana',emoji:'🎗️',color:'#ffc107',lang:'ca-ES',
   planets:['Colors','Animals','Números','Família','Andorra'],
   boss:{name:'El Drac dels Pirineus',emoji:'🐉'}}
 ];
@@ -413,61 +474,172 @@ const GALAXIES=[
 // Format: [question, [4 options], correctIndex, lang?]
 const QUESTIONS={
 math:[
-[ // Sumas
-{q:'5 + 3 = ?',o:['7','8','9','6'],a:1,easy:true},
-{q:'12 + 7 = ?',o:['18','19','20','17'],a:1,easy:true},
-{q:'25 + 14 = ?',o:['38','39','40','37'],a:1},
-{q:'48 + 27 = ?',o:['74','75','76','73'],a:1},
-{q:'9 + 6 = ?',o:['14','15','16','13'],a:1,easy:true},
-{q:'100 + 250 = ?',o:['350','340','360','355'],a:0},
-{q:'7 + 8 = ?',o:['14','15','16','13'],a:1,easy:true},
-{q:'33 + 19 = ?',o:['51','52','53','50'],a:1},
-{q:'80 + 45 = ?',o:['115','125','120','135'],a:1},
-{q:'56 + 28 = ?',o:['82','84','86','80'],a:1}
-],[ // Restas
-{q:'10 - 4 = ?',o:['5','6','7','4'],a:1,easy:true},
-{q:'20 - 8 = ?',o:['11','12','13','10'],a:1,easy:true},
-{q:'45 - 17 = ?',o:['27','28','29','26'],a:1},
-{q:'100 - 35 = ?',o:['65','75','55','60'],a:0},
-{q:'15 - 9 = ?',o:['5','6','7','4'],a:1,easy:true},
-{q:'80 - 27 = ?',o:['52','53','54','51'],a:1},
-{q:'13 - 5 = ?',o:['7','8','9','6'],a:1,easy:true},
-{q:'90 - 41 = ?',o:['48','49','50','47'],a:1},
-{q:'200 - 75 = ?',o:['125','135','115','145'],a:0},
-{q:'66 - 29 = ?',o:['36','37','38','35'],a:1}
-],[ // Multiplicación
-{q:'3 × 4 = ?',o:['11','12','13','10'],a:1,easy:true},
-{q:'5 × 6 = ?',o:['28','30','32','25'],a:1,easy:true},
-{q:'7 × 8 = ?',o:['54','56','58','55'],a:1},
-{q:'9 × 9 = ?',o:['80','81','82','79'],a:1},
-{q:'2 × 7 = ?',o:['12','14','16','13'],a:1,easy:true},
-{q:'12 × 5 = ?',o:['58','60','62','55'],a:1},
-{q:'4 × 4 = ?',o:['14','16','18','12'],a:1,easy:true},
-{q:'8 × 6 = ?',o:['46','48','50','44'],a:1},
-{q:'11 × 7 = ?',o:['76','77','78','75'],a:1},
-{q:'15 × 4 = ?',o:['58','60','62','56'],a:1}
-],[ // División
-{q:'12 ÷ 3 = ?',o:['3','4','5','2'],a:1,easy:true},
-{q:'20 ÷ 4 = ?',o:['4','5','6','3'],a:1,easy:true},
-{q:'56 ÷ 7 = ?',o:['7','8','9','6'],a:1},
-{q:'81 ÷ 9 = ?',o:['8','9','10','7'],a:1},
-{q:'10 ÷ 2 = ?',o:['4','5','6','3'],a:1,easy:true},
-{q:'48 ÷ 6 = ?',o:['7','8','9','6'],a:1},
-{q:'100 ÷ 10 = ?',o:['9','10','11','8'],a:1,easy:true},
-{q:'72 ÷ 8 = ?',o:['8','9','10','7'],a:1},
-{q:'63 ÷ 7 = ?',o:['8','9','10','7'],a:1},
-{q:'144 ÷ 12 = ?',o:['11','12','13','10'],a:1}
-],[ // Problemas
-{q:'Tienes 3 manzanas y compras 5 más. ¿Cuántas tienes?',o:['7','8','9','6'],a:1,easy:true},
-{q:'Si un libro cuesta 5€, ¿cuánto cuestan 4 libros?',o:['18€','20€','24€','15€'],a:1},
-{q:'Hay 24 caramelos para 6 niños. ¿Cuántos toca a cada uno?',o:['3','4','5','6'],a:1},
-{q:'Un tren sale a las 8:00 y llega a las 10:30. ¿Cuánto duró?',o:['1h 30m','2h 30m','3h','2h'],a:1},
-{q:'¿Cuál es la mitad de 50?',o:['20','25','30','15'],a:1,easy:true},
-{q:'5 niños tienen 2 chocolates cada uno. ¿Total?',o:['8','10','12','7'],a:1,easy:true},
-{q:'¿Cuántos minutos hay en 2 horas?',o:['100','120','60','180'],a:1},
-{q:'Si gastas 12€ y tenías 50€, ¿cuánto te queda?',o:['38','40','42','35'],a:0},
-{q:'Una pizza tiene 8 trozos. Si comes 3, ¿cuántos quedan?',o:['4','5','6','3'],a:1,easy:true},
-{q:'¿Cuántas patas tienen 6 perros?',o:['18','24','20','22'],a:1}
+[ // SUMAS - banco de 30
+// CE1 (Emiliano): básico, sumar 9/19/29 (área dominada), dobles, decenas
+{q:'5 + 3 = ?',o:['7','8','9','6'],a:1,level:'ce1'},
+{q:'7 + 4 = ?',o:['10','11','12','13'],a:1,level:'ce1'},
+{q:'6 + 6 = ?',o:['12','11','13','10'],a:0,level:'ce1'},
+{q:'8 + 5 = ?',o:['11','12','13','14'],a:2,level:'ce1'},
+{q:'9 + 9 = ?',o:['16','18','19','17'],a:1,level:'ce1'},
+{q:'9 + 6 = ?',o:['14','15','16','13'],a:1,level:'ce1'},
+{q:'7 + 8 = ?',o:['14','15','16','13'],a:1,level:'ce1'},
+{q:'10 + 8 = ?',o:['16','18','20','19'],a:1,level:'ce1'},
+{q:'12 + 7 = ?',o:['18','19','20','17'],a:1,level:'ce1'},
+{q:'15 + 9 = ?',o:['23','24','25','22'],a:1,level:'ce1'},
+{q:'25 + 9 = ?',o:['33','34','35','32'],a:1,level:'ce1'},
+{q:'40 + 19 = ?',o:['58','59','60','57'],a:1,level:'ce1'},
+{q:'30 + 29 = ?',o:['58','59','60','57'],a:1,level:'ce1'},
+{q:'14 + 14 = ?',o:['27','28','29','26'],a:1,level:'ce1'},
+{q:'17 + 13 = ?',o:['28','29','30','31'],a:2,level:'ce1'},
+{q:'25 + 5 = ?',o:['25','30','35','20'],a:1,level:'ce1'},
+{q:'33 + 9 = ?',o:['41','42','43','40'],a:1,level:'ce1'},
+{q:'50 + 29 = ?',o:['78','79','80','77'],a:1,level:'ce1'},
+// CM1 (Emmanuel): 2-3 dígitos, retención, varios sumandos
+{q:'25 + 14 = ?',o:['38','39','40','37'],a:1,level:'cm1'},
+{q:'48 + 27 = ?',o:['74','75','76','73'],a:1,level:'cm1'},
+{q:'56 + 28 = ?',o:['82','84','86','80'],a:1,level:'cm1'},
+{q:'80 + 45 = ?',o:['115','125','120','135'],a:1,level:'cm1'},
+{q:'33 + 19 = ?',o:['51','52','53','50'],a:1,level:'cm1'},
+{q:'156 + 84 = ?',o:['230','240','250','220'],a:1,level:'cm1'},
+{q:'234 + 56 = ?',o:['280','290','300','310'],a:1,level:'cm1'},
+{q:'567 + 433 = ?',o:['900','990','1000','1100'],a:2,level:'cm1'},
+{q:'1234 + 567 = ?',o:['1701','1801','1901','1701'],a:1,level:'cm1'},
+{q:'250 + 175 + 75 = ?',o:['450','475','500','525'],a:2,level:'cm1'},
+{q:'47 + 23 + 30 = ?',o:['90','100','110','85'],a:1,level:'cm1'},
+{q:'99 + 99 = ?',o:['188','198','199','200'],a:1,level:'cm1'}
+],[ // RESTAS - banco de 30
+// CE1 (Emiliano - área NA: restas en columna): básicas, restar 9, en columna sin retención, con retención
+{q:'10 - 4 = ?',o:['5','6','7','4'],a:1,level:'ce1'},
+{q:'13 - 5 = ?',o:['7','8','9','6'],a:1,level:'ce1'},
+{q:'15 - 9 = ?',o:['5','6','7','4'],a:1,level:'ce1'},
+{q:'20 - 9 = ?',o:['10','11','12','13'],a:1,level:'ce1'},
+{q:'18 - 9 = ?',o:['8','9','10','11'],a:1,level:'ce1'},
+{q:'25 - 9 = ?',o:['15','16','17','14'],a:1,level:'ce1'},
+{q:'30 - 9 = ?',o:['20','21','22','19'],a:1,level:'ce1'},
+{q:'12 - 7 = ?',o:['4','5','6','3'],a:1,level:'ce1'},
+{q:'17 - 8 = ?',o:['8','9','10','7'],a:1,level:'ce1'},
+{q:'20 - 8 = ?',o:['11','12','13','10'],a:1,level:'ce1'},
+{q:'34 - 12 = ?',o:['21','22','23','20'],a:1,level:'ce1'},
+{q:'45 - 23 = ?',o:['21','22','23','20'],a:1,level:'ce1'},
+{q:'67 - 35 = ?',o:['31','32','33','30'],a:1,level:'ce1'},
+{q:'56 - 28 = ?',o:['27','28','29','26'],a:1,level:'ce1'},
+{q:'40 - 14 = ?',o:['25','26','27','24'],a:1,level:'ce1'},
+{q:'50 - 27 = ?',o:['22','23','24','21'],a:1,level:'ce1'},
+{q:'70 - 39 = ?',o:['30','31','32','29'],a:1,level:'ce1'},
+{q:'82 - 47 = ?',o:['34','35','36','33'],a:1,level:'ce1'},
+// CM1: 3+ dígitos, con préstamo
+{q:'45 - 17 = ?',o:['27','28','29','26'],a:1,level:'cm1'},
+{q:'100 - 35 = ?',o:['55','60','65','75'],a:2,level:'cm1'},
+{q:'80 - 27 = ?',o:['52','53','54','51'],a:1,level:'cm1'},
+{q:'90 - 41 = ?',o:['48','49','50','47'],a:1,level:'cm1'},
+{q:'200 - 75 = ?',o:['115','125','135','145'],a:1,level:'cm1'},
+{q:'66 - 29 = ?',o:['36','37','38','35'],a:1,level:'cm1'},
+{q:'500 - 250 = ?',o:['200','250','300','150'],a:1,level:'cm1'},
+{q:'1000 - 1 = ?',o:['998','999','1000','1001'],a:1,level:'cm1'},
+{q:'1000 - 350 = ?',o:['550','650','750','850'],a:1,level:'cm1'},
+{q:'784 - 256 = ?',o:['518','528','538','548'],a:1,level:'cm1'},
+{q:'1500 - 750 = ?',o:['650','750','850','950'],a:1,level:'cm1'},
+{q:'2000 - 999 = ?',o:['1000','1001','1011','1101'],a:1,level:'cm1'}
+],[ // MULTIPLICACIÓN - banco de 30 (refuerzo tabla del 4 NA Emiliano, tablas 6-9 PA Emmanuel)
+// CE1: tablas 2, 4 (área NA), 5, 10
+{q:'2 × 3 = ?',o:['5','6','7','4'],a:1,level:'ce1'},
+{q:'2 × 5 = ?',o:['8','10','12','9'],a:1,level:'ce1'},
+{q:'2 × 7 = ?',o:['12','14','16','13'],a:1,level:'ce1'},
+{q:'2 × 9 = ?',o:['16','18','20','19'],a:1,level:'ce1'},
+{q:'4 × 1 = ?',o:['3','4','5','6'],a:1,level:'ce1'},
+{q:'4 × 2 = ?',o:['6','7','8','10'],a:2,level:'ce1'},
+{q:'4 × 3 = ?',o:['10','11','12','13'],a:2,level:'ce1'},
+{q:'4 × 4 = ?',o:['14','15','16','12'],a:2,level:'ce1'},
+{q:'4 × 5 = ?',o:['18','20','24','16'],a:1,level:'ce1'},
+{q:'4 × 6 = ?',o:['22','24','26','20'],a:1,level:'ce1'},
+{q:'4 × 7 = ?',o:['26','28','32','24'],a:1,level:'ce1'},
+{q:'4 × 8 = ?',o:['28','32','36','30'],a:1,level:'ce1'},
+{q:'4 × 9 = ?',o:['32','36','40','38'],a:1,level:'ce1'},
+{q:'4 × 10 = ?',o:['30','40','44','50'],a:1,level:'ce1'},
+{q:'5 × 5 = ?',o:['20','25','30','15'],a:1,level:'ce1'},
+{q:'5 × 8 = ?',o:['35','40','45','30'],a:1,level:'ce1'},
+{q:'10 × 6 = ?',o:['50','60','70','40'],a:1,level:'ce1'},
+{q:'10 × 9 = ?',o:['80','90','100','70'],a:1,level:'ce1'},
+// CM1: tablas 6, 7, 8, 9 (área PA), multiplicación 2 dígitos
+{q:'6 × 7 = ?',o:['40','42','44','46'],a:1,level:'cm1'},
+{q:'6 × 8 = ?',o:['42','46','48','54'],a:2,level:'cm1'},
+{q:'7 × 7 = ?',o:['47','48','49','56'],a:2,level:'cm1'},
+{q:'7 × 8 = ?',o:['54','56','58','55'],a:1,level:'cm1'},
+{q:'7 × 9 = ?',o:['61','63','64','72'],a:1,level:'cm1'},
+{q:'8 × 6 = ?',o:['46','48','50','44'],a:1,level:'cm1'},
+{q:'8 × 8 = ?',o:['56','64','72','60'],a:1,level:'cm1'},
+{q:'8 × 9 = ?',o:['62','72','81','64'],a:1,level:'cm1'},
+{q:'9 × 9 = ?',o:['72','81','82','79'],a:1,level:'cm1'},
+{q:'12 × 5 = ?',o:['58','60','62','55'],a:1,level:'cm1'},
+{q:'15 × 4 = ?',o:['58','60','62','56'],a:1,level:'cm1'},
+{q:'25 × 4 = ?',o:['90','100','110','120'],a:1,level:'cm1'}
+],[ // DIVISIÓN - banco de 30
+// CE1: divisiones simples (mitad, doble, tablas conocidas)
+{q:'10 ÷ 2 = ?',o:['4','5','6','3'],a:1,level:'ce1'},
+{q:'12 ÷ 2 = ?',o:['5','6','7','4'],a:1,level:'ce1'},
+{q:'20 ÷ 2 = ?',o:['9','10','11','12'],a:1,level:'ce1'},
+{q:'8 ÷ 4 = ?',o:['2','3','4','1'],a:0,level:'ce1'},
+{q:'16 ÷ 4 = ?',o:['3','4','5','6'],a:1,level:'ce1'},
+{q:'20 ÷ 4 = ?',o:['4','5','6','3'],a:1,level:'ce1'},
+{q:'10 ÷ 5 = ?',o:['1','2','3','4'],a:1,level:'ce1'},
+{q:'25 ÷ 5 = ?',o:['4','5','6','7'],a:1,level:'ce1'},
+{q:'50 ÷ 5 = ?',o:['8','10','12','9'],a:1,level:'ce1'},
+{q:'30 ÷ 10 = ?',o:['2','3','4','5'],a:1,level:'ce1'},
+{q:'100 ÷ 10 = ?',o:['9','10','11','8'],a:1,level:'ce1'},
+// CM1: división con tablas mayores, partición (área PA)
+{q:'12 ÷ 3 = ?',o:['3','4','5','2'],a:1,level:'cm1'},
+{q:'18 ÷ 3 = ?',o:['5','6','7','4'],a:1,level:'cm1'},
+{q:'24 ÷ 6 = ?',o:['3','4','5','6'],a:1,level:'cm1'},
+{q:'48 ÷ 6 = ?',o:['7','8','9','6'],a:1,level:'cm1'},
+{q:'56 ÷ 7 = ?',o:['7','8','9','6'],a:1,level:'cm1'},
+{q:'63 ÷ 7 = ?',o:['8','9','10','7'],a:1,level:'cm1'},
+{q:'72 ÷ 8 = ?',o:['8','9','10','7'],a:1,level:'cm1'},
+{q:'64 ÷ 8 = ?',o:['7','8','9','6'],a:1,level:'cm1'},
+{q:'81 ÷ 9 = ?',o:['8','9','10','7'],a:1,level:'cm1'},
+{q:'54 ÷ 9 = ?',o:['5','6','7','4'],a:1,level:'cm1'},
+{q:'144 ÷ 12 = ?',o:['11','12','13','10'],a:1,level:'cm1'},
+{q:'Repartir 24 caramelos entre 4 niños:',o:['5','6','7','8'],a:1,level:'cm1'},
+{q:'Repartir 35 cromos en 5 sobres:',o:['6','7','8','9'],a:1,level:'cm1'},
+{q:'45 minutos ÷ 9 partes:',o:['4 min','5 min','6 min','9 min'],a:1,level:'cm1'},
+{q:'¿Cuántas veces cabe el 8 en 64?',o:['7','8','9','6'],a:1,level:'cm1'},
+{q:'Si 6 amigos comparten 42€:',o:['6€','7€','8€','9€'],a:1,level:'cm1'},
+{q:'90 ÷ 6 = ?',o:['14','15','16','12'],a:1,level:'cm1'},
+{q:'120 ÷ 4 = ?',o:['25','30','35','40'],a:1,level:'cm1'},
+{q:'200 ÷ 8 = ?',o:['20','25','30','35'],a:1,level:'cm1'},
+{q:'¿Mitad de 86?',o:['41','43','45','46'],a:1,level:'cm1'}
+],[ // PROBLEMAS - banco de 30 (Emmanuel: comparación NA, longitudes NA · Emiliano: euros NA)
+// CE1: problemas simples, euros y céntimos (área NA Emiliano)
+{q:'Tienes 3 manzanas y compras 5 más. ¿Cuántas tienes?',o:['7','8','9','6'],a:1,level:'ce1'},
+{q:'¿Cuál es la mitad de 50?',o:['20','25','30','15'],a:1,level:'ce1'},
+{q:'5 niños tienen 2 chocolates cada uno. ¿Total?',o:['8','10','12','7'],a:1,level:'ce1'},
+{q:'Una pizza tiene 8 trozos. Si comes 3, ¿cuántos quedan?',o:['4','5','6','3'],a:1,level:'ce1'},
+{q:'¿Cuántos céntimos tiene 1 euro?',o:['10','50','100','1000'],a:2,level:'ce1'},
+{q:'2 monedas de 50 céntimos = ?',o:['50 cts','1 €','1,50 €','2 €'],a:1,level:'ce1'},
+{q:'Tienes una moneda de 2€ y otra de 50 céntimos. ¿Cuánto?',o:['2 €','2,20 €','2,50 €','3 €'],a:2,level:'ce1'},
+{q:'Un caramelo cuesta 20 céntimos. ¿5 caramelos?',o:['50 cts','80 cts','1 €','2 €'],a:2,level:'ce1'},
+{q:'Pagas con 5€ algo de 3€. ¿Vuelta?',o:['1 €','2 €','3 €','4 €'],a:1,level:'ce1'},
+{q:'Pagas con 10€ algo de 7,50€. ¿Vuelta?',o:['1,50 €','2 €','2,50 €','3 €'],a:2,level:'ce1'},
+{q:'¿Cuántos lados tiene un cuadrado?',o:['3','4','5','6'],a:1,level:'ce1'},
+{q:'¿Cuántas patas tienen 3 perros?',o:['9','10','12','15'],a:2,level:'ce1'},
+{q:'Tienes 7 cromos y te dan 5. ¿Cuántos?',o:['11','12','13','10'],a:1,level:'ce1'},
+{q:'Hay 10 dedos en 1 mano. ¿Cuántos en 2 manos?',o:['10','15','20','12'],a:0,level:'ce1'}, // truco: una mano son 5
+// CM1: problemas comparación (NA), longitudes (NA), proporcionalidad
+{q:'Si un libro cuesta 5€, ¿cuánto cuestan 4 libros?',o:['18€','20€','24€','15€'],a:1,level:'cm1'},
+{q:'Hay 24 caramelos para 6 niños. ¿Cuántos toca a cada uno?',o:['3','4','5','6'],a:1,level:'cm1'},
+{q:'Un tren sale a las 8:00 y llega a las 10:30. ¿Cuánto duró?',o:['1h 30','2h','2h 30','3h'],a:2,level:'cm1'},
+{q:'Si gastas 12€ y tenías 50€, ¿cuánto te queda?',o:['28€','38€','40€','42€'],a:1,level:'cm1'},
+{q:'¿Cuántos minutos hay en 2 horas?',o:['100','120','60','180'],a:1,level:'cm1'},
+{q:'Ana mide 130 cm y Luis 145 cm. ¿Cuánto más mide Luis?',o:['10 cm','15 cm','20 cm','25 cm'],a:1,level:'cm1'},
+{q:'Pablo tiene 12 cromos. Si Marta tiene 8 más que Pablo, ¿cuántos tiene Marta?',o:['16','18','20','22'],a:2,level:'cm1'},
+{q:'Una piscina mide 25 m. ¿Cuánto en 4 piscinas?',o:['100 m','125 m','150 m','75 m'],a:0,level:'cm1'},
+{q:'1 km = ? metros',o:['100','500','1000','10000'],a:2,level:'cm1'},
+{q:'2,5 km = ? metros',o:['250','2500','25000','25'],a:1,level:'cm1'},
+{q:'500 cm = ? metros',o:['5','50','500','0,5'],a:0,level:'cm1'},
+{q:'Convierte 3 m 25 cm a cm:',o:['325','305','3025','35'],a:0,level:'cm1'},
+{q:'Mi camisa cuesta 18€ y los pantalones 25€ más. ¿Cuánto los pantalones?',o:['43€','25€','7€','38€'],a:0,level:'cm1'},
+{q:'En una clase hay 24 alumnos. Hay 4 niñas más que niños. ¿Cuántos niños?',o:['10','12','14','8'],a:0,level:'cm1'},
+{q:'Una hora son 60 min. ¿Cuántos segundos en 1 minuto?',o:['30','60','100','120'],a:1,level:'cm1'},
+{q:'De 14:30 a 17:15, ¿cuánto pasa?',o:['2h 15','2h 45','3h','3h 15'],a:1,level:'cm1'}
 ]
 ],
 logic:[
@@ -583,7 +755,49 @@ fr:[
 {q:'¿"Comment ça va?" significa?',o:['¿Cómo te llamas?','¿Qué hora es?','¿Cómo estás?','¿Dónde vives?'],a:2},
 {q:'¿"Je m\'appelle" significa?',o:['Yo soy','Mi nombre es','Yo vivo','Yo como'],a:1},
 {q:'¿"Bonne nuit" significa?',o:['Buenos días','Buenas tardes','Buenas noches','Hola'],a:2},
-{q:'¿"À bientôt" significa?',o:['Adiós','Hasta pronto','Buenos días','Gracias'],a:1}
+{q:'¿"À bientôt" significa?',o:['Adiós','Hasta pronto','Buenos días','Gracias'],a:1},
+// Conjugación ÊTRE (Emiliano CE1 NA)
+{q:'"Yo soy" en français:',o:['Je suis','Tu es','Il est','Nous sommes'],a:0,level:'ce1'},
+{q:'"Tú eres" en français:',o:['Je suis','Tu es','Il est','Vous êtes'],a:1,level:'ce1'},
+{q:'"Él es" en français:',o:['Je suis','Tu es','Il est','Elle est'],a:2,level:'ce1'},
+{q:'"Nosotros somos" en français:',o:['Nous sommes','Vous êtes','Ils sont','On est'],a:0,level:'cm1'},
+{q:'"Ellos son" en français:',o:['Nous sommes','Vous êtes','Ils sont','Elles sont'],a:2,level:'cm1'},
+// Conjugación AVOIR (Emiliano CE1 NA)
+{q:'"Yo tengo" en français:',o:['J\'ai','Tu as','Il a','Nous avons'],a:0,level:'ce1'},
+{q:'"Tú tienes" en français:',o:['J\'ai','Tu as','Il a','Vous avez'],a:1,level:'ce1'},
+{q:'"Él tiene" en français:',o:['J\'ai','Tu as','Il a','Elle a'],a:2,level:'ce1'},
+{q:'"Nosotros tenemos" en français:',o:['Nous avons','Vous avez','Ils ont','On a'],a:0,level:'cm1'},
+{q:'"Ellos tienen" en français:',o:['Nous avons','Vous avez','Ils ont','Elles ont'],a:2,level:'cm1'},
+// Pronombres personales (Emiliano CE1 NA)
+{q:'"Yo" en français:',o:['Je','Tu','Il','Elle'],a:0,level:'ce1'},
+{q:'"Tú" en français:',o:['Je','Tu','Vous','Il'],a:1,level:'ce1'},
+{q:'"Él / Ella" en français:',o:['Je / Tu','Il / Elle','Nous / Vous','Ils / Elles'],a:1,level:'ce1'},
+{q:'"Nosotros" en français:',o:['Vous','Ils','Nous','On'],a:2,level:'ce1'},
+{q:'"Vosotros" en français:',o:['Nous','Vous','Ils','Elles'],a:1,level:'cm1'},
+{q:'"Ellas" en français:',o:['Ils','Elles','Vous','Nous'],a:1,level:'cm1'},
+// Los 3 tiempos: passé / présent / futur (Emiliano CE1 NA)
+{q:'¿"Hier" en français?',o:['Ayer','Hoy','Mañana','Antes'],a:0,level:'ce1'},
+{q:'¿"Aujourd\'hui"?',o:['Ayer','Hoy','Mañana','Tarde'],a:1,level:'ce1'},
+{q:'¿"Demain"?',o:['Hoy','Mañana','Ayer','Después'],a:1,level:'ce1'},
+{q:'"Hier, j\'ai mangé" está en:',o:['Passé','Présent','Futur','Imparfait'],a:0,level:'cm1'},
+{q:'"Demain, je mangerai" está en:',o:['Passé','Présent','Futur','Imparfait'],a:2,level:'cm1'},
+{q:'"Aujourd\'hui, je mange" está en:',o:['Passé','Présent','Futur','Imparfait'],a:1,level:'cm1'},
+// Sinónimos en francés (Emmanuel CM1 PA)
+{q:'Sinónimo de "grand":',o:['petit','immense','court','léger'],a:1,level:'cm1'},
+{q:'Sinónimo de "joli":',o:['laid','beau','triste','vieux'],a:1,level:'cm1'},
+{q:'Sinónimo de "rapide":',o:['lent','vite','tard','dur'],a:1,level:'cm1'},
+{q:'Sinónimo de "content":',o:['triste','heureux','fâché','fatigué'],a:1,level:'cm1'},
+{q:'Sinónimo de "maison":',o:['cabane','habitation','jardin','rue'],a:1,level:'cm1'},
+{q:'Sinónimo de "regarder":',o:['écouter','voir','manger','dormir'],a:1,level:'cm1'},
+// Antónimos en francés (Emmanuel CM1 PA)
+{q:'Antónimo de "chaud":',o:['froid','tiède','brûlant','doux'],a:0,level:'cm1'},
+{q:'Antónimo de "grand":',o:['long','petit','large','gros'],a:1,level:'cm1'},
+{q:'Antónimo de "jour":',o:['matin','soir','nuit','heure'],a:2,level:'cm1'},
+{q:'Antónimo de "ouvrir":',o:['fermer','tirer','pousser','prendre'],a:0,level:'cm1'},
+{q:'Antónimo de "monter":',o:['sauter','descendre','tomber','rester'],a:1,level:'cm1'},
+{q:'Antónimo de "vrai":',o:['juste','faux','sûr','clair'],a:1,level:'cm1'},
+{q:'Antónimo de "premier":',o:['second','dernier','meilleur','seul'],a:1,level:'cm1'},
+{q:'Antónimo de "lourd":',o:['gros','léger','dur','plein'],a:1,level:'cm1'}
 ]
 ],
 es:[
@@ -747,17 +961,47 @@ ca:[
 {q:'¿"Tia" en català significa?',o:['Madre','Tía','Hermana','Abuela'],a:1,easy:true},
 {q:'¿"Cosí" en català significa?',o:['Tío','Primo','Sobrino','Nieto'],a:1},
 {q:'¿"Família" en català significa?',o:['Casa','Familia','Amigos','Pueblo'],a:1,easy:true}
-],[ // Andorra
-{q:'¿Cuál es la capital de Andorra?',o:['La Massana','Encamp','Andorra la Vella','Ordino'],a:2},
-{q:'¿En qué montañas está Andorra?',o:['Alpes','Pirineos','Andes','Cárpatos'],a:1},
-{q:'¿Cuál es el idioma oficial de Andorra?',o:['Francés','Español','Catalán','Portugués'],a:2},
-{q:'¿Andorra tiene mar?',o:['Sí','No','A veces','En invierno'],a:1,easy:true},
-{q:'¿Qué deporte de invierno es famoso en Andorra?',o:['Surf','Esquí','Tenis','Fútbol'],a:1,easy:true},
-{q:'¿Andorra está entre qué dos países?',o:['España y Francia','Italia y Suiza','Portugal y España','Francia y Bélgica'],a:0},
-{q:'¿"Bon dia" en català significa?',o:['Buenas noches','Buenos días','Hola','Adiós'],a:1},
-{q:'¿"Adéu" en català significa?',o:['Hola','Adiós','Gracias','Por favor'],a:1,easy:true},
-{q:'¿"Gràcies" en català significa?',o:['Hola','Adiós','Gracias','De nada'],a:2,easy:true},
-{q:'¿Cuál es la moneda de Andorra?',o:['Peseta','Euro','Dólar','Libra'],a:1}
+],[ // Andorra + Llengua i Medi (parròquies + ortografía catalana)
+// Cultura general (CE1 + CM1)
+{q:'¿Cuál es la capital de Andorra?',o:['La Massana','Encamp','Andorra la Vella','Ordino'],a:2,level:'ce1'},
+{q:'¿En qué montañas está Andorra?',o:['Alpes','Pirineos','Andes','Cárpatos'],a:1,level:'ce1'},
+{q:'¿Cuál es el idioma oficial de Andorra?',o:['Francés','Español','Catalán','Portugués'],a:2,level:'ce1'},
+{q:'¿Andorra tiene mar?',o:['Sí','No','A veces','En invierno'],a:1,level:'ce1'},
+{q:'¿Qué deporte de invierno es famoso en Andorra?',o:['Surf','Esquí','Tenis','Fútbol'],a:1,level:'ce1'},
+{q:'¿Andorra está entre qué dos países?',o:['España y Francia','Italia y Suiza','Portugal y España','Francia y Bélgica'],a:0,level:'cm1'},
+{q:'¿Cuántas parròquies tiene Andorra?',o:['5','6','7','8'],a:2,level:'cm1'},
+{q:'¿Cuál es la moneda de Andorra?',o:['Peseta','Euro','Dólar','Libra'],a:1,level:'ce1'},
+{q:'¿En qué parròquia está vuestra escuela?',o:['Andorra la Vella','Escaldes-Engordany','Encamp','La Massana'],a:1,level:'ce1'},
+{q:'La estación de esquí Grandvalira está sobre todo en:',o:['Encamp y Canillo','Sant Julià','Ordino','La Massana'],a:0,level:'cm1'},
+{q:'Vallnord (esquí) está en:',o:['Ordino y La Massana','Encamp','Canillo','Sant Julià'],a:0,level:'cm1'},
+{q:'¿Qué parròquia está más al sur de Andorra?',o:['Canillo','Encamp','Sant Julià de Lòria','Ordino'],a:2,level:'cm1'},
+{q:'Casa de la Vall (parlamento histórico) está en:',o:['Andorra la Vella','Ordino','Canillo','Encamp'],a:0,level:'cm1'},
+{q:'Andorra la Vella es la capital más alta de Europa, ¿verdadero o falso?',o:['Verdadero','Falso','Solo en invierno','Depende'],a:0,level:'cm1'},
+// Llengua catalana (saludos y expresiones)
+{q:'¿"Bon dia" en català significa?',o:['Buenas noches','Buenos días','Hola','Adiós'],a:1,level:'ce1'},
+{q:'¿"Bona nit" en català significa?',o:['Buenas tardes','Buenas noches','Buenos días','Hola'],a:1,level:'ce1'},
+{q:'¿"Adéu" en català significa?',o:['Hola','Adiós','Gracias','Por favor'],a:1,level:'ce1'},
+{q:'¿"Gràcies" en català significa?',o:['Hola','Adiós','Gracias','De nada'],a:2,level:'ce1'},
+{q:'¿"Si us plau" en català significa?',o:['Por favor','Gracias','Hola','Disculpa'],a:0,level:'ce1'},
+{q:'¿"Com estàs?" en català significa?',o:['¿Cómo te llamas?','¿Cómo estás?','¿Dónde vives?','¿Qué haces?'],a:1,level:'ce1'},
+{q:'¿"Em dic..." en català significa?',o:['Yo voy','Mi nombre es','Yo como','Yo veo'],a:1,level:'cm1'},
+// Ortografía c/qu (Emiliano CE1: PA en c/qu)
+{q:'¿Cómo se escribe correctamente en català? (la pregunta = lo que se pregunta)',o:['ce','que','què','qué'],a:2,level:'ce1'},
+{q:'¿Cómo se escribe \'casa\' en català?',o:['kasa','casa','quasa','qasa'],a:1,level:'ce1'},
+{q:'En català, el sonido /k/ delante de E o I se escribe:',o:['c','k','qu','ch'],a:2,level:'cm1'},
+{q:'En català, el sonido /k/ delante de A, O, U se escribe:',o:['c','qu','k','ch'],a:0,level:'cm1'},
+{q:'¿Cómo se escribe \'cinco\' en català?',o:['cinc','sinc','quinc','cinq'],a:0,level:'ce1'},
+// Ortografía -mb / -nv (Emmanuel CM1: PA en -mb, -nv)
+{q:'En català, ¿qué letra va delante de B y P? (regla)',o:['n','m','ambas','ninguna'],a:1,level:'cm1'},
+{q:'En català, ¿qué letra va delante de V y F? (regla)',o:['m','n','ambas','ninguna'],a:1,level:'cm1'},
+{q:'¿Cuál es correcta? (también)',o:['tanbé','tambè','també','tanbe'],a:2,level:'cm1'},
+{q:'¿Cuál es correcta? (enviar)',o:['emviar','enviar','enbiar','emiar'],a:1,level:'cm1'},
+{q:'¿Cuál es correcta? (cambiar)',o:['cambiar','cambiar','canviar','camviar'],a:2,level:'cm1'},
+// Ortografía r / rr (Emmanuel CM1: PA en r/rr)
+{q:'¿Cuál es correcta? (caro - perro en català = gos)',o:['caro','carro','qarro','quarro'],a:0,level:'cm1'},
+{q:'¿Cuál es correcta? (mare = madre)',o:['marre','mare','mère','mère'],a:1,level:'cm1'},
+{q:'En català, RR entre vocales suena:',o:['Suave','Fuerte','Igual que R','No suena'],a:1,level:'cm1'},
+{q:'¿Cómo se dice "perro" (animal) en català?',o:['perro','gos','can','goz'],a:1,level:'ce1'}
 ]
 ]
 };
@@ -779,7 +1023,10 @@ const ACHIEVEMENTS=[
 {id:'planets10',emoji:'🪐',name:'Explorador',desc:'Conquista 10 planetas',cond:s=>s.planetsBeaten.length>=10},
 {id:'planets20',emoji:'🚀',name:'Pionero',desc:'Conquista 20 planetas',cond:s=>s.planetsBeaten.length>=20},
 {id:'planets30',emoji:'🌌',name:'Conquistador',desc:'Conquista los 30 planetas',cond:s=>s.planetsBeaten.length>=30},
-{id:'shopper',emoji:'🛍️',name:'Comprador',desc:'Compra 3 items',cond:s=>s.items.length>=3}
+{id:'shopper',emoji:'🛍️',name:'Comprador',desc:'Compra 3 items',cond:s=>s.items.length>=3},
+{id:'streak20',emoji:'💫',name:'Imparable absoluto',desc:'20 aciertos seguidos',cond:s=>s.bestStreak>=20},
+{id:'collector',emoji:'📦',name:'Coleccionista',desc:'Compra 7 items',cond:s=>s.items.length>=7},
+{id:'polyglot',emoji:'🌍',name:'Políglota',desc:'Conquista francés, inglés y catalán',cond:s=>['fr','en','ca'].every(g=>s.bossesBeaten.includes(g))}
 ];
 
 // Shop
@@ -862,6 +1109,37 @@ function sndWin(){snd(523,.1);setTimeout(()=>snd(659,.1),100);setTimeout(()=>snd
 function sndLose(){snd(330,.15,'sawtooth');setTimeout(()=>snd(247,.15,'sawtooth'),150);setTimeout(()=>snd(165,.4,'sawtooth'),300)}
 function toggleSound(){state.soundOn=!state.soundOn;save();document.getElementById('soundBtn').textContent=state.soundOn?'🔊':'🔇'}
 
+// ========== TEXT-TO-SPEECH ==========
+// Lee la pregunta en voz alta. Útil sobre todo para Emiliano (7) que aún lee con esfuerzo.
+function speak(text,lang){
+  if(!('speechSynthesis' in window))return;
+  try{
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang=lang||'es-ES';
+    u.rate=isYoung()?.85:1;
+    u.pitch=1;
+    u.volume=1;
+    const voices=window.speechSynthesis.getVoices();
+    const match=voices.find(v=>v.lang===u.lang)||voices.find(v=>v.lang.startsWith(u.lang.split('-')[0]));
+    if(match)u.voice=match;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+function speakCurrentQuestion(){
+  const g=GALAXIES[game.galaxy];
+  const qs=getQuestionsForCurrent();
+  const q=qs[game.qIdx];
+  if(!q)return;
+  speak(q.q,g.lang);
+}
+function speakCurrentBossQuestion(){
+  const g=GALAXIES[game.galaxy];
+  const q=game.bossQs[game.bossQIdx];
+  if(!q)return;
+  speak(q.q,g.lang);
+}
+
 // ========== UI HELPERS ==========
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -943,30 +1221,49 @@ function renderMap(){
   document.getElementById('hudCoins').textContent=p.coins;
   document.getElementById('hudPlanets').textContent=p.planetsBeaten.length;
   document.getElementById('hudAvatar').innerHTML=state.currentPlayer==='emmanuel'?AVATAR_EMMANUEL:AVATAR_EMILIANO;
+  // Nivel y barra de XP
+  const lvl=getLevel(p.xp);const next=getNextLevel(p.xp);
+  document.getElementById('hudLevel').innerHTML=`${lvl.emoji} L${lvl.n}`;
+  document.getElementById('hudLevel').title=`${lvl.name} (Nivel ${lvl.n})`;
+  if(next){
+    const span=next.xp-lvl.xp;const have=p.xp-lvl.xp;
+    document.getElementById('xpFill').style.width=Math.min(100,Math.round(have/span*100))+'%';
+    document.getElementById('xpText').textContent=`${lvl.name} · ${p.xp} / ${next.xp} XP`;
+  }else{
+    document.getElementById('xpFill').style.width='100%';
+    document.getElementById('xpText').textContent=`${lvl.name} · NIVEL MÁXIMO (${p.xp} XP)`;
+  }
   const grid=document.getElementById('galaxyGrid');grid.innerHTML='';
   GALAXIES.forEach((g,gi)=>{
     const unlocked=gi===0||p.bossesBeaten.includes(GALAXIES[gi-1].id);
     const beatenInGal=g.planets.filter((_,pi)=>p.planetsBeaten.includes(g.id+'-'+pi)).length;
-    const bossReady=beatenInGal>=5&&!p.bossesBeaten.includes(g.id);
+    const totalPlanets=g.planets.length;
+    const starsInGal=g.planets.reduce((acc,_,pi)=>acc+(p.planetStars[g.id+'-'+pi]||0),0);
+    const maxStarsGal=totalPlanets*3;
+    const bossReady=beatenInGal>=totalPlanets&&!p.bossesBeaten.includes(g.id);
     const card=document.createElement('div');
     card.className='galaxy-card'+(unlocked?'':' locked');
     card.innerHTML=`
       ${bossReady?'<div class="boss-mark">👹</div>':p.bossesBeaten.includes(g.id)?'<div class="boss-mark">✅</div>':''}
       <div class="emoji">${g.emoji}</div>
       <div class="name">${g.name}</div>
-      <div class="progress">${beatenInGal}/5 planetas</div>
+      <div class="progress">${beatenInGal}/${totalPlanets} planetas</div>
+      <div class="stars-row">⭐ ${starsInGal}/${maxStarsGal}</div>
       <div class="planet-row">
         ${g.planets.map((pn,pi)=>{
-          const done=p.planetsBeaten.includes(g.id+'-'+pi);
-          return `<div class="planet-dot${done?' done':''}" title="${pn}">${done?'✓':pi+1}</div>`;
+          const key=g.id+'-'+pi;
+          const stars=p.planetStars[key]||0;
+          const done=stars>0;
+          const cls=done?(' done s'+stars):'';
+          return `<div class="planet-dot${cls}" title="${pn}${done?' · '+stars+'⭐':''}">${done?'⭐'.repeat(stars)||'✓':pi+1}</div>`;
         }).join('')}
       </div>`;
     if(unlocked){
       card.onclick=()=>{
         if(bossReady){startBoss(gi)}
         else{
-          // pick first incomplete planet
-          let pi=g.planets.findIndex((_,i)=>!p.planetsBeaten.includes(g.id+'-'+i));
+          // Elige el primer planeta sin 3 estrellas (para incentivar perfeccionar)
+          let pi=g.planets.findIndex((_,i)=>(p.planetStars[g.id+'-'+i]||0)<3);
           if(pi<0)pi=0;
           startPlanet(gi,pi);
         }
@@ -974,24 +1271,54 @@ function renderMap(){
     }
     grid.appendChild(card);
   });
+  // Total de planetas dinámico (puede crecer si añadimos)
+  document.getElementById('hudPlanets').textContent=p.planetsBeaten.length;
+  const totalGal=GALAXIES.reduce((a,g)=>a+g.planets.length,0);
+  const hudP=document.getElementById('hudPlanets').parentNode;
+  hudP.innerHTML=`🏆 <span id="hudPlanets">${p.planetsBeaten.length}</span>/${totalGal}`;
   checkAchievements();
 }
 
 function startPlanet(galIdx,planetIdx){
   game.galaxy=galIdx;game.planet=planetIdx;
   game.qIdx=0;game.lives=3;game.correct=0;game.wrong=[];
+  game.qPool=[]; // forzar nuevo sorteo de pool en cada partida
   show('question');
   renderQuestion();
 }
 
-function getQuestionsForCurrent(){
-  const g=GALAXIES[game.galaxy];
-  let qs=QUESTIONS[g.id][game.planet]||[];
-  if(isYoung()){
-    const easy=qs.filter(q=>q.easy);
-    if(easy.length>=8)qs=easy;
+// Pool de preguntas: cada planeta puede tener 30+ preguntas, escogemos 10 al azar
+// filtradas por nivel del jugador (Emiliano CE1 / Emmanuel CM1).
+function getPool(galaxyId,planetIdx){
+  const node=QUESTIONS[galaxyId]&&QUESTIONS[galaxyId][planetIdx];
+  if(!node)return[];
+  return Array.isArray(node)?node:(node.pool||[]);
+}
+function pickQuestions(galaxyId,planetIdx,who){
+  const pool=getPool(galaxyId,planetIdx);
+  if(!pool.length)return[];
+  const young=who==='emiliano';
+  // Modelo nuevo: cada pregunta lleva `level: 'ce1' | 'cm1'`. Sin level = ambos.
+  // Modelo viejo: `easy: true` = ce1, ausente = cm1.
+  const eff=q=>q.level||(q.easy?'ce1':undefined);
+  let filtered=pool.filter(q=>{
+    const lvl=eff(q);
+    if(young)return lvl==='ce1'||lvl===undefined; // CE1 ve sus cosas + neutras
+    return lvl==='cm1'||lvl===undefined||lvl==='ce1'; // CM1 ve todo (CE1 como repaso)
+  });
+  // Si CM1 tiene suficientes propias, prioriza esas
+  if(!young){
+    const hard=filtered.filter(q=>q.level==='cm1'||(q.level===undefined&&!q.easy));
+    if(hard.length>=8)filtered=hard;
   }
-  return qs.slice(0,10);
+  if(filtered.length<5)filtered=pool.slice();
+  return filtered.slice().sort(()=>Math.random()-.5).slice(0,10);
+}
+function getQuestionsForCurrent(){
+  if(game.qPool&&game.qPool.length)return game.qPool;
+  const g=GALAXIES[game.galaxy];
+  game.qPool=pickQuestions(g.id,game.planet,state.currentPlayer);
+  return game.qPool;
 }
 
 function renderQuestion(){
@@ -1011,6 +1338,7 @@ function renderQuestion(){
     b.onclick=()=>answer(i,q,b);
     ans.appendChild(b);
   });
+  if(isYoung())speak(q.q,g.lang);
 }
 
 function useHint(){
@@ -1041,6 +1369,7 @@ function answer(idx,q,btn){
     p.totalCorrect++;p.currentStreak++;
     if(p.currentStreak>p.bestStreak)p.bestStreak=p.currentStreak;
     p.coins+=isYoung()?3:5;
+    addXP(isYoung()?1:2); // +XP por cada acierto
     game.correct++;
     feedback('✓ ¡Correcto!','success');
   }else{
@@ -1064,6 +1393,7 @@ function endPlanet(failed=false){
   const g=GALAXIES[game.galaxy];
   const planetKey=g.id+'-'+game.planet;
   const p=getPlayer();
+  const total=getQuestionsForCurrent().length;
   show('result');
   if(failed){
     sndLose();
@@ -1072,21 +1402,31 @@ function endPlanet(failed=false){
     document.getElementById('resultText').textContent='Te quedaste sin vidas, pero puedes intentarlo de nuevo. ¡Vamos!';
     document.getElementById('nextBtn').style.display='none';
   }else{
-    const passed=game.correct>=Math.ceil(getQuestionsForCurrent().length*.6);
-    if(passed&&!p.planetsBeaten.includes(planetKey)){
-      p.planetsBeaten.push(planetKey);
-      const stars=game.correct>=10?3:game.correct>=8?2:1;
-      p.stars+=stars;
-      p.coins+=20+stars*10;
+    const passed=game.correct>=Math.ceil(total*.6);
+    const newStars=game.correct>=total?3:game.correct>=Math.ceil(total*.8)?2:passed?1:0;
+    const prevStars=p.planetStars[planetKey]||0;
+    const isFirst=!p.planetsBeaten.includes(planetKey);
+    const improved=newStars>prevStars;
+    if(passed){
+      if(isFirst)p.planetsBeaten.push(planetKey);
+      if(improved){
+        // Suma solo el delta de estrellas para que rejugar no infle el total
+        p.stars+=(newStars-prevStars);
+        p.planetStars[planetKey]=newStars;
+        addXP(isFirst?(newStars*20):(newStars-prevStars)*10);
+      }
+      p.coins+=isFirst?(20+newStars*10):(5+newStars*5);
       sndWin();confetti();
       document.getElementById('resultEmoji').textContent='🎉';
-      document.getElementById('resultTitle').textContent='¡Planeta conquistado!';
-      document.getElementById('resultText').textContent=`${stars===3?'⭐⭐⭐ ¡Perfecto!':stars===2?'⭐⭐ ¡Genial!':'⭐ ¡Bien!'} Aciertos: ${game.correct}/${getQuestionsForCurrent().length}`;
+      document.getElementById('resultTitle').textContent=isFirst?'¡Planeta conquistado!':improved?'¡Nuevo récord!':'Planeta superado';
+      const starStr='⭐'.repeat(newStars)+'☆'.repeat(3-newStars);
+      const flavor=newStars===3?'¡Perfecto absoluto!':newStars===2?'¡Genial!':'¡Bien!';
+      document.getElementById('resultText').textContent=`${starStr} ${flavor} · Aciertos: ${game.correct}/${total}${improved&&!isFirst?' · ¡Mejoraste tu récord!':''}`;
     }else{
       sndLose();
       document.getElementById('resultEmoji').textContent='😅';
       document.getElementById('resultTitle').textContent='Intenta otra vez';
-      document.getElementById('resultText').textContent=`Aciertos: ${game.correct}/${getQuestionsForCurrent().length}. Necesitas más para conquistar el planeta.`;
+      document.getElementById('resultText').textContent=`Aciertos: ${game.correct}/${total}. Necesitas al menos ${Math.ceil(total*.6)} para conquistarlo.`;
     }
     document.getElementById('nextBtn').style.display='inline-block';
   }
@@ -1139,6 +1479,7 @@ function renderBossQ(){
     b.onclick=()=>bossAnswer(i,q,b);
     ans.appendChild(b);
   });
+  if(isYoung())speak(q.q,GALAXIES[game.galaxy].lang);
 }
 
 function bossAnswer(idx,q,btn){
@@ -1167,6 +1508,10 @@ function bossWin(){
   if(!p.bossesBeaten.includes(g.id)){
     p.bossesBeaten.push(g.id);
     p.stars+=10;p.coins+=100;
+    addXP(150); // gran salto de XP por jefe nuevo
+  }else{
+    p.coins+=30;
+    addXP(30); // re-derrota: recompensa pequeña
   }
   save();
   sndWin();confetti(60);
@@ -1422,8 +1767,34 @@ function memFlip(c){
 function init(){
   if('serviceWorker' in navigator){
     window.addEventListener('load',()=>{
-      navigator.serviceWorker.register('sw.js').catch(()=>{});
+      navigator.serviceWorker.register('sw.js').then(reg=>{
+        // Detecta una nueva versión esperando y avisa al usuario
+        reg.addEventListener('updatefound',()=>{
+          const nw=reg.installing;
+          if(!nw)return;
+          nw.addEventListener('statechange',()=>{
+            if(nw.state==='installed'&&navigator.serviceWorker.controller){
+              const t=document.createElement('div');
+              t.className='toast';t.style.cursor='pointer';
+              t.innerHTML='✨ Nueva versión disponible · Toca para actualizar';
+              t.onclick=()=>{nw.postMessage({type:'SKIP_WAITING'});location.reload()};
+              document.body.appendChild(t);
+            }
+          });
+        });
+      }).catch(()=>{});
+      // Cuando el SW nuevo toma control, recarga para ver la versión nueva
+      let refreshing=false;
+      navigator.serviceWorker.addEventListener('controllerchange',()=>{
+        if(refreshing)return;
+        refreshing=true;location.reload();
+      });
     });
+  }
+  // Pre-carga voces TTS (algunas plataformas las cargan asincrónicamente)
+  if('speechSynthesis' in window){
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();
   }
   document.getElementById('soundBtn').textContent=state.soundOn?'🔊':'🔇';
   // resume audio context on first interaction
