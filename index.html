@@ -873,18 +873,41 @@ const STORAGE_KEY = 'aventura_espacial_v1';
 function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){}}
 function load(){try{const d=localStorage.getItem(STORAGE_KEY);if(d)return JSON.parse(d)}catch(e){}return null}
 
+// ========== GRADOS ESCOLARES (sistema francés - aplica en escuela de Andorra) ==========
+// Cada nivel mapea a una edad típica. El juego pickea preguntas dentro de ±1 grado del jugador,
+// permitiendo repaso del año anterior y previsualización del siguiente.
+// Cuando el niño cambie de curso (septiembre cada año), se actualiza desde Modo Padres.
+const GRADES=[
+  {id:'cp',  name:'CP',     age:6,  emoji:'🌱', desc:'Cours Préparatoire'},
+  {id:'ce1', name:'CE1',    age:7,  emoji:'📖', desc:'Cours Élémentaire 1'},
+  {id:'ce2', name:'CE2',    age:8,  emoji:'✏️', desc:'Cours Élémentaire 2'},
+  {id:'cm1', name:'CM1',    age:9,  emoji:'📐', desc:'Cours Moyen 1'},
+  {id:'cm2', name:'CM2',    age:10, emoji:'🎓', desc:'Cours Moyen 2'},
+  {id:'6e',  name:'6ème',   age:11, emoji:'⚛️', desc:'Sixième (collège)'},
+  {id:'5e',  name:'5ème',   age:12, emoji:'🔬', desc:'Cinquième'},
+  {id:'4e',  name:'4ème',   age:13, emoji:'📚', desc:'Quatrième'},
+  {id:'3e',  name:'3ème',   age:14, emoji:'🎯', desc:'Troisième (brevet)'}
+];
+function gradeIndex(g){const i=GRADES.findIndex(x=>x.id===g);return i<0?1:i}
+function gradeOf(playerKey){
+  const p=state[playerKey]||{};
+  return p.grade||(playerKey==='emmanuel'?'cm1':'ce1');
+}
+
 // ========== STATE + VERSIONING ==========
 // STATE_VERSION sube cuando cambia la estructura del state. migrateState() aplica
 // los cambios necesarios para que partidas guardadas en versiones anteriores
 // no se rompan. Documentar cada salto en el comentario del case correspondiente.
-const STATE_VERSION=2;
-const initialPlayer={stars:0,coins:0,xp:0,planetsBeaten:[],planetStars:{},bossesBeaten:[],items:[],achievements:[],totalCorrect:0,totalAnswered:0,bestStreak:0,currentStreak:0,welcomed:false,dailyDate:'',dailyCorrect:0,dailyStreak:0};
+const STATE_VERSION=3;
+const initialPlayer={stars:0,coins:0,xp:0,grade:'ce1',planetsBeaten:[],planetStars:{},bossesBeaten:[],items:[],achievements:[],totalCorrect:0,totalAnswered:0,bestStreak:0,currentStreak:0,welcomed:false,dailyDate:'',dailyCorrect:0,dailyStreak:0};
 function freshState(){
+  const em=JSON.parse(JSON.stringify(initialPlayer));em.grade='cm1';
+  const el=JSON.parse(JSON.stringify(initialPlayer));el.grade='ce1';
   return{
     version:STATE_VERSION,
     currentPlayer:null,
-    emmanuel:JSON.parse(JSON.stringify(initialPlayer)),
-    emiliano:JSON.parse(JSON.stringify(initialPlayer)),
+    emmanuel:em,
+    emiliano:el,
     snakeBest:0,
     soundOn:true,
     ttsAuto:true,
@@ -903,11 +926,21 @@ function migrateState(s){
     s.customDict=s.customDict||[];
     s.version=2;
   }
+  // v2 → v3: añadir campo `grade` a cada jugador (sistema escolar francés CP→3ème)
+  if(s.version<3){
+    if(s.emmanuel&&!s.emmanuel.grade)s.emmanuel.grade='cm1';
+    if(s.emiliano&&!s.emiliano.grade)s.emiliano.grade='ce1';
+    s.version=3;
+  }
   // Asegurar campos de jugadores (compat con v1 y migra player fields)
   ['emmanuel','emiliano'].forEach(k=>{
-    if(!s[k])s[k]=JSON.parse(JSON.stringify(initialPlayer));
+    if(!s[k]){
+      s[k]=JSON.parse(JSON.stringify(initialPlayer));
+      s[k].grade=k==='emmanuel'?'cm1':'ce1';
+    }
     const p=s[k];
     if(p.xp===undefined)p.xp=0;
+    if(!p.grade)p.grade=k==='emmanuel'?'cm1':'ce1';
     if(!p.planetStars)p.planetStars={};
     if(!p.dailyDate)p.dailyDate='';
     if(p.dailyCorrect===undefined)p.dailyCorrect=0;
@@ -1092,7 +1125,45 @@ math:[
 {q:'1234 + 567 = ?',o:['1701','1801','1901','1701'],a:1,level:'cm1'},
 {q:'250 + 175 + 75 = ?',o:['450','475','500','525'],a:2,level:'cm1'},
 {q:'47 + 23 + 30 = ?',o:['90','100','110','85'],a:1,level:'cm1'},
-{q:'99 + 99 = ?',o:['188','198','199','200'],a:1,level:'cm1'}
+{q:'99 + 99 = ?',o:['188','198','199','200'],a:1,level:'cm1'},
+// CP (6 años) — sumas hasta 10
+{q:'1 + 1 = ?',o:['2','3','1','4'],a:0,level:'cp'},
+{q:'2 + 2 = ?',o:['3','4','5','2'],a:1,level:'cp'},
+{q:'3 + 2 = ?',o:['4','5','6','3'],a:1,level:'cp'},
+{q:'4 + 3 = ?',o:['6','7','8','5'],a:1,level:'cp'},
+{q:'5 + 1 = ?',o:['5','6','7','4'],a:1,level:'cp'},
+{q:'2 + 5 = ?',o:['6','7','8','5'],a:1,level:'cp'},
+{q:'3 + 4 = ?',o:['6','7','8','5'],a:1,level:'cp'},
+{q:'4 + 4 = ?',o:['7','8','9','6'],a:1,level:'cp'},
+{q:'1 + 6 = ?',o:['6','7','8','5'],a:1,level:'cp'},
+{q:'5 + 5 = ?',o:['9','10','11','8'],a:1,level:'cp'},
+// CE2 (8 años) — sumas con número de 2-3 cifras y mental
+{q:'37 + 28 = ?',o:['64','65','66','55'],a:1,level:'ce2'},
+{q:'45 + 47 = ?',o:['92','82','102','90'],a:0,level:'ce2'},
+{q:'126 + 74 = ?',o:['190','200','210','180'],a:1,level:'ce2'},
+{q:'58 + 36 = ?',o:['92','94','96','84'],a:1,level:'ce2'},
+{q:'199 + 1 = ?',o:['100','199','200','201'],a:2,level:'ce2'},
+{q:'250 + 250 = ?',o:['400','500','550','450'],a:1,level:'ce2'},
+{q:'318 + 25 = ?',o:['333','343','353','363'],a:1,level:'ce2'},
+{q:'89 + 11 = ?',o:['90','99','100','110'],a:2,level:'ce2'},
+// CM2 (10-11 años) — números grandes y decimales
+{q:'2 504 + 1 396 = ?',o:['3 800','3 900','4 000','3 850'],a:1,level:'cm2'},
+{q:'12 580 + 6 420 = ?',o:['18 000','19 000','20 000','17 500'],a:1,level:'cm2'},
+{q:'0,5 + 0,5 = ?',o:['0,1','1','5','10'],a:1,level:'cm2'},
+{q:'1,25 + 2,75 = ?',o:['3','3,5','4','4,25'],a:2,level:'cm2'},
+{q:'3,7 + 2,3 = ?',o:['5','5,5','6','6,7'],a:2,level:'cm2'},
+{q:'15,8 + 4,2 = ?',o:['18','19','20','19,5'],a:2,level:'cm2'},
+{q:'9,99 + 0,01 = ?',o:['9,991','10','10,1','11'],a:1,level:'cm2'},
+{q:'¿Cuánto suman 2,5; 1,5 y 4?',o:['7','8','7,5','9'],a:1,level:'cm2'},
+// 6ème (11-12 años) — sumas algebraicas y negativos
+{q:'(-3) + 5 = ?',o:['2','-2','8','-8'],a:0,level:'6e'},
+{q:'(-7) + (-4) = ?',o:['-3','3','-11','11'],a:2,level:'6e'},
+{q:'8 + (-5) = ?',o:['3','-3','13','-13'],a:0,level:'6e'},
+{q:'Si x = 4, ¿cuánto vale x + 9?',o:['12','13','14','15'],a:1,level:'6e'},
+{q:'(-10) + 10 = ?',o:['0','20','-20','100'],a:0,level:'6e'},
+{q:'2,5 + (-1,5) = ?',o:['1','-1','4','-4'],a:0,level:'6e'},
+{q:'Suma: 1/2 + 1/2 = ?',o:['1/4','1','2','1/2'],a:1,level:'6e'},
+{q:'Suma: 1/3 + 1/3 = ?',o:['2/3','2/6','1/6','1'],a:0,level:'6e'}
 ],[ // RESTAS - banco de 30
 // CE1 (Emiliano - área NA: restas en columna): básicas, restar 9, en columna sin retención, con retención
 {q:'10 - 4 = ?',o:['5','6','7','4'],a:1,level:'ce1'},
@@ -1125,7 +1196,43 @@ math:[
 {q:'1000 - 350 = ?',o:['550','650','750','850'],a:1,level:'cm1'},
 {q:'784 - 256 = ?',o:['518','528','538','548'],a:1,level:'cm1'},
 {q:'1500 - 750 = ?',o:['650','750','850','950'],a:1,level:'cm1'},
-{q:'2000 - 999 = ?',o:['1000','1001','1011','1101'],a:1,level:'cm1'}
+{q:'2000 - 999 = ?',o:['1000','1001','1011','1101'],a:1,level:'cm1'},
+// CP (6 años) — restas hasta 10
+{q:'5 - 1 = ?',o:['3','4','5','2'],a:1,level:'cp'},
+{q:'6 - 2 = ?',o:['3','4','5','2'],a:1,level:'cp'},
+{q:'7 - 3 = ?',o:['3','4','5','2'],a:1,level:'cp'},
+{q:'8 - 4 = ?',o:['3','4','5','2'],a:1,level:'cp'},
+{q:'10 - 5 = ?',o:['4','5','6','3'],a:1,level:'cp'},
+{q:'9 - 2 = ?',o:['6','7','8','5'],a:1,level:'cp'},
+{q:'10 - 1 = ?',o:['8','9','10','7'],a:1,level:'cp'},
+{q:'5 - 5 = ?',o:['0','1','5','10'],a:0,level:'cp'},
+// CE2 (8 años) — restas con números más grandes
+{q:'124 - 38 = ?',o:['86','96','76','106'],a:0,level:'ce2'},
+{q:'200 - 87 = ?',o:['113','123','103','115'],a:0,level:'ce2'},
+{q:'350 - 175 = ?',o:['175','185','165','275'],a:0,level:'ce2'},
+{q:'500 - 99 = ?',o:['401','411','391','501'],a:0,level:'ce2'},
+{q:'432 - 217 = ?',o:['215','225','205','315'],a:0,level:'ce2'},
+{q:'1000 - 250 = ?',o:['650','750','850','550'],a:1,level:'ce2'},
+{q:'600 - 350 = ?',o:['250','350','150','450'],a:0,level:'ce2'},
+{q:'875 - 125 = ?',o:['650','750','850','775'],a:1,level:'ce2'},
+// CM2 (10-11 años) — restas con decimales y miles
+{q:'5 000 - 1 750 = ?',o:['3 050','3 250','3 350','3 750'],a:1,level:'cm2'},
+{q:'10 000 - 4 999 = ?',o:['5 000','5 001','4 999','6 001'],a:1,level:'cm2'},
+{q:'8,5 - 3,5 = ?',o:['4','5','6','3,5'],a:1,level:'cm2'},
+{q:'10 - 0,5 = ?',o:['9','9,5','10,5','5'],a:1,level:'cm2'},
+{q:'7,25 - 2,75 = ?',o:['4','4,5','5','5,25'],a:1,level:'cm2'},
+{q:'100 - 0,01 = ?',o:['99,99','100,01','99,9','99,1'],a:0,level:'cm2'},
+{q:'15,5 - 7,8 = ?',o:['7,7','8,7','7,3','7,5'],a:0,level:'cm2'},
+{q:'25 - 12,5 = ?',o:['12','12,5','13','13,5'],a:1,level:'cm2'},
+// 6ème — operaciones con negativos
+{q:'5 - 8 = ?',o:['3','-3','13','-13'],a:1,level:'6e'},
+{q:'(-3) - 4 = ?',o:['-7','7','-1','1'],a:0,level:'6e'},
+{q:'(-5) - (-3) = ?',o:['-2','2','-8','8'],a:0,level:'6e'},
+{q:'10 - (-5) = ?',o:['5','15','-5','-15'],a:1,level:'6e'},
+{q:'Si x=10, ¿cuánto es 25-x?',o:['5','15','25','35'],a:1,level:'6e'},
+{q:'1 - 1/2 = ?',o:['1/2','3/2','0','1/4'],a:0,level:'6e'},
+{q:'(-12) - (-12) = ?',o:['0','24','-24','12'],a:0,level:'6e'},
+{q:'4 - 9 + 5 = ?',o:['0','-1','9','-9'],a:0,level:'6e'}
 ],[ // MULTIPLICACIÓN - banco de 30 (refuerzo tabla del 4 NA Emiliano, tablas 6-9 PA Emmanuel)
 // CE1: tablas 2, 4 (área NA), 5, 10
 {q:'2 × 3 = ?',o:['5','6','7','4'],a:1,level:'ce1'},
@@ -1158,7 +1265,45 @@ math:[
 {q:'9 × 9 = ?',o:['72','81','82','79'],a:1,level:'cm1'},
 {q:'12 × 5 = ?',o:['58','60','62','55'],a:1,level:'cm1'},
 {q:'15 × 4 = ?',o:['58','60','62','56'],a:1,level:'cm1'},
-{q:'25 × 4 = ?',o:['90','100','110','120'],a:1,level:'cm1'}
+{q:'25 × 4 = ?',o:['90','100','110','120'],a:1,level:'cm1'},
+// CP (6 años) — multiplicaciones simples (introducción)
+{q:'1 × 5 = ?',o:['4','5','6','1'],a:1,level:'cp'},
+{q:'2 × 2 = ?',o:['2','3','4','5'],a:2,level:'cp'},
+{q:'2 × 3 = ?',o:['5','6','7','4'],a:1,level:'cp'},
+{q:'3 × 1 = ?',o:['1','2','3','4'],a:2,level:'cp'},
+{q:'5 × 1 = ?',o:['4','5','6','10'],a:1,level:'cp'},
+{q:'10 × 1 = ?',o:['1','5','10','100'],a:2,level:'cp'},
+// CE2 (8 años) — tablas 2-5 + 10
+{q:'3 × 5 = ?',o:['12','15','18','13'],a:1,level:'ce2'},
+{q:'4 × 7 = ?',o:['24','28','32','21'],a:1,level:'ce2'},
+{q:'5 × 9 = ?',o:['40','45','50','35'],a:1,level:'ce2'},
+{q:'6 × 3 = ?',o:['16','18','20','15'],a:1,level:'ce2'},
+{q:'7 × 5 = ?',o:['30','35','40','25'],a:1,level:'ce2'},
+{q:'10 × 7 = ?',o:['60','70','80','100'],a:1,level:'ce2'},
+{q:'8 × 5 = ?',o:['35','40','45','30'],a:1,level:'ce2'},
+{q:'4 × 6 = ?',o:['22','24','26','20'],a:1,level:'ce2'},
+{q:'2 × 10 = ?',o:['10','20','30','22'],a:1,level:'ce2'},
+{q:'5 × 10 = ?',o:['25','45','50','55'],a:2,level:'ce2'},
+// CM2 (10-11 años) — multiplicaciones de 2 y 3 cifras + decimales
+{q:'12 × 12 = ?',o:['124','144','164','132'],a:1,level:'cm2'},
+{q:'25 × 8 = ?',o:['180','200','220','160'],a:1,level:'cm2'},
+{q:'15 × 15 = ?',o:['200','225','250','275'],a:1,level:'cm2'},
+{q:'24 × 6 = ?',o:['134','144','154','124'],a:1,level:'cm2'},
+{q:'45 × 4 = ?',o:['170','180','190','160'],a:1,level:'cm2'},
+{q:'100 × 25 = ?',o:['2 000','2 500','3 000','25 000'],a:1,level:'cm2'},
+{q:'0,5 × 10 = ?',o:['5','50','0,5','5,5'],a:0,level:'cm2'},
+{q:'2,5 × 4 = ?',o:['8','10','12','11'],a:1,level:'cm2'},
+{q:'3,5 × 2 = ?',o:['6','7','8','6,5'],a:1,level:'cm2'},
+{q:'1,2 × 10 = ?',o:['12','120','1,2','10,2'],a:0,level:'cm2'},
+// 6ème — multiplicaciones con negativos y propiedades
+{q:'(-3) × 4 = ?',o:['-12','12','-7','7'],a:0,level:'6e'},
+{q:'(-5) × (-2) = ?',o:['10','-10','7','-7'],a:0,level:'6e'},
+{q:'7 × (-6) = ?',o:['42','-42','13','-13'],a:1,level:'6e'},
+{q:'(-1) × (-1) = ?',o:['1','-1','0','2'],a:0,level:'6e'},
+{q:'Si a=3, ¿cuánto vale 5×a?',o:['15','8','12','35'],a:0,level:'6e'},
+{q:'1/2 × 4 = ?',o:['1','2','3','4'],a:1,level:'6e'},
+{q:'1/3 × 9 = ?',o:['3','6','9','27'],a:0,level:'6e'},
+{q:'25 × 4 × 0 = ?',o:['100','0','25','4'],a:1,level:'6e'}
 ],[ // DIVISIÓN - banco de 30
 // CE1: divisiones simples (mitad, doble, tablas conocidas)
 {q:'10 ÷ 2 = ?',o:['4','5','6','3'],a:1,level:'ce1'},
@@ -1192,7 +1337,37 @@ math:[
 {q:'90 ÷ 6 = ?',o:['14','15','16','12'],a:1,level:'cm1'},
 {q:'120 ÷ 4 = ?',o:['25','30','35','40'],a:1,level:'cm1'},
 {q:'200 ÷ 8 = ?',o:['20','25','30','35'],a:1,level:'cm1'},
-{q:'¿Mitad de 86?',o:['41','43','45','46'],a:1,level:'cm1'}
+{q:'¿Mitad de 86?',o:['41','43','45','46'],a:1,level:'cm1'},
+// CP (6 años) — repartos muy básicos
+{q:'¿Si tengo 6 caramelos para 2 amigos, cuántos a cada uno?',o:['2','3','4','5'],a:1,level:'cp'},
+{q:'¿Mitad de 4?',o:['1','2','3','4'],a:1,level:'cp'},
+{q:'¿Mitad de 10?',o:['3','5','7','10'],a:1,level:'cp'},
+{q:'¿Mitad de 6?',o:['2','3','4','5'],a:1,level:'cp'},
+// CE2 (8 años) — divisiones exactas pequeñas
+{q:'21 ÷ 3 = ?',o:['6','7','8','9'],a:1,level:'ce2'},
+{q:'40 ÷ 5 = ?',o:['7','8','9','10'],a:1,level:'ce2'},
+{q:'27 ÷ 3 = ?',o:['7','8','9','10'],a:2,level:'ce2'},
+{q:'36 ÷ 4 = ?',o:['7','8','9','10'],a:2,level:'ce2'},
+{q:'50 ÷ 10 = ?',o:['3','5','10','50'],a:1,level:'ce2'},
+{q:'18 ÷ 2 = ?',o:['7','8','9','10'],a:2,level:'ce2'},
+{q:'30 ÷ 5 = ?',o:['4','5','6','7'],a:2,level:'ce2'},
+// CM2 (10-11 años) — divisiones con decimales y resto
+{q:'150 ÷ 3 = ?',o:['40','50','60','45'],a:1,level:'cm2'},
+{q:'250 ÷ 5 = ?',o:['40','50','60','55'],a:1,level:'cm2'},
+{q:'1 000 ÷ 4 = ?',o:['200','250','300','400'],a:1,level:'cm2'},
+{q:'¿Cuánto es la mitad de 0,5?',o:['0,1','0,25','0,5','1'],a:1,level:'cm2'},
+{q:'10 ÷ 0,5 = ?',o:['5','15','20','25'],a:2,level:'cm2'},
+{q:'¿Cuánto es 1/4 de 100?',o:['10','20','25','50'],a:2,level:'cm2'},
+{q:'30 ÷ 4 (resto y cociente):',o:['7 r 2','8 r 0','7 r 0','6 r 6'],a:0,level:'cm2'},
+{q:'1 hora son 60 min. ¿Cuánto es 1/4 de hora?',o:['10 min','15 min','20 min','30 min'],a:1,level:'cm2'},
+// 6ème — divisiones con negativos y fracciones
+{q:'(-12) ÷ 4 = ?',o:['-3','3','-4','4'],a:0,level:'6e'},
+{q:'(-20) ÷ (-5) = ?',o:['-4','4','-5','5'],a:1,level:'6e'},
+{q:'¿Cuánto es 5/10 simplificado?',o:['1/2','1/5','5','2/5'],a:0,level:'6e'},
+{q:'¿Cuánto es 6/8 simplificado?',o:['3/4','2/3','3/8','1/2'],a:0,level:'6e'},
+{q:'Si 3x = 12, ¿cuánto es x?',o:['3','4','6','12'],a:1,level:'6e'},
+{q:'Si x/4 = 5, ¿cuánto es x?',o:['9','15','20','25'],a:2,level:'6e'},
+{q:'2/3 dividido entre 2 es:',o:['1/3','2/6','4/3','1/6'],a:0,level:'6e'}
 ],[ // PROBLEMAS - banco de 30 (Emmanuel: comparación NA, longitudes NA · Emiliano: euros NA)
 // CE1: problemas simples, euros y céntimos (área NA Emiliano)
 {q:'Tienes 3 manzanas y compras 5 más. ¿Cuántas tienes?',o:['7','8','9','6'],a:1,level:'ce1'},
@@ -1225,7 +1400,42 @@ math:[
 {q:'Mi camisa cuesta 18€ y los pantalones 25€ más. ¿Cuánto los pantalones?',o:['43€','25€','7€','38€'],a:0,level:'cm1'},
 {q:'En una clase hay 24 alumnos. Hay 4 niñas más que niños. ¿Cuántos niños?',o:['10','12','14','8'],a:0,level:'cm1'},
 {q:'Una hora son 60 min. ¿Cuántos segundos en 1 minuto?',o:['30','60','100','120'],a:1,level:'cm1'},
-{q:'De 14:30 a 17:15, ¿cuánto pasa?',o:['2h 15','2h 45','3h','3h 15'],a:1,level:'cm1'}
+{q:'De 14:30 a 17:15, ¿cuánto pasa?',o:['2h 15','2h 45','3h','3h 15'],a:1,level:'cm1'},
+// CP (6 años) — problemas muy simples
+{q:'Tengo 3 globos y me dan 2 más. ¿Cuántos tengo?',o:['4','5','6','3'],a:1,level:'cp'},
+{q:'Hay 7 patos y se van 2. ¿Cuántos quedan?',o:['4','5','6','3'],a:1,level:'cp'},
+{q:'Si reparto 4 chuches entre 2 niños, ¿cuántas cada uno?',o:['1','2','3','4'],a:1,level:'cp'},
+{q:'¿Cuántos meses tiene un año?',o:['10','11','12','7'],a:2,level:'cp'},
+// CE2 (8 años) — problemas intermedios
+{q:'Compro 3 chocolates a 2€ cada uno. ¿Cuánto pago?',o:['5€','6€','7€','8€'],a:1,level:'ce2'},
+{q:'Tengo 30€ y gasto 18€. ¿Cuánto me queda?',o:['10€','12€','14€','16€'],a:1,level:'ce2'},
+{q:'Una caja tiene 24 lápices. ¿Cuántos lápices en 3 cajas?',o:['62','72','82','60'],a:1,level:'ce2'},
+{q:'Si vamos a las 10:00 al cine y dura 90 minutos, ¿a qué hora termina?',o:['11:00','11:30','12:00','12:30'],a:1,level:'ce2'},
+{q:'Un cuadrado tiene lados de 5 cm. ¿Perímetro?',o:['10 cm','15 cm','20 cm','25 cm'],a:2,level:'ce2'},
+{q:'Si pago 50€ por 5 entradas iguales, ¿cuánto cuesta cada una?',o:['8€','9€','10€','12€'],a:2,level:'ce2'},
+{q:'¿Cuántas horas hay desde las 9:00 hasta las 14:00?',o:['4','5','6','7'],a:1,level:'ce2'},
+// CM2 (10-11 años) — proporcionalidad, áreas, fracciones
+{q:'Si 3 manzanas cuestan 1,50€, ¿cuánto cuestan 9 manzanas?',o:['3€','4€','4,50€','6€'],a:2,level:'cm2'},
+{q:'Un rectángulo mide 8 × 5 cm. ¿Área?',o:['13 cm²','26 cm²','40 cm²','45 cm²'],a:2,level:'cm2'},
+{q:'¿Cuánto es 25% de 80?',o:['10','20','25','40'],a:1,level:'cm2'},
+{q:'¿Cuánto es 50% de 200?',o:['50','75','100','150'],a:2,level:'cm2'},
+{q:'¿Cuánto es 3/4 de 100?',o:['25','50','75','100'],a:2,level:'cm2'},
+{q:'En una receta para 4 personas usas 200g de harina. ¿Para 8 personas?',o:['250g','300g','400g','500g'],a:2,level:'cm2'},
+{q:'1 km son 1000 m. ¿Cuántos m hay en 3,5 km?',o:['350','3 500','35 000','350 000'],a:1,level:'cm2'},
+{q:'Un triángulo equilátero tiene perímetro 30 cm. ¿Cuánto mide cada lado?',o:['8','10','12','15'],a:1,level:'cm2'},
+{q:'¿Cuántos minutos hay en 1/2 hora?',o:['15','20','30','45'],a:2,level:'cm2'},
+{q:'Si 1 € = 100 cts, ¿cuántos cts hay en 5,75€?',o:['575','525','5 075','5 750'],a:0,level:'cm2'},
+// 6ème — álgebra introductoria, geometría
+{q:'Si x + 7 = 12, ¿cuánto vale x?',o:['3','4','5','6'],a:2,level:'6e'},
+{q:'Si 2x = 16, ¿cuánto vale x?',o:['6','7','8','9'],a:2,level:'6e'},
+{q:'¿Cuántos grados tiene un ángulo recto?',o:['45°','60°','90°','180°'],a:2,level:'6e'},
+{q:'¿Suma de los ángulos de un triángulo?',o:['90°','180°','270°','360°'],a:1,level:'6e'},
+{q:'Un círculo tiene radio 5. ¿Diámetro?',o:['5','10','15','25'],a:1,level:'6e'},
+{q:'Si x – 6 = 10, ¿x = ?',o:['4','14','16','24'],a:2,level:'6e'},
+{q:'Resuelve: 3x + 2 = 11. x = ?',o:['2','3','4','5'],a:1,level:'6e'},
+{q:'Un coche va a 60 km/h. ¿Distancia en 2 horas?',o:['60 km','90 km','120 km','150 km'],a:2,level:'6e'},
+{q:'¿Cuánto es 10² (10 al cuadrado)?',o:['20','100','110','1000'],a:1,level:'6e'},
+{q:'¿Cuánto es 2³ (2 al cubo)?',o:['6','8','9','12'],a:1,level:'6e'}
 ]
 ],
 logic:[
@@ -1383,7 +1593,41 @@ fr:[
 {q:'Antónimo de "monter":',o:['sauter','descendre','tomber','rester'],a:1,level:'cm1'},
 {q:'Antónimo de "vrai":',o:['juste','faux','sûr','clair'],a:1,level:'cm1'},
 {q:'Antónimo de "premier":',o:['second','dernier','meilleur','seul'],a:1,level:'cm1'},
-{q:'Antónimo de "lourd":',o:['gros','léger','dur','plein'],a:1,level:'cm1'}
+{q:'Antónimo de "lourd":',o:['gros','léger','dur','plein'],a:1,level:'cm1'},
+// CP (6 años) — francés muy básico
+{q:'¿"Maman" significa?',o:['Papá','Mamá','Hermana','Abuela'],a:1,level:'cp'},
+{q:'¿"Bonjour" significa?',o:['Hola','Adiós','Gracias','Por favor'],a:0,level:'cp'},
+{q:'¿"Chat" significa?',o:['Perro','Gato','Pez','Ratón'],a:1,level:'cp'},
+{q:'¿"Soleil" significa?',o:['Luna','Sol','Estrella','Cielo'],a:1,level:'cp'},
+{q:'¿"Eau" significa?',o:['Pan','Agua','Leche','Aire'],a:1,level:'cp'},
+{q:'¿"Trois" en francés es?',o:['1','2','3','4'],a:2,level:'cp'},
+// CE2 (8 años) — Passé composé y vocabulario
+{q:'"J\'ai mangé" está en:',o:['Presente','Pasado','Futuro','Imperativo'],a:1,level:'ce2'},
+{q:'"Je suis allé(e)" usa el auxiliar:',o:['avoir','être','aller','faire'],a:1,level:'ce2'},
+{q:'¿"Hier soir" significa?',o:['Esta tarde','Ayer noche','Mañana','El otro día'],a:1,level:'ce2'},
+{q:'¿"Pendant" significa?',o:['Antes','Durante','Después','Cerca'],a:1,level:'ce2'},
+{q:'"Nous avons fini" está en:',o:['Présent','Passé composé','Futur','Imparfait'],a:1,level:'ce2'},
+{q:'¿"Toujours" significa?',o:['Nunca','A veces','Siempre','Solo'],a:2,level:'ce2'},
+{q:'Femenino de "petit":',o:['petit','petits','petite','petites'],a:2,level:'ce2'},
+{q:'Plural de "le chat":',o:['les chats','la chats','les chat','des chat'],a:0,level:'ce2'},
+// CM2 (10-11 años) — imparfait, futuro simple, COD/COI
+{q:'"Quand j\'étais petit" — el verbo está en:',o:['Présent','Imparfait','Futur','Passé composé'],a:1,level:'cm2'},
+{q:'"Demain je mangerai" está en:',o:['Présent','Passé','Futur','Imparfait'],a:2,level:'cm2'},
+{q:'"Je le vois" — "le" es:',o:['Sujeto','COD','COI','Adjetivo'],a:1,level:'cm2'},
+{q:'"Je lui parle" — "lui" es:',o:['COD','COI','Adverbio','Sujeto'],a:1,level:'cm2'},
+{q:'Conjuga "manger" en imparfait, je: ?',o:['mangeai','mangeais','mangerai','mangé'],a:1,level:'cm2'},
+{q:'Sinónimo de "rapide":',o:['lent','vite','tard','dur'],a:1,level:'cm2'},
+{q:'Antónimo de "facile":',o:['simple','difficile','clair','lourd'],a:1,level:'cm2'},
+{q:'¿Cuál es el participio pasado de "prendre"?',o:['prendu','prenu','pris','prendé'],a:2,level:'cm2'},
+// 6ème — pronombres, subjonctif intro, conditionnel
+{q:'"Si j\'avais de l\'argent, je voyagerais." — "voyagerais" es:',o:['Présent','Conditionnel','Subjonctif','Futur'],a:1,level:'6e'},
+{q:'¿Cuál es el conditionnel de "être" para "je"?',o:['je suis','j\'étais','je serais','je serai'],a:2,level:'6e'},
+{q:'"Il faut que tu viennes" — "viennes" es:',o:['Indicativo','Subjonctif','Imperativo','Infinitivo'],a:1,level:'6e'},
+{q:'Pronombre relativo en "le livre QUE je lis":',o:['qui','que','dont','où'],a:1,level:'6e'},
+{q:'Pronombre relativo en "la maison OÙ j\'habite":',o:['qui','que','dont','où'],a:3,level:'6e'},
+{q:'Antónimo de "généreux":',o:['gentil','avare','poli','riche'],a:1,level:'6e'},
+{q:'Sinónimo de "intelligent":',o:['stupide','intélligent','malin','beau'],a:2,level:'6e'},
+{q:'¿Quién escribió "Le Petit Prince"?',o:['Victor Hugo','Saint-Exupéry','Molière','Voltaire'],a:1,level:'6e'}
 ]
 ],
 es:[
@@ -1499,7 +1743,33 @@ en:[
 {q:'¿"How are you?" significa?',o:['¿Cuántos años?','¿Cómo estás?','¿Dónde vives?','¿Quién eres?'],a:1},
 {q:'¿"My name is" significa?',o:['Soy de','Mi nombre es','Yo vivo','Yo soy'],a:1},
 {q:'¿"Good morning" significa?',o:['Buenas noches','Buenos días','Buenas tardes','Hola'],a:1},
-{q:'¿"I love you" significa?',o:['Te quiero','Hola amigo','Te veo','Buen día'],a:0}
+{q:'¿"I love you" significa?',o:['Te quiero','Hola amigo','Te veo','Buen día'],a:0},
+// CP (6 años) — frases muy simples
+{q:'¿"Hi" significa?',o:['Hola','Adiós','Sí','No'],a:0,level:'cp'},
+{q:'¿"Mom" significa?',o:['Papá','Mamá','Tío','Primo'],a:1,level:'cp'},
+{q:'¿"Dog" significa?',o:['Gato','Perro','Pez','Pájaro'],a:1,level:'cp'},
+{q:'¿"Sun" significa?',o:['Luna','Sol','Estrella','Nube'],a:1,level:'cp'},
+// CE2 (8 años) — present simple
+{q:'¿"I am" significa?',o:['Yo soy','Tú eres','Él es','Nosotros somos'],a:0,level:'ce2'},
+{q:'¿"You are" significa?',o:['Yo soy','Tú eres','Ellos son','Vosotros sois'],a:1,level:'ce2'},
+{q:'¿"He is" significa?',o:['Yo soy','Tú eres','Él es','Ella es'],a:2,level:'ce2'},
+{q:'¿"She has" significa?',o:['Él tiene','Ella tiene','Yo tengo','Tú tienes'],a:1,level:'ce2'},
+{q:'¿"We are" significa?',o:['Yo soy','Vosotros sois','Nosotros somos','Ellos son'],a:2,level:'ce2'},
+{q:'¿"Today" significa?',o:['Ayer','Hoy','Mañana','Pasado'],a:1,level:'ce2'},
+// CM2 (10-11 años) — past simple, comparatives
+{q:'¿Pasado de "go"?',o:['goed','went','gone','goes'],a:1,level:'cm2'},
+{q:'¿Pasado de "eat"?',o:['eated','ate','aten','eaten'],a:1,level:'cm2'},
+{q:'Comparativo de "big":',o:['biger','bigger','more big','biggest'],a:1,level:'cm2'},
+{q:'Superlativo de "good":',o:['gooder','best','goodest','more good'],a:1,level:'cm2'},
+{q:'¿"I have been" se traduce como?',o:['Yo soy','Yo he sido','Yo era','Yo seré'],a:1,level:'cm2'},
+{q:'Plural de "child":',o:['childs','childrens','children','childen'],a:2,level:'cm2'},
+// 6ème — present perfect, conditional
+{q:'¿"If I had money, I would travel" se llama?',o:['First conditional','Second conditional','Third conditional','Zero conditional'],a:1,level:'6e'},
+{q:'¿"He has lived here for 5 years" está en?',o:['Past Simple','Present Perfect','Past Continuous','Future'],a:1,level:'6e'},
+{q:'¿Cuál es el participio pasado de "see"?',o:['seed','saw','seen','seeing'],a:2,level:'6e'},
+{q:'Pronombre relativo: "The book ___ I read"',o:['who','which','where','whose'],a:1,level:'6e'},
+{q:'Sinónimo de "happy":',o:['sad','joyful','tired','angry'],a:1,level:'6e'},
+{q:'Antónimo de "expensive":',o:['rich','cheap','poor','high'],a:1,level:'6e'}
 ]
 ],
 ca:[
@@ -1587,7 +1857,37 @@ ca:[
 {q:'¿Cuál es correcta? (caro - perro en català = gos)',o:['caro','carro','qarro','quarro'],a:0,level:'cm1'},
 {q:'¿Cuál es correcta? (mare = madre)',o:['marre','mare','mère','mère'],a:1,level:'cm1'},
 {q:'En català, RR entre vocales suena:',o:['Suave','Fuerte','Igual que R','No suena'],a:1,level:'cm1'},
-{q:'¿Cómo se dice "perro" (animal) en català?',o:['perro','gos','can','goz'],a:1,level:'ce1'}
+{q:'¿Cómo se dice "perro" (animal) en català?',o:['perro','gos','can','goz'],a:1,level:'ce1'},
+// CP (6 años) — catalán muy básico
+{q:'¿"Hola" en català?',o:['Hola','Bona','Adéu','Sí'],a:0,level:'cp'},
+{q:'¿"Mare" significa en català?',o:['Padre','Madre','Hermana','Abuela'],a:1,level:'cp'},
+{q:'¿Cómo se dice "uno" en català?',o:['un','dos','tres','quatre'],a:0,level:'cp'},
+{q:'¿"Sol" en català significa?',o:['Luna','Sol','Cielo','Estrella'],a:1,level:'cp'},
+// CE2 (8 años) — vocabulario y geografía Andorra
+{q:'¿Capital de Andorra?',o:['Encamp','La Massana','Andorra la Vella','Ordino'],a:2,level:'ce2'},
+{q:'¿"Aigua" en català significa?',o:['Agua','Aire','Tierra','Fuego'],a:0,level:'ce2'},
+{q:'¿"Demà" en català significa?',o:['Ayer','Hoy','Mañana','Pasado'],a:2,level:'ce2'},
+{q:'¿En qué montañas está Andorra?',o:['Alpes','Pirineos','Apeninos','Andes'],a:1,level:'ce2'},
+{q:'¿"Llibre" en català?',o:['Cuaderno','Libro','Lápiz','Mesa'],a:1,level:'ce2'},
+{q:'¿"Jugar" en català?',o:['Trabajar','Estudiar','Jugar','Correr'],a:2,level:'ce2'},
+// CM2 (10-11 años) — Andorra cultural y gramatical
+{q:'¿Cuántas parròquies tiene Andorra?',o:['5','6','7','8'],a:2,level:'cm2'},
+{q:'¿"Coprínceps" d\'Andorra son?',o:['Bisbe i President francès','Rei i Papa','Alcaldes','Regidors'],a:0,level:'cm2'},
+{q:'¿"Síndic General" és el cap de:',o:['Govern','Consell General','Justícia','Església'],a:1,level:'cm2'},
+{q:'¿Idioma cooficial NO de Andorra:',o:['Català','Castellà','Italiano','Francès'],a:2,level:'cm2'},
+{q:'Conjuga "anar" en present, jo: ?',o:['vaig','vas','va','aniré'],a:0,level:'cm2'},
+{q:'Pretèrit perfet de "menjar", jo:',o:['menjava','vaig menjar','menjaré','menji'],a:1,level:'cm2'},
+{q:'Plural de "el llibre":',o:['els llibre','els llibres','les llibres','els llibrer'],a:1,level:'cm2'},
+{q:'¿"Bosc" en català significa?',o:['Lago','Bosque','Camino','Montaña'],a:1,level:'cm2'},
+// 6ème — gramática catalana intermedia
+{q:'Pronom feble: "Compro un llibre" → "El compro". "El" sustituye a:',o:['Compro','llibre','un','un llibre'],a:3,level:'6e'},
+{q:'L\'Imperfet de "tenir", jo:',o:['tinc','tenia','tindré','tingués'],a:1,level:'6e'},
+{q:'¿"Ratllar" porta accent?',o:['Sí','No','Depèn','Solo en mayúscula'],a:1,level:'6e'},
+{q:'Antònim de "lluny":',o:['proper','prop','distant','llargà'],a:1,level:'6e'},
+{q:'Sinònim de "bonic":',o:['lleig','formós','trist','vell'],a:1,level:'6e'},
+{q:'Article "el" + "home" → ?',o:['el home','l\'home','lo home','la home'],a:1,level:'6e'},
+{q:'Subjuntiu present de "ser", jo:',o:['sóc','sigui','seré','era'],a:1,level:'6e'},
+{q:'¿Quins són els 7 cons d\'Andorra (parròquies)?',o:['5','6','7','8'],a:2,level:'6e'}
 ]
 ]
 };
@@ -1914,21 +2214,25 @@ function getPool(galaxyId,planetIdx){
 function pickQuestions(galaxyId,planetIdx,who){
   const pool=getPool(galaxyId,planetIdx);
   if(!pool.length)return[];
-  const young=who==='emiliano';
-  // Modelo nuevo: cada pregunta lleva `level: 'ce1' | 'cm1'`. Sin level = ambos.
-  // Modelo viejo: `easy: true` = ce1, ausente = cm1.
-  const eff=q=>q.level||(q.easy?'ce1':undefined);
-  let filtered=pool.filter(q=>{
+  // Pickea preguntas dentro de ±1 grado del jugador. Si no hay suficientes
+  // expande a ±2, y si aún no hay coge cualquier pregunta del pool.
+  const grade=gradeOf(who);
+  const gIdx=gradeIndex(grade);
+  // Mapa de level→grade index. Compatible con etiquetas viejas:
+  //   level:'ce1' → idx 1, level:'cm1' → idx 3, easy:true → ce1 (idx 1)
+  //   level ausente = pregunta neutra (la ven todos)
+  const eff=q=>q.level||(q.easy?'ce1':null);
+  const inRange=(q,delta)=>{
     const lvl=eff(q);
-    if(young)return lvl==='ce1'||lvl===undefined; // CE1 ve sus cosas + neutras
-    return lvl==='cm1'||lvl===undefined||lvl==='ce1'; // CM1 ve todo (CE1 como repaso)
-  });
-  // Si CM1 tiene suficientes propias, prioriza esas
-  if(!young){
-    const hard=filtered.filter(q=>q.level==='cm1'||(q.level===undefined&&!q.easy));
-    if(hard.length>=8)filtered=hard;
-  }
+    if(!lvl)return true; // neutra
+    return Math.abs(gradeIndex(lvl)-gIdx)<=delta;
+  };
+  let filtered=pool.filter(q=>inRange(q,1));
+  if(filtered.length<5)filtered=pool.filter(q=>inRange(q,2));
   if(filtered.length<5)filtered=pool.slice();
+  // Prioriza ligeramente las preguntas del grado exacto (mayor proporción)
+  const exact=filtered.filter(q=>{const l=eff(q);return l&&gradeIndex(l)===gIdx});
+  if(exact.length>=8)filtered=exact;
   return filtered.slice().sort(()=>Math.random()-.5).slice(0,10);
 }
 function getQuestionsForCurrent(){
@@ -4155,10 +4459,18 @@ function parentsRender(){
     const correct=p.totalCorrect||0;
     const acc=total>0?Math.round(correct/total*100):0;
     const lvl=getLevel(p.xp||0);
+    const currentGrade=gradeOf(k);
+    const currentGradeObj=GRADES.find(g=>g.id===currentGrade)||GRADES[1];
+    const gradeOpts=GRADES.map(g=>`<option value="${g.id}"${g.id===currentGrade?' selected':''}>${g.emoji} ${g.name} · ${g.age} años</option>`).join('');
     return `
       <div class="parents-section">
-        <h3>${k==='emmanuel'?'⚡ Emmanuel (CM1)':'⛏️ Emiliano (CE1)'}</h3>
-        <div class="parents-row"><span class="parents-key">Nivel</span><span class="parents-val">${lvl.emoji} ${lvl.name} (L${lvl.n})</span></div>
+        <h3>${k==='emmanuel'?'⚡ Emmanuel':'⛏️ Emiliano'}</h3>
+        <div class="parents-row" style="display:block;padding:8px 0">
+          <span class="parents-key" style="display:block;margin-bottom:4px">📚 Curso escolar actual</span>
+          <select class="admin-select" onchange="parentsSetGrade('${k}',this.value)">${gradeOpts}</select>
+          <p style="font-size:11px;opacity:.65;margin-top:4px;text-align:left">El juego pickea preguntas de este grado y de los grados ±1 (repaso anterior + previsualización siguiente).</p>
+        </div>
+        <div class="parents-row"><span class="parents-key">Nivel del juego</span><span class="parents-val">${lvl.emoji} ${lvl.name} (L${lvl.n})</span></div>
         <div class="parents-row"><span class="parents-key">XP total</span><span class="parents-val">${p.xp||0}</span></div>
         <div class="parents-row"><span class="parents-key">Estrellas</span><span class="parents-val">⭐ ${p.stars||0}</span></div>
         <div class="parents-row"><span class="parents-key">Monedas</span><span class="parents-val">💰 ${p.coins||0}</span></div>
@@ -4213,6 +4525,15 @@ function parentsRender(){
     ${recent?`<div class="parents-section"><h3>⏱ Últimas 7 sesiones</h3>${recent}</div>`:''}
   `;
 }
+function parentsSetGrade(playerKey,gradeId){
+  if(!state[playerKey])return;
+  const oldGrade=state[playerKey].grade;
+  state[playerKey].grade=gradeId;
+  save();
+  const g=GRADES.find(x=>x.id===gradeId);
+  toast('🎓 '+(playerKey==='emmanuel'?'Emmanuel':'Emiliano')+' ahora está en '+(g?g.emoji+' '+g.name:gradeId));
+  parentsRender();
+}
 function parentsResetAnalytics(){
   if(!confirm('¿Borrar todos los datos de analytics? El progreso del juego (XP, planetas, monedas) NO se borra, solo las estadísticas.'))return;
   state.analytics={sessions:[],gamesPlayed:{},questionsByGalaxy:{},questionsByPlanet:{},firstSeen:Date.now(),lastSeen:Date.now()};
@@ -4236,11 +4557,10 @@ function adminRender(){
       </select>
       <label>Planeta</label>
       <select class="admin-select" id="adminPlanet"></select>
-      <label>Nivel</label>
+      <label>Nivel escolar</label>
       <select class="admin-select" id="adminLevel">
-        <option value="">Ambos (CE1 + CM1)</option>
-        <option value="ce1">Solo CE1 (Emiliano)</option>
-        <option value="cm1">Solo CM1 (Emmanuel)</option>
+        <option value="">Genérica (todos los grados)</option>
+        ${GRADES.map(g=>`<option value="${g.id}">${g.emoji} ${g.name} · ${g.age} años · ${g.desc}</option>`).join('')}
       </select>
       <label>Pregunta</label>
       <input type="text" class="admin-input" id="adminQuestion" placeholder="Ej: ¿Cuánto es 5 + 3?">
