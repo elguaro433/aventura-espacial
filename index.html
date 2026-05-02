@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>La Gran Aventura Espacial - Hermanos Díaz</title>
+<meta name="description" content="Juego educativo para Emiliano y Emmanuel">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Trebuchet MS','Comic Sans MS',sans-serif;background:#0a0020;color:#fff;touch-action:manipulation}
+body{background:radial-gradient(ellipse at center,#1a0033 0%,#0a0020 70%,#000 100%);position:relative}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(2px 2px at 20% 30%,#fff,transparent),radial-gradient(2px 2px at 60% 70%,#fff,transparent),radial-gradient(1px 1px at 50% 50%,#fff,transparent),radial-gradient(1px 1px at 80% 10%,#fff,transparent),radial-gradient(2px 2px at 90% 80%,#fff,transparent),radial-gradient(1px 1px at 10% 90%,#fff,transparent),radial-gradient(1px 1px at 33% 25%,#fff,transparent),radial-gradient(2px 2px at 75% 45%,#fff,transparent);background-size:300px 300px;animation:starfield 100s linear infinite;opacity:.6;pointer-events:none;z-index:0}
+@keyframes starfield{from{background-position:0 0}to{background-position:300px 300px}}
+#app{position:relative;width:100%;height:100%;z-index:1;overflow:hidden}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;padding:20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.screen.active{display:flex;animation:fadeIn .4s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+h1,h2,h3{text-align:center;text-shadow:0 0 20px rgba(255,215,0,.5)}
+h1{font-size:clamp(28px,6vw,52px);background:linear-gradient(90deg,#ffd700,#ff6b9d,#00d4ff,#ffd700);background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shine 4s linear infinite;margin-bottom:10px}
+@keyframes shine{from{background-position:0 0}to{background-position:300% 0}}
+h2{font-size:clamp(20px,4vw,30px);color:#ffd700;margin-bottom:15px}
+h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
+.btn{padding:14px 26px;border:none;border-radius:18px;font-size:clamp(14px,3.5vw,18px);font-weight:bold;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a0033;box-shadow:0 6px 0 #b8860b,0 8px 14px rgba(0,0,0,.4);font-family:inherit;min-width:120px;text-shadow:none;outline:none}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b8860b,0 4px 8px rgba(0,0,0,.4)}
+.btn-purple{background:linear-gradient(135deg,#9c27b0,#673ab7);color:#fff;box-shadow:0 6px 0 #4a148c,0 8px 14px rgba(0,0,0,.4)}
+.btn-purple:active{box-shadow:0 2px 0 #4a148c,0 4px 8px rgba(0,0,0,.4)}
+.btn-green{background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;box-shadow:0 6px 0 #1b5e20,0 8px 14px rgba(0,0,0,.4)}
+.btn-green:active{box-shadow:0 2px 0 #1b5e20,0 4px 8px rgba(0,0,0,.4)}
+.btn-red{background:linear-gradient(135deg,#f44336,#c62828);color:#fff;box-shadow:0 6px 0 #b71c1c,0 8px 14px rgba(0,0,0,.4)}
+.btn-blue{background:linear-gradient(135deg,#2196f3,#1565c0);color:#fff;box-shadow:0 6px 0 #0d47a1,0 8px 14px rgba(0,0,0,.4)}
+.btn-small{padding:8px 14px;font-size:13px;min-width:auto}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.center{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;flex:1}
+.row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
+.card{background:rgba(255,255,255,.08);border:2px solid rgba(255,215,0,.3);border-radius:20px;padding:18px;backdrop-filter:blur(10px)}
+.player-card{background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.05));border:3px solid;border-radius:24px;padding:18px;cursor:pointer;transition:all .3s;width:min(280px,42vw);text-align:center;position:relative;overflow:hidden}
+.player-card.emmanuel{border-color:#2196f3;box-shadow:0 0 30px rgba(33,150,243,.4)}
+.player-card.emiliano{border-color:#ff7043;box-shadow:0 0 30px rgba(255,112,67,.4)}
+.player-card:active{transform:scale(.96)}
+.player-card::before{content:'';position:absolute;inset:-2px;background:linear-gradient(45deg,transparent,rgba(255,255,255,.3),transparent);transform:translateX(-100%);animation:cardShine 3s infinite}
+@keyframes cardShine{50%,100%{transform:translateX(100%)}}
+.avatar-container{width:120px;height:120px;margin:0 auto 10px;border-radius:50%;overflow:hidden;border:4px solid #ffd700;box-shadow:0 0 20px rgba(255,215,0,.5);position:relative}
+.avatar-svg{width:100%;height:100%;display:block}
+.avatar-mini{width:40px;height:40px;border-radius:50%;border:2px solid #ffd700;display:inline-block;vertical-align:middle;margin-right:8px;overflow:hidden}
+.avatar-mini svg{width:100%;height:100%}
+.player-name{font-size:22px;font-weight:bold;margin:8px 0 4px;color:#ffd700}
+.player-nick{font-size:14px;color:#fff;opacity:.85;font-style:italic}
+.player-age{font-size:12px;opacity:.7;margin-top:4px}
+.hud{display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,.5);border:2px solid rgba(255,215,0,.4);border-radius:16px;padding:10px 14px;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.hud-info{display:flex;align-items:center;gap:6px;font-size:14px}
+.hud-stat{background:rgba(255,255,255,.1);border-radius:10px;padding:4px 10px;font-size:14px;font-weight:bold}
+.galaxy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;padding:10px;width:100%;max-width:900px;margin:0 auto}
+.galaxy-card{background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:2px solid rgba(255,215,0,.3);border-radius:18px;padding:14px;text-align:center;cursor:pointer;transition:all .3s;position:relative;min-height:160px;display:flex;flex-direction:column;justify-content:space-between;align-items:center}
+.galaxy-card:active{transform:scale(.96)}
+.galaxy-card.locked{opacity:.4;cursor:not-allowed;filter:grayscale(70%)}
+.galaxy-card .emoji{font-size:50px;margin:6px 0;filter:drop-shadow(0 0 10px rgba(255,215,0,.6))}
+.galaxy-card .name{font-size:14px;font-weight:bold;color:#ffd700}
+.galaxy-card .progress{font-size:11px;opacity:.85;margin-top:4px}
+.galaxy-card .boss-mark{position:absolute;top:6px;right:6px;font-size:18px;filter:drop-shadow(0 0 8px red)}
+.planet-row{display:flex;justify-content:space-around;width:100%;flex-wrap:wrap;gap:8px;margin-top:8px}
+.planet-dot{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,215,0,.4);display:flex;align-items:center;justify-content:center;font-size:11px}
+.planet-dot.done{background:#4caf50;border-color:#2e7d32;box-shadow:0 0 10px #4caf50}
+.planet-dot.current{background:#ffd700;border-color:#fff;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{transform:scale(1);box-shadow:0 0 10px #ffd700}50%{transform:scale(1.15);box-shadow:0 0 20px #ffd700}}
+.question-box{background:rgba(255,255,255,.1);border:3px solid #ffd700;border-radius:24px;padding:24px;margin:20px 0;font-size:clamp(18px,5vw,26px);text-align:center;line-height:1.4;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.5);min-height:120px;display:flex;align-items:center;justify-content:center;position:relative}
+.answers{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;width:100%;max-width:700px;margin:0 auto}
+.answer-btn{padding:18px 14px;border:3px solid rgba(255,215,0,.4);border-radius:18px;background:rgba(255,255,255,.08);color:#fff;font-size:clamp(14px,3.5vw,18px);font-weight:bold;cursor:pointer;transition:all .2s;font-family:inherit;min-height:60px;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.answer-btn:active{transform:scale(.96)}
+.answer-btn.correct{background:linear-gradient(135deg,#4caf50,#2e7d32);border-color:#fff;animation:correctPulse .5s ease-out}
+.answer-btn.wrong{background:linear-gradient(135deg,#f44336,#c62828);border-color:#fff;animation:shake .5s ease-out}
+.answer-btn.hint-eliminated{opacity:.3;text-decoration:line-through}
+@keyframes correctPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08);box-shadow:0 0 30px #4caf50}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+.lives{display:flex;gap:6px;font-size:24px}
+.heart{transition:all .3s}
+.heart.lost{opacity:.2;filter:grayscale(100%)}
+.feedback{position:fixed;top:30%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.9);border:3px solid;border-radius:20px;padding:24px 36px;font-size:clamp(20px,5vw,32px);font-weight:bold;text-align:center;z-index:1000;animation:popIn .4s ease-out;pointer-events:none}
+.feedback.success{border-color:#4caf50;color:#4caf50}
+.feedback.fail{border-color:#f44336;color:#f44336}
+@keyframes popIn{from{transform:translate(-50%,-50%) scale(0)}50%{transform:translate(-50%,-50%) scale(1.2)}to{transform:translate(-50%,-50%) scale(1)}}
+.tabs{display:flex;justify-content:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tab{padding:10px 16px;background:rgba(255,255,255,.08);border:2px solid rgba(255,215,0,.3);border-radius:14px;cursor:pointer;font-size:13px;font-weight:bold;color:#fff;transition:all .2s;font-family:inherit}
+.tab.active{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a0033;border-color:#ffd700}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;padding:10px}
+.shop-item{background:rgba(255,255,255,.08);border:2px solid rgba(255,215,0,.3);border-radius:16px;padding:14px;text-align:center}
+.shop-item .emoji{font-size:40px;margin-bottom:6px}
+.shop-item .name{font-size:13px;font-weight:bold;margin-bottom:4px}
+.shop-item .price{font-size:14px;color:#ffd700;margin-bottom:8px}
+.shop-item.owned{border-color:#4caf50;background:rgba(76,175,80,.15)}
+.shop-item.owned .price{color:#4caf50}
+.achievement-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;padding:10px}
+.achievement{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:14px;padding:12px;text-align:center;opacity:.5}
+.achievement.unlocked{opacity:1;border-color:#ffd700;background:rgba(255,215,0,.1);box-shadow:0 0 15px rgba(255,215,0,.3)}
+.achievement .emoji{font-size:32px;display:block;margin-bottom:4px}
+.achievement .name{font-size:13px;font-weight:bold;color:#ffd700}
+.achievement .desc{font-size:11px;opacity:.8;margin-top:4px}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);border:2px solid #ffd700;border-radius:14px;padding:12px 20px;color:#ffd700;font-weight:bold;z-index:2000;animation:slideDown .4s ease-out;pointer-events:none;text-align:center;font-size:14px}
+@keyframes slideDown{from{transform:translate(-50%,-100px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+.boss-stage{background:radial-gradient(circle at 50% 30%,rgba(244,67,54,.3),rgba(0,0,0,.8))}
+.boss-info{text-align:center;margin:10px 0}
+.boss-emoji{font-size:80px;animation:bossFloat 2s ease-in-out infinite;filter:drop-shadow(0 0 15px red)}
+@keyframes bossFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.health-bar{width:80%;max-width:400px;height:24px;background:rgba(255,255,255,.1);border:2px solid #fff;border-radius:12px;margin:8px auto;overflow:hidden;position:relative}
+.health-fill{height:100%;transition:width .5s;border-radius:10px}
+.boss-health{background:linear-gradient(90deg,#f44336,#c62828)}
+.player-health{background:linear-gradient(90deg,#4caf50,#2e7d32)}
+.health-label{font-size:12px;text-align:center;margin-bottom:2px}
+.confetti{position:fixed;width:10px;height:10px;pointer-events:none;z-index:1500;animation:fall 2.5s linear forwards}
+@keyframes fall{from{transform:translateY(-30px) rotate(0)}to{transform:translateY(110vh) rotate(720deg)}}
+.classic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;padding:10px;max-width:700px;margin:0 auto}
+.classic-card{background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.04));border:3px solid rgba(255,215,0,.4);border-radius:18px;padding:18px;text-align:center;cursor:pointer;transition:all .2s}
+.classic-card:active{transform:scale(.96)}
+.classic-card .emoji{font-size:54px;margin-bottom:8px;filter:drop-shadow(0 0 10px rgba(255,215,0,.5))}
+.classic-card .title{font-size:15px;font-weight:bold;color:#ffd700}
+.classic-card .desc{font-size:11px;opacity:.8;margin-top:4px}
+#snake-canvas,#memory-canvas{display:block;margin:10px auto;background:rgba(0,0,0,.5);border:3px solid #ffd700;border-radius:14px;max-width:100%;touch-action:none}
+.tictac-board{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:min(300px,80vw);height:min(300px,80vw);margin:14px auto;background:rgba(255,215,0,.2);border-radius:14px;padding:6px}
+.tictac-cell{background:rgba(255,255,255,.08);border:2px solid rgba(255,215,0,.4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:60px;font-weight:bold;cursor:pointer;transition:all .2s;color:#fff}
+.tictac-cell:active{background:rgba(255,255,255,.2)}
+.tictac-cell.x{color:#2196f3;text-shadow:0 0 15px #2196f3}
+.tictac-cell.o{color:#f44336;text-shadow:0 0 15px #f44336}
+.tictac-cell.win{background:rgba(255,215,0,.3);border-color:#ffd700;animation:pulse 1s infinite}
+.memory-grid{display:grid;gap:6px;margin:10px auto;width:min(95vw,500px)}
+.mem-card{aspect-ratio:1;background:linear-gradient(135deg,#9c27b0,#673ab7);border:3px solid #ffd700;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:clamp(20px,5vw,32px);cursor:pointer;transition:all .3s;color:transparent;font-weight:bold}
+.mem-card.flipped{background:linear-gradient(135deg,#fff,#e0e0e0);color:#1a0033;transform:rotateY(180deg)}
+.mem-card.matched{background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;animation:correctPulse .5s ease-out}
+.controls{display:flex;justify-content:center;gap:20px;margin:14px 0;flex-wrap:wrap}
+.dpad{display:grid;grid-template-areas:". up ." "left . right" ". down .";gap:6px;width:180px;margin:0 auto}
+.dpad-btn{width:55px;height:55px;background:linear-gradient(135deg,#9c27b0,#673ab7);border:none;border-radius:14px;color:#fff;font-size:26px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 0 #4a148c}
+.dpad-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #4a148c}
+.dpad-up{grid-area:up}.dpad-down{grid-area:down}.dpad-left{grid-area:left}.dpad-right{grid-area:right}
+.back-btn{position:fixed;top:14px;left:14px;width:44px;height:44px;background:rgba(0,0,0,.7);border:2px solid #ffd700;border-radius:50%;color:#ffd700;font-size:22px;cursor:pointer;z-index:100;font-family:inherit;display:flex;align-items:center;justify-content:center}
+.sound-btn{position:fixed;top:14px;right:14px;width:44px;height:44px;background:rgba(0,0,0,.7);border:2px solid #ffd700;border-radius:50%;color:#ffd700;font-size:20px;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center}
+.welcome-msg{background:linear-gradient(135deg,rgba(255,215,0,.2),rgba(156,39,176,.2));border:2px solid #ffd700;border-radius:18px;padding:16px;margin:10px auto;max-width:600px;font-size:14px;text-align:center;line-height:1.5}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:10px}
+.stat-box{background:rgba(255,255,255,.08);border:2px solid rgba(255,215,0,.3);border-radius:14px;padding:12px;text-align:center}
+.stat-box .num{font-size:30px;font-weight:bold;color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,.6)}
+.stat-box .label{font-size:11px;opacity:.85;margin-top:4px}
+.certificate{background:linear-gradient(135deg,#fff,#ffd700);color:#1a0033;border:4px solid #ffd700;border-radius:24px;padding:30px;margin:20px auto;max-width:500px;text-align:center;box-shadow:0 0 40px rgba(255,215,0,.6)}
+.certificate h1{background:linear-gradient(90deg,#9c27b0,#f44336);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:32px;margin-bottom:12px}
+.certificate p{font-size:16px;line-height:1.6;color:#1a0033;margin:8px 0}
+.certificate .name{font-size:28px;font-weight:bold;color:#9c27b0;margin:14px 0}
+@media (max-width:480px){.galaxy-grid{grid-template-columns:repeat(2,1fr)}.player-card{width:45vw}.btn{padding:12px 18px;font-size:14px}.hud{font-size:12px}.tabs{font-size:11px}.tab{padding:8px 12px}}
+</style>
+</head>
+<body>
+
+<button class="sound-btn" id="soundBtn" onclick="toggleSound()" style="display:none">🔊</button>
+<button class="back-btn" id="backBtn" onclick="goBack()" style="display:none">←</button>
+
+<div id="app">
+
+<!-- INTRO -->
+<div class="screen active" id="intro">
+  <div class="center">
+    <h1>🚀 LA GRAN AVENTURA ESPACIAL</h1>
+    <h2>De los Hermanos Díaz</h2>
+    <div style="font-size:60px;margin:10px 0">🌌</div>
+    <p style="text-align:center;max-width:600px;line-height:1.5;font-size:14px;opacity:.9">
+      Una aventura de matemáticas, lógica e idiomas para Emiliano y Emmanuel.<br>
+      ¡Conquista 6 galaxias, derrota a los jefes y rescata al Profesor Cosmos!
+    </p>
+    <button class="btn" onclick="startGame()">▶ EMPEZAR</button>
+    <button class="btn btn-purple" onclick="show('classic')">🎮 Juegos Clásicos</button>
+  </div>
+</div>
+
+<!-- PLAYER SELECT -->
+<div class="screen" id="select">
+  <div class="center">
+    <h2>¿Quién eres, Astronauta?</h2>
+    <div class="row">
+      <div class="player-card emmanuel" onclick="choosePlayer('emmanuel')">
+        <div class="avatar-container" id="ava-em-big"></div>
+        <div class="player-name">Emmanuel</div>
+        <div class="player-nick">⚡ El Saiyajin</div>
+        <div class="player-age">10 años</div>
+      </div>
+      <div class="player-card emiliano" onclick="choosePlayer('emiliano')">
+        <div class="avatar-container" id="ava-eli-big"></div>
+        <div class="player-name">Emiliano</div>
+        <div class="player-nick">⛏️ El Constructor</div>
+        <div class="player-age">7 años</div>
+      </div>
+    </div>
+    <button class="btn btn-purple btn-small" onclick="show('intro')">← Volver</button>
+  </div>
+</div>
+
+<!-- MAP -->
+<div class="screen" id="map">
+  <div class="hud">
+    <div class="hud-info">
+      <span class="avatar-mini" id="hudAvatar"></span>
+      <span id="hudName">-</span>
+    </div>
+    <div class="hud-stat">⭐ <span id="hudStars">0</span></div>
+    <div class="hud-stat">💰 <span id="hudCoins">0</span></div>
+    <div class="hud-stat">🏆 <span id="hudPlanets">0</span>/30</div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('mapTab',event)">🗺️ Mapa</div>
+    <div class="tab" onclick="switchTab('shopTab',event)">🛒 Tienda</div>
+    <div class="tab" onclick="switchTab('achTab',event)">🏆 Logros</div>
+    <div class="tab" onclick="switchTab('statsTab',event)">📊 Stats</div>
+    <div class="tab" onclick="switchTab('classicTab',event)">🎮 Juegos</div>
+  </div>
+  <div class="tab-content active" id="mapTab">
+    <div id="welcomeMsg" class="welcome-msg" style="display:none"></div>
+    <div class="galaxy-grid" id="galaxyGrid"></div>
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn btn-red btn-small" onclick="confirmReset()">🔄 Reiniciar Progreso</button>
+      <button class="btn btn-blue btn-small" onclick="show('intro')">🏠 Inicio</button>
+    </div>
+  </div>
+  <div class="tab-content" id="shopTab">
+    <h2>🛒 Tienda Intergaláctica</h2>
+    <p style="text-align:center;font-size:13px;opacity:.85">Gasta tus monedas en items especiales</p>
+    <div class="shop-grid" id="shopGrid"></div>
+  </div>
+  <div class="tab-content" id="achTab">
+    <h2>🏆 Tus Logros</h2>
+    <div class="achievement-grid" id="achGrid"></div>
+  </div>
+  <div class="tab-content" id="statsTab">
+    <h2>📊 Estadísticas</h2>
+    <div class="stats-grid" id="statsGrid"></div>
+  </div>
+  <div class="tab-content" id="classicTab">
+    <h2>🎮 Juegos Clásicos</h2>
+    <div class="classic-grid">
+      <div class="classic-card" onclick="show('snake')"><div class="emoji">🐍</div><div class="title">Snake</div><div class="desc">Come y crece</div></div>
+      <div class="classic-card" onclick="show('tictac')"><div class="emoji">⭕</div><div class="title">3 en Raya</div><div class="desc">vs Computadora</div></div>
+      <div class="classic-card" onclick="show('memo')"><div class="emoji">🃏</div><div class="title">Memorama</div><div class="desc">Encuentra parejas</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION -->
+<div class="screen" id="question">
+  <div class="hud">
+    <div class="hud-info" id="qPlanet">Planeta</div>
+    <div class="hud-stat" id="qNum">1/10</div>
+    <div class="lives" id="lives"></div>
+  </div>
+  <div class="center" style="flex:1">
+    <div class="question-box" id="qText"></div>
+    <button class="btn btn-purple btn-small" onclick="useHint()" id="hintBtn">💡 Pista (5💰)</button>
+    <div class="answers" id="answers"></div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="result">
+  <div class="center">
+    <div id="resultEmoji" style="font-size:80px"></div>
+    <h2 id="resultTitle"></h2>
+    <p id="resultText" style="text-align:center;max-width:500px;line-height:1.5"></p>
+    <div id="resultStats" style="margin:14px 0"></div>
+    <div class="row">
+      <button class="btn" onclick="goToMap()">🗺️ Mapa</button>
+      <button class="btn btn-green" id="nextBtn" onclick="nextPlanet()">▶ Siguiente</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOSS -->
+<div class="screen boss-stage" id="boss">
+  <div class="boss-info">
+    <div class="boss-emoji" id="bossEmoji">👹</div>
+    <h2 id="bossName">Jefe Final</h2>
+    <div class="health-label">Vida del Jefe</div>
+    <div class="health-bar"><div class="health-fill boss-health" id="bossHp" style="width:100%"></div></div>
+    <div class="health-label">Tu Vida</div>
+    <div class="health-bar"><div class="health-fill player-health" id="playerHp" style="width:100%"></div></div>
+  </div>
+  <div class="center" style="flex:1">
+    <div class="question-box" id="bossQText"></div>
+    <div class="answers" id="bossAnswers"></div>
+  </div>
+</div>
+
+<!-- CERTIFICATE -->
+<div class="screen" id="cert">
+  <div class="center">
+    <div class="certificate">
+      <h1>🏆 ¡VICTORIA! 🏆</h1>
+      <p>Por la presente se certifica que</p>
+      <div class="name" id="certName">Astronauta</div>
+      <p>ha conquistado las 6 galaxias del saber, derrotado a todos los jefes y rescatado al <strong>Profesor Cosmos</strong>.</p>
+      <div style="font-size:50px;margin:14px 0">🚀⭐🪐</div>
+      <p><strong>Maestro Astronauta del Saber</strong></p>
+      <p style="font-size:12px;margin-top:14px;opacity:.7">Andorra · 2026</p>
+    </div>
+    <button class="btn" onclick="goToMap()">Continuar Aventura</button>
+  </div>
+</div>
+
+<!-- CLASSIC GAMES -->
+<div class="screen" id="classic">
+  <div class="center">
+    <h1>🎮 Juegos Clásicos</h1>
+    <div class="classic-grid">
+      <div class="classic-card" onclick="show('snake')"><div class="emoji">🐍</div><div class="title">Snake</div><div class="desc">Culebrita clásica</div></div>
+      <div class="classic-card" onclick="show('tictac')"><div class="emoji">⭕</div><div class="title">3 en Raya</div><div class="desc">vs Computadora</div></div>
+      <div class="classic-card" onclick="show('memo')"><div class="emoji">🃏</div><div class="title">Memorama</div><div class="desc">12 parejas</div></div>
+    </div>
+    <button class="btn btn-purple" onclick="show('intro')">← Volver</button>
+  </div>
+</div>
+
+<!-- SNAKE -->
+<div class="screen" id="snake">
+  <div class="center">
+    <h2>🐍 Snake</h2>
+    <div class="hud" style="max-width:340px;width:100%">
+      <div class="hud-stat">Puntos: <span id="snakeScore">0</span></div>
+      <div class="hud-stat">Récord: <span id="snakeBest">0</span></div>
+    </div>
+    <canvas id="snake-canvas" width="320" height="320"></canvas>
+    <div class="dpad">
+      <button class="dpad-btn dpad-up" onclick="snakeDir(0,-1)">▲</button>
+      <button class="dpad-btn dpad-left" onclick="snakeDir(-1,0)">◀</button>
+      <button class="dpad-btn dpad-right" onclick="snakeDir(1,0)">▶</button>
+      <button class="dpad-btn dpad-down" onclick="snakeDir(0,1)">▼</button>
+    </div>
+    <div class="row">
+      <button class="btn btn-green" onclick="snakeStart()">🔄 Empezar</button>
+      <button class="btn btn-purple" onclick="goBack()">← Volver</button>
+    </div>
+  </div>
+</div>
+
+<!-- TIC TAC TOE -->
+<div class="screen" id="tictac">
+  <div class="center">
+    <h2>⭕ 3 en Raya</h2>
+    <div class="hud" style="max-width:340px;width:100%">
+      <div class="hud-stat">Tú (X): <span id="tttHuman">0</span></div>
+      <div class="hud-stat">PC (O): <span id="tttComp">0</span></div>
+      <div class="hud-stat">Empates: <span id="tttDraws">0</span></div>
+    </div>
+    <div class="tictac-board" id="tttBoard"></div>
+    <div id="tttStatus" style="text-align:center;font-size:18px;margin:8px 0"></div>
+    <div class="row">
+      <button class="btn btn-green" onclick="tttStart()">🔄 Nueva Partida</button>
+      <button class="btn btn-purple" onclick="goBack()">← Volver</button>
+    </div>
+  </div>
+</div>
+
+<!-- MEMORY -->
+<div class="screen" id="memo">
+  <div class="center">
+    <h2>🃏 Memorama</h2>
+    <div class="hud" style="max-width:340px;width:100%">
+      <div class="hud-stat">Movs: <span id="memMoves">0</span></div>
+      <div class="hud-stat">Parejas: <span id="memPairs">0</span>/12</div>
+    </div>
+    <div class="memory-grid" id="memGrid"></div>
+    <div class="row">
+      <button class="btn btn-green" onclick="memStart()">🔄 Nueva Partida</button>
+      <button class="btn btn-purple" onclick="goBack()">← Volver</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ========== STORAGE ==========
+const STORAGE_KEY = 'aventura_espacial_v1';
+function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){}}
+function load(){try{const d=localStorage.getItem(STORAGE_KEY);if(d)return JSON.parse(d)}catch(e){}return null}
+
+// ========== STATE ==========
+const initialPlayer={stars:0,coins:0,planetsBeaten:[],bossesBeaten:[],items:[],achievements:[],totalCorrect:0,totalAnswered:0,bestStreak:0,currentStreak:0,welcomed:false};
+let state=load()||{currentPlayer:null,emmanuel:JSON.parse(JSON.stringify(initialPlayer)),emiliano:JSON.parse(JSON.stringify(initialPlayer)),snakeBest:0,soundOn:true};
+let game={screen:'intro',galaxy:0,planet:0,qIdx:0,lives:3,correct:0,wrong:[],bossHp:100,playerHp:100,bossQs:[],bossQIdx:0,history:['intro']};
+
+// ========== GALAXIES & QUESTIONS ==========
+const GALAXIES=[
+{id:'math',name:'Galaxia Matemática',emoji:'🔢',color:'#2196f3',
+  planets:['Sumas','Restas','Multiplicación','División','Problemas'],
+  boss:{name:'Robot Calculador',emoji:'🤖'}},
+{id:'logic',name:'Galaxia Lógica',emoji:'🧩',color:'#9c27b0',
+  planets:['Secuencias','Patrones','Acertijos','Memoria','Adivinanzas'],
+  boss:{name:'Esfinge Cósmica',emoji:'🦁'}},
+{id:'fr',name:'Galaxia Francesa',emoji:'🇫🇷',color:'#3f51b5',
+  planets:['Couleurs','Animaux','Nombres','Famille','Phrases'],
+  boss:{name:'Le Grand Méchant',emoji:'👹'}},
+{id:'es',name:'Galaxia Española',emoji:'🇪🇸',color:'#ff5722',
+  planets:['Ortografía','Sinónimos','Antónimos','Frases','Adivinanzas'],
+  boss:{name:'Dragón de Letras',emoji:'🐲'}},
+{id:'en',name:'Galaxia Inglesa',emoji:'🇬🇧',color:'#f44336',
+  planets:['Colors','Animals','Numbers','Verbs','Phrases'],
+  boss:{name:'The Word Wizard',emoji:'🧙'}},
+{id:'ca',name:'Galaxia Catalana',emoji:'🎗️',color:'#ffc107',
+  planets:['Colors','Animals','Números','Família','Andorra'],
+  boss:{name:'El Drac dels Pirineus',emoji:'🐉'}}
+];
+
+// Questions per galaxy/planet (10 per planet for older, easier versions for younger)
+// Format: [question, [4 options], correctIndex, lang?]
+const QUESTIONS={
+math:[
+[ // Sumas
+{q:'5 + 3 = ?',o:['7','8','9','6'],a:1,easy:true},
+{q:'12 + 7 = ?',o:['18','19','20','17'],a:1,easy:true},
+{q:'25 + 14 = ?',o:['38','39','40','37'],a:1},
+{q:'48 + 27 = ?',o:['74','75','76','73'],a:1},
+{q:'9 + 6 = ?',o:['14','15','16','13'],a:1,easy:true},
+{q:'100 + 250 = ?',o:['350','340','360','355'],a:0},
+{q:'7 + 8 = ?',o:['14','15','16','13'],a:1,easy:true},
+{q:'33 + 19 = ?',o:['51','52','53','50'],a:1},
+{q:'80 + 45 = ?',o:['115','125','120','135'],a:1},
+{q:'56 + 28 = ?',o:['82','84','86','80'],a:1}
+],[ // Restas
+{q:'10 - 4 = ?',o:['5','6','7','4'],a:1,easy:true},
+{q:'20 - 8 = ?',o:['11','12','13','10'],a:1,easy:true},
+{q:'45 - 17 = ?',o:['27','28','29','26'],a:1},
+{q:'100 - 35 = ?',o:['65','75','55','60'],a:0},
+{q:'15 - 9 = ?',o:['5','6','7','4'],a:1,easy:true},
+{q:'80 - 27 = ?',o:['52','53','54','51'],a:1},
+{q:'13 - 5 = ?',o:['7','8','9','6'],a:1,easy:true},
+{q:'90 - 41 = ?',o:['48','49','50','47'],a:1},
+{q:'200 - 75 = ?',o:['125','135','115','145'],a:0},
+{q:'66 - 29 = ?',o:['36','37','38','35'],a:1}
+],[ // Multiplicación
+{q:'3 × 4 = ?',o:['11','12','13','10'],a:1,easy:true},
+{q:'5 × 6 = ?',o:['28','30','32','25'],a:1,easy:true},
+{q:'7 × 8 = ?',o:['54','56','58','55'],a:1},
+{q:'9 × 9 = ?',o:['80','81','82','79'],a:1},
+{q:'2 × 7 = ?',o:['12','14','16','13'],a:1,easy:true},
+{q:'12 × 5 = ?',o:['58','60','62','55'],a:1},
+{q:'4 × 4 = ?',o:['14','16','18','12'],a:1,easy:true},
+{q:'8 × 6 = ?',o:['46','48','50','44'],a:1},
+{q:'11 × 7 = ?',o:['76','77','78','75'],a:1},
+{q:'15 × 4 = ?',o:['58','60','62','56'],a:1}
+],[ // División
+{q:'12 ÷ 3 = ?',o:['3','4','5','2'],a:1,easy:true},
+{q:'20 ÷ 4 = ?',o:['4','5','6','3'],a:1,easy:true},
+{q:'56 ÷ 7 = ?',o:['7','8','9','6'],a:1},
+{q:'81 ÷ 9 = ?',o:['8','9','10','7'],a:1},
+{q:'10 ÷ 2 = ?',o:['4','5','6','3'],a:1,easy:true},
+{q:'48 ÷ 6 = ?',o:['7','8','9','6'],a:1},
+{q:'100 ÷ 10 = ?',o:['9','10','11','8'],a:1,easy:true},
+{q:'72 ÷ 8 = ?',o:['8','9','10','7'],a:1},
+{q:'63 ÷ 7 = ?',o:['8','9','10','7'],a:1},
+{q:'144 ÷ 12 = ?',o:['11','12','13','10'],a:1}
+],[ // Problemas
+{q:'Tienes 3 manzanas y compras 5 más. ¿Cuántas tienes?',o:['7','8','9','6'],a:1,easy:true},
+{q:'Si un libro cuesta 5€, ¿cuánto cuestan 4 libros?',o:['18€','20€','24€','15€'],a:1},
+{q:'Hay 24 caramelos para 6 niños. ¿Cuántos toca a cada uno?',o:['3','4','5','6'],a:1},
+{q:'Un tren sale a las 8:00 y llega a las 10:30. ¿Cuánto duró?',o:['1h 30m','2h 30m','3h','2h'],a:1},
+{q:'¿Cuál es la mitad de 50?',o:['20','25','30','15'],a:1,easy:true},
+{q:'5 niños tienen 2 chocolates cada uno. ¿Total?',o:['8','10','12','7'],a:1,easy:true},
+{q:'¿Cuántos minutos hay en 2 horas?',o:['100','120','60','180'],a:1},
+{q:'Si gastas 12€ y tenías 50€, ¿cuánto te queda?',o:['38','40','42','35'],a:0},
+{q:'Una pizza tiene 8 trozos. Si comes 3, ¿cuántos quedan?',o:['4','5','6','3'],a:1,easy:true},
+{q:'¿Cuántas patas tienen 6 perros?',o:['18','24','20','22'],a:1}
+]
+],
+logic:[
+[ // Secuencias
+{q:'2, 4, 6, 8, ?',o:['9','10','11','12'],a:1,easy:true},
+{q:'5, 10, 15, 20, ?',o:['22','25','30','35'],a:1},
+{q:'1, 3, 5, 7, ?',o:['8','9','10','11'],a:1,easy:true},
+{q:'10, 20, 40, 80, ?',o:['100','120','160','140'],a:2},
+{q:'100, 90, 80, ?',o:['60','70','75','85'],a:1,easy:true},
+{q:'1, 4, 9, 16, ?',o:['20','25','24','30'],a:1},
+{q:'3, 6, 9, 12, ?',o:['14','15','16','13'],a:1,easy:true},
+{q:'1, 1, 2, 3, 5, ?',o:['7','8','6','9'],a:1},
+{q:'A, C, E, G, ?',o:['H','I','J','K'],a:1,easy:true},
+{q:'2, 6, 18, 54, ?',o:['108','162','100','216'],a:1}
+],[ // Patrones
+{q:'🔴🔵🔴🔵🔴?',o:['🔴','🔵','🟢','🟡'],a:1,easy:true},
+{q:'⭐🌙⭐🌙⭐?',o:['⭐','🌙','☀️','🌟'],a:1,easy:true},
+{q:'🐱🐶🐱🐶?',o:['🐭','🐱','🐶','🐰'],a:1,easy:true},
+{q:'1A 2B 3C 4?',o:['D','E','F','C'],a:0},
+{q:'🔺🔵🔺🔺🔵🔺🔺🔺?',o:['🔵','🔺','🔴','🟢'],a:0},
+{q:'XY ZA BC ?',o:['DE','EF','FG','GH'],a:0},
+{q:'🌞☁️🌞☁️🌞?',o:['🌞','☁️','🌧️','⛈️'],a:1,easy:true},
+{q:'2-4-6-?-10',o:['7','8','9','11'],a:1,easy:true},
+{q:'🔵🔵🔴🔵🔵🔴🔵🔵?',o:['🔴','🔵','🟢','🟡'],a:0},
+{q:'A1 B2 C3 D?',o:['3','4','5','6'],a:1}
+],[ // Acertijos
+{q:'¿Qué tiene cabeza pero no piensa?',o:['Una mesa','Un alfiler','Un libro','Un perro'],a:1},
+{q:'¿Qué animal va siempre con su casa?',o:['Caracol','Tortuga','Ambos','Perro'],a:2},
+{q:'Cuanto más le quitas, más grande es. ¿Qué es?',o:['Un agujero','El sol','Un árbol','Una casa'],a:0},
+{q:'¿Qué se moja al secar?',o:['Una toalla','Un vaso','El sol','La nieve'],a:0},
+{q:'¿De qué color es el caballo blanco de Santiago?',o:['Negro','Blanco','Marrón','Gris'],a:1,easy:true},
+{q:'Tiene dientes pero no come. ¿Qué es?',o:['Un peine','Un tigre','Un perro','Un libro'],a:0},
+{q:'Va y viene pero no se mueve. ¿Qué es?',o:['El reloj','Un río','El camino','La luna'],a:2},
+{q:'¿Qué tiene 4 patas pero no camina?',o:['Una mesa','Un caballo','Un gato','Un pulpo'],a:0,easy:true},
+{q:'Sin él no podemos ver, pero está oscuro.',o:['El sol','El ojo','Una vela','La luz'],a:1},
+{q:'Cuesta más cuanto más vacía está. ¿Qué es?',o:['La cabeza','La barriga','La cartera','La casa'],a:1}
+],[ // Memoria
+{q:'Recuerda: 3-7-2. ¿Cuál es el segundo?',o:['3','7','2','5'],a:1,easy:true},
+{q:'¿Cuántas patas tiene un pulpo?',o:['6','7','8','10'],a:2,easy:true},
+{q:'Recuerda: rojo, azul, verde. ¿Cuál es el último?',o:['Rojo','Azul','Verde','Amarillo'],a:2,easy:true},
+{q:'¿Cuántos días tiene una semana?',o:['5','6','7','8'],a:2,easy:true},
+{q:'¿Cuántos planetas hay en el sistema solar?',o:['7','8','9','10'],a:1},
+{q:'Recuerda: A-B-C-D-E. ¿Cuál es la cuarta letra?',o:['B','C','D','E'],a:2,easy:true},
+{q:'¿Cuántos lados tiene un hexágono?',o:['5','6','7','8'],a:1},
+{q:'¿Cuántos meses tiene un año?',o:['10','11','12','13'],a:2,easy:true},
+{q:'Recuerda: gato-perro-loro. ¿Cuál está en medio?',o:['Gato','Perro','Loro','Pez'],a:1,easy:true},
+{q:'¿Cuántas horas tiene un día?',o:['12','24','36','48'],a:1,easy:true}
+],[ // Adivinanzas
+{q:'Vuela sin alas, llora sin ojos. ¿Qué es?',o:['Una nube','Un pájaro','La lluvia','El viento'],a:0},
+{q:'Soy redondo y de cristal, te ayudo a ver. ¿Qué soy?',o:['Una pelota','Un espejo','Las gafas','Una bola'],a:2},
+{q:'Tengo escamas y nado. ¿Qué soy?',o:['Pájaro','Pez','Conejo','Tigre'],a:1,easy:true},
+{q:'Tengo agujas pero no coso. ¿Qué soy?',o:['Un reloj','Un árbol','Un peine','Ambos a y b'],a:3},
+{q:'Crece y crece pero no es planta. ¿Qué es?',o:['Pelo','Sombra','Niño','Todas'],a:3},
+{q:'No habla pero dice todo. ¿Qué es?',o:['Un libro','Una foto','Un cartel','Todas'],a:3},
+{q:'Suena y suena pero no tiene boca. ¿Qué es?',o:['Una campana','Un tambor','Un reloj','Todos'],a:3},
+{q:'Brilla en la noche y nos guía. ¿Qué es?',o:['El sol','La luna','El humo','La sombra'],a:1,easy:true},
+{q:'Soy amarillo y doy luz de día. ¿Qué soy?',o:['Luna','Sol','Estrella','Vela'],a:1,easy:true},
+{q:'Cae pero no se rompe. ¿Qué es?',o:['La lluvia','La nieve','La noche','Todas'],a:3}
+]
+],
+fr:[
+[ // Couleurs
+{q:'¿Cómo se dice ROJO en francés?',o:['bleu','rouge','vert','jaune'],a:1,easy:true},
+{q:'¿Cómo se dice AZUL en francés?',o:['rouge','bleu','noir','blanc'],a:1,easy:true},
+{q:'¿Cómo se dice VERDE en francés?',o:['vert','bleu','jaune','noir'],a:0,easy:true},
+{q:'¿Cómo se dice AMARILLO en francés?',o:['rose','jaune','rouge','blanc'],a:1},
+{q:'¿Cómo se dice NEGRO en francés?',o:['blanc','noir','gris','vert'],a:1,easy:true},
+{q:'¿Cómo se dice BLANCO en francés?',o:['blanc','noir','rouge','bleu'],a:0,easy:true},
+{q:'¿Cómo se dice ROSA en francés?',o:['rouge','rose','vert','noir'],a:1},
+{q:'¿Cómo se dice MORADO en francés?',o:['violet','rose','bleu','rouge'],a:0},
+{q:'¿Cómo se dice GRIS en francés?',o:['gris','blanc','noir','marron'],a:0,easy:true},
+{q:'¿Cómo se dice MARRÓN en francés?',o:['marron','blanc','jaune','rose'],a:0}
+],[ // Animaux
+{q:'¿"Chat" significa?',o:['Perro','Gato','Pez','Pájaro'],a:1,easy:true},
+{q:'¿"Chien" significa?',o:['Perro','Gato','Caballo','Conejo'],a:0,easy:true},
+{q:'¿"Oiseau" significa?',o:['Pez','Pájaro','Vaca','Ratón'],a:1},
+{q:'¿"Cheval" significa?',o:['Vaca','Caballo','Cerdo','Pato'],a:1},
+{q:'¿"Lapin" significa?',o:['Conejo','Ratón','Lobo','Oso'],a:0},
+{q:'¿"Souris" significa?',o:['Sapo','Ratón','Pato','Pez'],a:1},
+{q:'¿"Vache" significa?',o:['Vaca','Cabra','Oveja','Cerdo'],a:0,easy:true},
+{q:'¿"Poisson" significa?',o:['Pollo','Pez','Pato','Pavo'],a:1,easy:true},
+{q:'¿"Ours" significa?',o:['Lobo','Tigre','Oso','León'],a:2},
+{q:'¿"Tortue" significa?',o:['Caracol','Tortuga','Lagarto','Sapo'],a:1}
+],[ // Nombres
+{q:'¿"Un" en español es?',o:['1','2','3','4'],a:0,easy:true},
+{q:'¿"Deux" en español es?',o:['1','2','3','4'],a:1,easy:true},
+{q:'¿"Trois" en español es?',o:['2','3','4','5'],a:1,easy:true},
+{q:'¿"Cinq" en español es?',o:['4','5','6','7'],a:1,easy:true},
+{q:'¿"Dix" en español es?',o:['8','9','10','11'],a:2},
+{q:'¿"Sept" en español es?',o:['6','7','8','9'],a:1},
+{q:'¿"Huit" en español es?',o:['7','8','9','10'],a:1},
+{q:'¿"Neuf" en español es?',o:['8','9','10','11'],a:1},
+{q:'¿"Quatre" en español es?',o:['3','4','5','6'],a:1,easy:true},
+{q:'¿"Six" en español es?',o:['5','6','7','8'],a:1,easy:true}
+],[ // Famille
+{q:'¿"Maman" significa?',o:['Papá','Mamá','Hermano','Tío'],a:1,easy:true},
+{q:'¿"Papa" significa?',o:['Papá','Mamá','Abuelo','Primo'],a:0,easy:true},
+{q:'¿"Frère" significa?',o:['Hermano','Hermana','Tío','Primo'],a:0},
+{q:'¿"Sœur" significa?',o:['Hermano','Hermana','Madre','Tía'],a:1},
+{q:'¿"Grand-père" significa?',o:['Abuelo','Abuela','Padre','Tío'],a:0},
+{q:'¿"Grand-mère" significa?',o:['Abuela','Abuelo','Tía','Madre'],a:0},
+{q:'¿"Oncle" significa?',o:['Primo','Tío','Padre','Hermano'],a:1},
+{q:'¿"Tante" significa?',o:['Madre','Tía','Hermana','Abuela'],a:1},
+{q:'¿"Cousin" significa?',o:['Tío','Primo','Sobrino','Nieto'],a:1},
+{q:'¿"Famille" significa?',o:['Casa','Familia','Amigos','Pueblo'],a:1,easy:true}
+],[ // Phrases
+{q:'¿"Bonjour" significa?',o:['Adiós','Hola','Gracias','Por favor'],a:1,easy:true},
+{q:'¿"Merci" significa?',o:['Hola','Adiós','Gracias','Sí'],a:2,easy:true},
+{q:'¿"Au revoir" significa?',o:['Hola','Adiós','Buenos días','Perdón'],a:1},
+{q:'¿"S\'il vous plaît" significa?',o:['Gracias','Por favor','De nada','Disculpe'],a:1},
+{q:'¿"Oui" significa?',o:['Sí','No','Quizás','Nunca'],a:0,easy:true},
+{q:'¿"Non" significa?',o:['Sí','No','Tal vez','Bien'],a:1,easy:true},
+{q:'¿"Comment ça va?" significa?',o:['¿Cómo te llamas?','¿Qué hora es?','¿Cómo estás?','¿Dónde vives?'],a:2},
+{q:'¿"Je m\'appelle" significa?',o:['Yo soy','Mi nombre es','Yo vivo','Yo como'],a:1},
+{q:'¿"Bonne nuit" significa?',o:['Buenos días','Buenas tardes','Buenas noches','Hola'],a:2},
+{q:'¿"À bientôt" significa?',o:['Adiós','Hasta pronto','Buenos días','Gracias'],a:1}
+]
+],
+es:[
+[ // Ortografía
+{q:'¿Cuál es correcta?',o:['Aver','Haver','Haber','Aber'],a:2},
+{q:'¿Cuál es correcta?',o:['Bueno','Vueno','Bweno','Buenu'],a:0,easy:true},
+{q:'¿Cuál es correcta?',o:['Hola','Ola','Hhola','Olla'],a:0,easy:true},
+{q:'¿Cuál lleva tilde?',o:['Pajaro','Pájaro','Pájáro','Pájara'],a:1,easy:true},
+{q:'¿Cuál es correcta?',o:['Vamos','Bamos','Vamoz','Vamus'],a:0,easy:true},
+{q:'¿Cuál es correcta?',o:['Casa','Caza','Kasa','Cása'],a:0,easy:true},
+{q:'¿Cuál lleva H?',o:['Iglesia','Hiena','Iuevo','Iola'],a:1},
+{q:'¿Cuál es correcta?',o:['Vibir','Bivir','Vivir','Bibir'],a:2},
+{q:'¿Cuál es correcta?',o:['Tambien','También','Tanvién','Tambíen'],a:1},
+{q:'¿Cuál es correcta?',o:['Vurro','Burro','Bourro','Vourro'],a:1,easy:true}
+],[ // Sinónimos
+{q:'Sinónimo de FELIZ:',o:['Triste','Contento','Enojado','Cansado'],a:1,easy:true},
+{q:'Sinónimo de RÁPIDO:',o:['Lento','Veloz','Pesado','Tarde'],a:1,easy:true},
+{q:'Sinónimo de GRANDE:',o:['Pequeño','Enorme','Bajo','Fino'],a:1,easy:true},
+{q:'Sinónimo de BONITO:',o:['Feo','Hermoso','Sucio','Roto'],a:1,easy:true},
+{q:'Sinónimo de TRISTE:',o:['Alegre','Apenado','Risueño','Lleno'],a:1},
+{q:'Sinónimo de CASA:',o:['Coche','Hogar','Río','Mesa'],a:1,easy:true},
+{q:'Sinónimo de COMENZAR:',o:['Acabar','Iniciar','Parar','Dormir'],a:1},
+{q:'Sinónimo de OBSERVAR:',o:['Hablar','Mirar','Correr','Comer'],a:1},
+{q:'Sinónimo de DIFÍCIL:',o:['Fácil','Complicado','Bueno','Liso'],a:1},
+{q:'Sinónimo de AMIGO:',o:['Enemigo','Compañero','Profesor','Hermano'],a:1,easy:true}
+],[ // Antónimos
+{q:'Antónimo de ALTO:',o:['Largo','Bajo','Grande','Lejos'],a:1,easy:true},
+{q:'Antónimo de FRÍO:',o:['Caliente','Cálido','Templado','Helado'],a:0,easy:true},
+{q:'Antónimo de DÍA:',o:['Sol','Noche','Luna','Tarde'],a:1,easy:true},
+{q:'Antónimo de ENTRAR:',o:['Bajar','Salir','Subir','Volar'],a:1,easy:true},
+{q:'Antónimo de RICO:',o:['Pobre','Caro','Grande','Sucio'],a:0,easy:true},
+{q:'Antónimo de DULCE:',o:['Salado','Amargo','Picante','Soso'],a:1},
+{q:'Antónimo de LUZ:',o:['Sombra','Oscuridad','Sol','Lámpara'],a:1},
+{q:'Antónimo de ABRIR:',o:['Cerrar','Tocar','Buscar','Quitar'],a:0,easy:true},
+{q:'Antónimo de RECORDAR:',o:['Saber','Olvidar','Pensar','Aprender'],a:1},
+{q:'Antónimo de SEGURO:',o:['Tranquilo','Peligroso','Bueno','Listo'],a:1}
+],[ // Frases
+{q:'Completa: "El sol ___ por el este"',o:['cae','sale','duerme','llora'],a:1},
+{q:'Completa: "Los pájaros ___"',o:['nadan','vuelan','escriben','cocinan'],a:1,easy:true},
+{q:'Completa: "El pez vive en ___"',o:['el cielo','el agua','el fuego','la tierra'],a:1,easy:true},
+{q:'Completa: "Comemos con ___"',o:['los pies','la boca','las manos','el pelo'],a:1,easy:true},
+{q:'Completa: "La luna brilla de ___"',o:['día','tarde','mañana','noche'],a:3,easy:true},
+{q:'Completa: "Los libros se ___"',o:['comen','leen','beben','tocan'],a:1,easy:true},
+{q:'Completa: "El doctor cura a los ___"',o:['perros','enfermos','árboles','peces'],a:1},
+{q:'Completa: "El bombero apaga el ___"',o:['agua','fuego','viento','sol'],a:1,easy:true},
+{q:'Completa: "Andorra está en los ___"',o:['Pirineos','Andes','Alpes','Himalayas'],a:0},
+{q:'Completa: "El idioma oficial de Andorra es el ___"',o:['francés','catalán','español','inglés'],a:1}
+],[ // Adivinanzas
+{q:'Verde fui de mi nacer, amarillo del crecer y blanco al envejecer. ¿Qué soy?',o:['Una flor','Un puerro','Una manzana','Un huevo'],a:1},
+{q:'Tengo cuello pero no cabeza. ¿Qué soy?',o:['Una camisa','Una botella','Un libro','Una mesa'],a:1},
+{q:'Salgo de noche y me escondo de día. ¿Qué soy?',o:['El sol','Las estrellas','La luna','Todas'],a:3},
+{q:'Tengo hojas pero no soy árbol. ¿Qué soy?',o:['Un libro','Una flor','Una rama','Un pino'],a:0,easy:true},
+{q:'No soy mar pero traigo olas. ¿Qué soy?',o:['Río','Cabello','Lago','Lluvia'],a:1},
+{q:'Te miro pero no te veo. ¿Qué soy?',o:['Cámara','Espejo','Foto','Reloj'],a:0},
+{q:'Soy blanca y caigo del cielo. ¿Qué soy?',o:['Lluvia','Nieve','Granizo','Pluma'],a:1,easy:true},
+{q:'Tengo pelos pero no animal. ¿Qué soy?',o:['Pincel','Cabeza','Cepillo','Todas'],a:3},
+{q:'Doy fruto sin tener flor. ¿Qué soy?',o:['Pino','Higuera','Robles','Manzano'],a:1},
+{q:'En el cielo soy y no me alcanzas. ¿Qué soy?',o:['Luna','Sol','Nube','Estrella'],a:0}
+]
+],
+en:[
+[ // Colors
+{q:'¿"Red" significa?',o:['Azul','Rojo','Verde','Negro'],a:1,easy:true},
+{q:'¿"Blue" significa?',o:['Rojo','Azul','Amarillo','Blanco'],a:1,easy:true},
+{q:'¿"Green" significa?',o:['Verde','Rojo','Negro','Gris'],a:0,easy:true},
+{q:'¿"Yellow" significa?',o:['Naranja','Amarillo','Rosa','Marrón'],a:1,easy:true},
+{q:'¿"Black" significa?',o:['Blanco','Negro','Gris','Azul'],a:1,easy:true},
+{q:'¿"White" significa?',o:['Negro','Blanco','Amarillo','Verde'],a:1,easy:true},
+{q:'¿"Pink" significa?',o:['Rojo','Rosa','Morado','Naranja'],a:1},
+{q:'¿"Purple" significa?',o:['Verde','Morado','Azul','Marrón'],a:1},
+{q:'¿"Orange" significa?',o:['Rojo','Naranja','Amarillo','Marrón'],a:1,easy:true},
+{q:'¿"Brown" significa?',o:['Rosa','Marrón','Negro','Verde'],a:1}
+],[ // Animals
+{q:'¿"Dog" significa?',o:['Gato','Perro','Pez','Pollo'],a:1,easy:true},
+{q:'¿"Cat" significa?',o:['Gato','Perro','Vaca','Conejo'],a:0,easy:true},
+{q:'¿"Bird" significa?',o:['Pez','Pájaro','Cerdo','Caballo'],a:1,easy:true},
+{q:'¿"Fish" significa?',o:['Pollo','Pato','Pez','Loro'],a:2,easy:true},
+{q:'¿"Horse" significa?',o:['Vaca','Cabra','Caballo','Cerdo'],a:2},
+{q:'¿"Mouse" significa?',o:['Rana','Ratón','Sapo','Mosca'],a:1},
+{q:'¿"Cow" significa?',o:['Vaca','Cabra','Oveja','Pato'],a:0,easy:true},
+{q:'¿"Sheep" significa?',o:['Cabra','Oveja','Cerdo','Pavo'],a:1},
+{q:'¿"Bear" significa?',o:['Lobo','Oso','Tigre','León'],a:1},
+{q:'¿"Rabbit" significa?',o:['Conejo','Ratón','Hámster','Sapo'],a:0,easy:true}
+],[ // Numbers
+{q:'¿"One" significa?',o:['1','2','3','4'],a:0,easy:true},
+{q:'¿"Five" significa?',o:['3','4','5','6'],a:2,easy:true},
+{q:'¿"Ten" significa?',o:['8','9','10','11'],a:2,easy:true},
+{q:'¿"Twenty" significa?',o:['12','15','20','25'],a:2},
+{q:'¿"Three" significa?',o:['2','3','4','5'],a:1,easy:true},
+{q:'¿"Eight" significa?',o:['7','8','9','10'],a:1},
+{q:'¿"Twelve" significa?',o:['10','11','12','13'],a:2},
+{q:'¿"Fifty" significa?',o:['15','40','50','60'],a:2},
+{q:'¿"One hundred" significa?',o:['10','50','100','1000'],a:2,easy:true},
+{q:'¿"Seven" significa?',o:['6','7','8','9'],a:1,easy:true}
+],[ // Verbs
+{q:'¿"Run" significa?',o:['Comer','Correr','Saltar','Dormir'],a:1,easy:true},
+{q:'¿"Eat" significa?',o:['Beber','Comer','Mirar','Correr'],a:1,easy:true},
+{q:'¿"Sleep" significa?',o:['Despertar','Dormir','Comer','Andar'],a:1,easy:true},
+{q:'¿"Read" significa?',o:['Escribir','Leer','Hablar','Cantar'],a:1},
+{q:'¿"Write" significa?',o:['Leer','Escribir','Pintar','Bailar'],a:1},
+{q:'¿"Play" significa?',o:['Trabajar','Jugar','Correr','Comer'],a:1,easy:true},
+{q:'¿"Walk" significa?',o:['Correr','Andar','Saltar','Volar'],a:1,easy:true},
+{q:'¿"Sing" significa?',o:['Bailar','Cantar','Hablar','Gritar'],a:1},
+{q:'¿"Drink" significa?',o:['Comer','Beber','Mirar','Tocar'],a:1,easy:true},
+{q:'¿"Speak" significa?',o:['Cantar','Hablar','Reír','Llorar'],a:1}
+],[ // Phrases
+{q:'¿"Hello" significa?',o:['Adiós','Hola','Gracias','Sí'],a:1,easy:true},
+{q:'¿"Goodbye" significa?',o:['Hola','Adiós','Buenos días','Por favor'],a:1,easy:true},
+{q:'¿"Thank you" significa?',o:['Hola','Lo siento','Gracias','De nada'],a:2,easy:true},
+{q:'¿"Please" significa?',o:['Por favor','Gracias','Sí','Disculpe'],a:0,easy:true},
+{q:'¿"Yes" significa?',o:['Sí','No','Tal vez','Quizás'],a:0,easy:true},
+{q:'¿"No" significa?',o:['Sí','No','Bueno','Gracias'],a:1,easy:true},
+{q:'¿"How are you?" significa?',o:['¿Cuántos años?','¿Cómo estás?','¿Dónde vives?','¿Quién eres?'],a:1},
+{q:'¿"My name is" significa?',o:['Soy de','Mi nombre es','Yo vivo','Yo soy'],a:1},
+{q:'¿"Good morning" significa?',o:['Buenas noches','Buenos días','Buenas tardes','Hola'],a:1},
+{q:'¿"I love you" significa?',o:['Te quiero','Hola amigo','Te veo','Buen día'],a:0}
+]
+],
+ca:[
+[ // Colors
+{q:'¿"Vermell" en català significa?',o:['Azul','Rojo','Verde','Amarillo'],a:1},
+{q:'¿"Blau" en català significa?',o:['Rojo','Azul','Verde','Negro'],a:1,easy:true},
+{q:'¿"Verd" en català significa?',o:['Verde','Rojo','Azul','Blanco'],a:0,easy:true},
+{q:'¿"Groc" en català significa?',o:['Naranja','Amarillo','Rosa','Marrón'],a:1},
+{q:'¿"Negre" en català significa?',o:['Blanco','Negro','Gris','Verde'],a:1,easy:true},
+{q:'¿"Blanc" en català significa?',o:['Negro','Blanco','Gris','Azul'],a:1,easy:true},
+{q:'¿"Rosa" en català significa?',o:['Rojo','Rosa','Verde','Negro'],a:1,easy:true},
+{q:'¿"Lila/violeta" en català?',o:['Lila','Verd','Marró','Blau'],a:0},
+{q:'¿"Marró" en català significa?',o:['Rosa','Marrón','Negro','Verde'],a:1,easy:true},
+{q:'¿"Taronja" en català significa?',o:['Verde','Naranja','Rojo','Amarillo'],a:1}
+],[ // Animals
+{q:'¿"Gos" en català significa?',o:['Gato','Perro','Pez','Pájaro'],a:1,easy:true},
+{q:'¿"Gat" en català significa?',o:['Gato','Perro','Conejo','Ratón'],a:0,easy:true},
+{q:'¿"Ocell" en català significa?',o:['Pájaro','Pez','Mariposa','Mosca'],a:0},
+{q:'¿"Peix" en català significa?',o:['Pollo','Pato','Pez','Loro'],a:2,easy:true},
+{q:'¿"Cavall" en català significa?',o:['Vaca','Caballo','Cerdo','Cabra'],a:1},
+{q:'¿"Vaca" en català significa?',o:['Vaca','Cabra','Oveja','Cerdo'],a:0,easy:true},
+{q:'¿"Conill" en català significa?',o:['Conejo','Ratón','Hámster','Sapo'],a:0},
+{q:'¿"Os" en català significa?',o:['Lobo','Oso','Tigre','León'],a:1},
+{q:'¿"Llop" en català significa?',o:['Lobo','Zorro','Oso','Perro'],a:0},
+{q:'¿"Tortuga" en català significa?',o:['Tortuga','Lagarto','Sapo','Caracol'],a:0,easy:true}
+],[ // Números
+{q:'¿"U/Un" en català significa?',o:['1','2','3','4'],a:0,easy:true},
+{q:'¿"Dos" en català significa?',o:['1','2','3','4'],a:1,easy:true},
+{q:'¿"Tres" en català significa?',o:['2','3','4','5'],a:1,easy:true},
+{q:'¿"Cinc" en català significa?',o:['4','5','6','7'],a:1},
+{q:'¿"Deu" en català significa?',o:['8','9','10','11'],a:2},
+{q:'¿"Set" en català significa?',o:['6','7','8','9'],a:1},
+{q:'¿"Vuit" en català significa?',o:['7','8','9','10'],a:1},
+{q:'¿"Nou" en català significa?',o:['8','9','10','11'],a:1},
+{q:'¿"Quatre" en català significa?',o:['3','4','5','6'],a:1,easy:true},
+{q:'¿"Sis" en català significa?',o:['5','6','7','8'],a:1,easy:true}
+],[ // Família
+{q:'¿"Mare" en català significa?',o:['Padre','Madre','Hermana','Abuela'],a:1,easy:true},
+{q:'¿"Pare" en català significa?',o:['Padre','Madre','Abuelo','Tío'],a:0,easy:true},
+{q:'¿"Germà" en català significa?',o:['Hermano','Hermana','Tío','Primo'],a:0},
+{q:'¿"Germana" en català significa?',o:['Hermano','Hermana','Madre','Tía'],a:1},
+{q:'¿"Avi" en català significa?',o:['Abuelo','Abuela','Padre','Tío'],a:0},
+{q:'¿"Àvia" en català significa?',o:['Abuela','Abuelo','Tía','Madre'],a:0},
+{q:'¿"Oncle" en català significa?',o:['Primo','Tío','Padre','Hermano'],a:1},
+{q:'¿"Tia" en català significa?',o:['Madre','Tía','Hermana','Abuela'],a:1,easy:true},
+{q:'¿"Cosí" en català significa?',o:['Tío','Primo','Sobrino','Nieto'],a:1},
+{q:'¿"Família" en català significa?',o:['Casa','Familia','Amigos','Pueblo'],a:1,easy:true}
+],[ // Andorra
+{q:'¿Cuál es la capital de Andorra?',o:['La Massana','Encamp','Andorra la Vella','Ordino'],a:2},
+{q:'¿En qué montañas está Andorra?',o:['Alpes','Pirineos','Andes','Cárpatos'],a:1},
+{q:'¿Cuál es el idioma oficial de Andorra?',o:['Francés','Español','Catalán','Portugués'],a:2},
+{q:'¿Andorra tiene mar?',o:['Sí','No','A veces','En invierno'],a:1,easy:true},
+{q:'¿Qué deporte de invierno es famoso en Andorra?',o:['Surf','Esquí','Tenis','Fútbol'],a:1,easy:true},
+{q:'¿Andorra está entre qué dos países?',o:['España y Francia','Italia y Suiza','Portugal y España','Francia y Bélgica'],a:0},
+{q:'¿"Bon dia" en català significa?',o:['Buenas noches','Buenos días','Hola','Adiós'],a:1},
+{q:'¿"Adéu" en català significa?',o:['Hola','Adiós','Gracias','Por favor'],a:1,easy:true},
+{q:'¿"Gràcies" en català significa?',o:['Hola','Adiós','Gracias','De nada'],a:2,easy:true},
+{q:'¿Cuál es la moneda de Andorra?',o:['Peseta','Euro','Dólar','Libra'],a:1}
+]
+]
+};
+
+// Achievements
+const ACHIEVEMENTS=[
+{id:'first',emoji:'🌱',name:'Primer paso',desc:'Conquista tu primer planeta',cond:s=>s.planetsBeaten.length>=1},
+{id:'streak5',emoji:'🔥',name:'En racha',desc:'5 aciertos seguidos',cond:s=>s.bestStreak>=5},
+{id:'streak10',emoji:'⚡',name:'Imparable',desc:'10 aciertos seguidos',cond:s=>s.bestStreak>=10},
+{id:'streak15',emoji:'🌟',name:'Leyenda',desc:'15 aciertos seguidos',cond:s=>s.bestStreak>=15},
+{id:'rich',emoji:'💎',name:'Millonario',desc:'Acumula 500 monedas',cond:s=>s.coins>=500},
+{id:'gal1',emoji:'🔢',name:'Matemático',desc:'Conquista la Galaxia Matemática',cond:s=>s.bossesBeaten.includes('math')},
+{id:'gal2',emoji:'🧩',name:'Lógico',desc:'Conquista la Galaxia Lógica',cond:s=>s.bossesBeaten.includes('logic')},
+{id:'gal3',emoji:'🇫🇷',name:'Francófono',desc:'Conquista la Galaxia Francesa',cond:s=>s.bossesBeaten.includes('fr')},
+{id:'gal4',emoji:'🇪🇸',name:'Hispanohablante',desc:'Conquista la Galaxia Española',cond:s=>s.bossesBeaten.includes('es')},
+{id:'gal5',emoji:'🇬🇧',name:'Anglófono',desc:'Conquista la Galaxia Inglesa',cond:s=>s.bossesBeaten.includes('en')},
+{id:'gal6',emoji:'🏔️',name:'Andorrano',desc:'Conquista la Galaxia Catalana',cond:s=>s.bossesBeaten.includes('ca')},
+{id:'master',emoji:'👑',name:'Maestro Astronauta',desc:'Conquista las 6 galaxias',cond:s=>s.bossesBeaten.length>=6},
+{id:'planets10',emoji:'🪐',name:'Explorador',desc:'Conquista 10 planetas',cond:s=>s.planetsBeaten.length>=10},
+{id:'planets20',emoji:'🚀',name:'Pionero',desc:'Conquista 20 planetas',cond:s=>s.planetsBeaten.length>=20},
+{id:'planets30',emoji:'🌌',name:'Conquistador',desc:'Conquista los 30 planetas',cond:s=>s.planetsBeaten.length>=30},
+{id:'shopper',emoji:'🛍️',name:'Comprador',desc:'Compra 3 items',cond:s=>s.items.length>=3}
+];
+
+// Shop
+const SHOP=[
+{id:'helmet1',emoji:'⛑️',name:'Casco básico',price:50},
+{id:'helmet2',emoji:'🪖',name:'Casco avanzado',price:120},
+{id:'ship1',emoji:'🚀',name:'Nave estándar',price:100},
+{id:'ship2',emoji:'🛸',name:'Nave alien',price:200},
+{id:'pet1',emoji:'👽',name:'Mascota alien',price:80},
+{id:'pet2',emoji:'🐉',name:'Dragón cósmico',price:250},
+{id:'shield',emoji:'🛡️',name:'Escudo galáctico',price:150},
+{id:'cape',emoji:'🦸',name:'Capa de héroe',price:130},
+{id:'medal',emoji:'🏅',name:'Medalla de oro',price:300},
+{id:'crown',emoji:'👑',name:'Corona estelar',price:400},
+{id:'dragon',emoji:'🟠',name:'Bola de Dragón',price:175},
+{id:'pickaxe',emoji:'⛏️',name:'Pico de Diamante',price:175},
+{id:'mushroom',emoji:'🍄',name:'Champiñón Mario',price:125},
+{id:'fireball',emoji:'🔥',name:'Bola de Fuego',price:140}
+];
+
+// ========== AVATARS (SVG) ==========
+const AVATAR_EMMANUEL=`<svg class="avatar-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+<defs><radialGradient id="aura1" cx="50%" cy="50%"><stop offset="60%" stop-color="#ffd700" stop-opacity="0"/><stop offset="100%" stop-color="#ffd700" stop-opacity=".7"/></radialGradient></defs>
+<circle cx="60" cy="60" r="58" fill="url(#aura1)"><animate attributeName="r" values="55;60;55" dur="2s" repeatCount="indefinite"/></circle>
+<circle cx="60" cy="60" r="50" fill="#1565c0"/>
+<rect x="35" y="80" width="50" height="35" fill="#1976d2" rx="3"/>
+<polygon points="50,90 60,82 70,90 65,95 55,95" fill="#4caf50"/>
+<ellipse cx="60" cy="55" rx="22" ry="26" fill="#fdbcb4"/>
+<path d="M 38 38 Q 35 25 45 22 L 50 30 L 55 18 L 62 28 L 68 16 L 73 26 L 80 22 Q 85 28 82 40 Q 80 35 75 36 Q 70 30 65 36 Q 60 30 55 36 Q 50 30 45 36 Q 40 38 38 38 Z" fill="#1a0d00"/>
+<rect x="42" y="48" width="36" height="9" fill="#ff6b00" rx="2"/>
+<rect x="44" y="49" width="14" height="6" fill="#ffeb3b" opacity=".7"/>
+<rect x="62" y="49" width="14" height="6" fill="#ffeb3b" opacity=".7"/>
+<path d="M 50 65 Q 60 70 70 65" stroke="#1a0d00" stroke-width="2" fill="none"/>
+<text x="20" y="30" font-size="14" fill="#ffd700">⚡</text>
+<text x="92" y="35" font-size="14" fill="#ffd700">⚡</text>
+<text x="15" y="100" font-size="12" fill="#ffd700">⚡</text>
+</svg>`;
+
+const AVATAR_EMILIANO=`<svg class="avatar-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+<defs><radialGradient id="aura2" cx="50%" cy="50%"><stop offset="60%" stop-color="#ff7043" stop-opacity="0"/><stop offset="100%" stop-color="#ff7043" stop-opacity=".5"/></radialGradient></defs>
+<circle cx="60" cy="60" r="58" fill="url(#aura2)"/>
+<circle cx="60" cy="60" r="50" fill="#ff7043"/>
+<rect x="35" y="80" width="50" height="35" fill="#f4511e" rx="3"/>
+<rect x="42" y="86" width="6" height="6" fill="#4caf50"/>
+<rect x="50" y="92" width="6" height="6" fill="#8bc34a"/>
+<rect x="58" y="86" width="6" height="6" fill="#795548"/>
+<rect x="66" y="92" width="6" height="6" fill="#4caf50"/>
+<rect x="74" y="86" width="6" height="6" fill="#8bc34a"/>
+<ellipse cx="60" cy="55" rx="22" ry="26" fill="#fdbcb4"/>
+<path d="M 38 35 Q 38 22 60 22 Q 82 22 82 35 L 80 42 Q 75 32 60 32 Q 45 32 40 42 Z" fill="#3e2723"/>
+<rect x="42" y="48" width="36" height="9" fill="#0288d1" rx="2"/>
+<rect x="44" y="49" width="14" height="6" fill="#00d4ff" opacity=".7"/>
+<rect x="62" y="49" width="14" height="6" fill="#00d4ff" opacity=".7"/>
+<circle cx="46" cy="65" r="3" fill="#ff8a80" opacity=".6"/>
+<circle cx="74" cy="65" r="3" fill="#ff8a80" opacity=".6"/>
+<path d="M 50 68 Q 60 73 70 68" stroke="#3e2723" stroke-width="2" fill="none"/>
+<text x="22" y="28" font-size="11">🟫<animate attributeName="y" values="28;24;28" dur="3s" repeatCount="indefinite"/></text>
+<text x="88" y="32" font-size="11">🟩<animate attributeName="y" values="32;28;32" dur="2.5s" repeatCount="indefinite"/></text>
+<text x="92" y="100" font-size="14">🍄</text>
+</svg>`;
+
+// ========== SOUND ==========
+let audioCtx=null;
+function snd(freq,dur=.15,type='sine'){
+  if(!state.soundOn)return;
+  try{
+    if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.connect(g);g.connect(audioCtx.destination);
+    o.frequency.value=freq;o.type=type;
+    g.gain.setValueAtTime(.15,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);
+    o.start();o.stop(audioCtx.currentTime+dur);
+  }catch(e){}
+}
+function sndCorrect(){snd(523,.12);setTimeout(()=>snd(659,.12),100);setTimeout(()=>snd(784,.18),200)}
+function sndWrong(){snd(220,.2,'sawtooth');setTimeout(()=>snd(165,.3,'sawtooth'),150)}
+function sndCoin(){snd(988,.08);setTimeout(()=>snd(1318,.12),60)}
+function sndWin(){snd(523,.1);setTimeout(()=>snd(659,.1),100);setTimeout(()=>snd(784,.1),200);setTimeout(()=>snd(1047,.3),300)}
+function sndLose(){snd(330,.15,'sawtooth');setTimeout(()=>snd(247,.15,'sawtooth'),150);setTimeout(()=>snd(165,.4,'sawtooth'),300)}
+function toggleSound(){state.soundOn=!state.soundOn;save();document.getElementById('soundBtn').textContent=state.soundOn?'🔊':'🔇'}
+
+// ========== UI HELPERS ==========
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  game.screen=id;
+  if(id!==game.history[game.history.length-1])game.history.push(id);
+  document.getElementById('soundBtn').style.display=id==='intro'?'none':'flex';
+  document.getElementById('backBtn').style.display=(id==='snake'||id==='tictac'||id==='memo'||id==='classic'||id==='select')?'flex':'none';
+  if(id==='snake')snakeStart();
+  if(id==='tictac')tttStart();
+  if(id==='memo')memStart();
+  // stop minigames if leaving
+  if(id!=='snake'&&snakeLoop){clearInterval(snakeLoop);snakeLoop=null}
+  if(id!=='memo'&&memTimer){clearTimeout(memTimer);memTimer=null}
+}
+function goBack(){
+  if(game.history.length>1){game.history.pop();const prev=game.history[game.history.length-1];game.history.pop();show(prev)}
+  else show('intro');
+}
+function goToMap(){show('map');renderMap()}
+function toast(msg,duration=2500){
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),duration);
+}
+function feedback(msg,type='success'){
+  const f=document.createElement('div');f.className='feedback '+type;f.textContent=msg;
+  document.body.appendChild(f);
+  setTimeout(()=>f.remove(),1200);
+}
+function confetti(count=30){
+  const colors=['#ffd700','#ff6b9d','#00d4ff','#4caf50','#9c27b0','#ff7043'];
+  for(let i=0;i<count;i++){
+    const c=document.createElement('div');c.className='confetti';
+    c.style.left=Math.random()*100+'vw';
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDelay=Math.random()*.5+'s';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),3000);
+  }
+}
+function switchTab(id,event){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  if(event&&event.target)event.target.classList.add('active');
+  document.getElementById(id).classList.add('active');
+  if(id==='shopTab')renderShop();
+  if(id==='achTab')renderAchievements();
+  if(id==='statsTab')renderStats();
+}
+
+// ========== GAME FLOW ==========
+function startGame(){
+  show('select');
+  document.getElementById('ava-em-big').innerHTML=AVATAR_EMMANUEL;
+  document.getElementById('ava-eli-big').innerHTML=AVATAR_EMILIANO;
+}
+function choosePlayer(p){
+  state.currentPlayer=p;save();
+  goToMap();
+  const player=state[p];
+  if(!player.welcomed){
+    const msg=p==='emmanuel'
+      ?'⚡ ¡Bienvenido, Emmanuel! Tu poder Saiyajin es inmenso. El Profesor Cosmos te necesita...'
+      :'⛏️ ¡Bienvenido, Emiliano! Hora de construir la victoria como en Minecraft. ¡Vamos!';
+    document.getElementById('welcomeMsg').textContent=msg;
+    document.getElementById('welcomeMsg').style.display='block';
+    player.welcomed=true;save();
+    setTimeout(()=>{document.getElementById('welcomeMsg').style.display='none'},6000);
+  }
+}
+function getPlayer(){return state[state.currentPlayer]}
+function isYoung(){return state.currentPlayer==='emiliano'}
+
+function renderMap(){
+  const p=getPlayer();
+  document.getElementById('hudName').textContent=state.currentPlayer==='emmanuel'?'Emmanuel ⚡':'Emiliano ⛏️';
+  document.getElementById('hudStars').textContent=p.stars;
+  document.getElementById('hudCoins').textContent=p.coins;
+  document.getElementById('hudPlanets').textContent=p.planetsBeaten.length;
+  document.getElementById('hudAvatar').innerHTML=state.currentPlayer==='emmanuel'?AVATAR_EMMANUEL:AVATAR_EMILIANO;
+  const grid=document.getElementById('galaxyGrid');grid.innerHTML='';
+  GALAXIES.forEach((g,gi)=>{
+    const unlocked=gi===0||p.bossesBeaten.includes(GALAXIES[gi-1].id);
+    const beatenInGal=g.planets.filter((_,pi)=>p.planetsBeaten.includes(g.id+'-'+pi)).length;
+    const bossReady=beatenInGal>=5&&!p.bossesBeaten.includes(g.id);
+    const card=document.createElement('div');
+    card.className='galaxy-card'+(unlocked?'':' locked');
+    card.innerHTML=`
+      ${bossReady?'<div class="boss-mark">👹</div>':p.bossesBeaten.includes(g.id)?'<div class="boss-mark">✅</div>':''}
+      <div class="emoji">${g.emoji}</div>
+      <div class="name">${g.name}</div>
+      <div class="progress">${beatenInGal}/5 planetas</div>
+      <div class="planet-row">
+        ${g.planets.map((pn,pi)=>{
+          const done=p.planetsBeaten.includes(g.id+'-'+pi);
+          return `<div class="planet-dot${done?' done':''}" title="${pn}">${done?'✓':pi+1}</div>`;
+        }).join('')}
+      </div>`;
+    if(unlocked){
+      card.onclick=()=>{
+        if(bossReady){startBoss(gi)}
+        else{
+          // pick first incomplete planet
+          let pi=g.planets.findIndex((_,i)=>!p.planetsBeaten.includes(g.id+'-'+i));
+          if(pi<0)pi=0;
+          startPlanet(gi,pi);
+        }
+      };
+    }
+    grid.appendChild(card);
+  });
+  checkAchievements();
+}
+
+function startPlanet(galIdx,planetIdx){
+  game.galaxy=galIdx;game.planet=planetIdx;
+  game.qIdx=0;game.lives=3;game.correct=0;game.wrong=[];
+  show('question');
+  renderQuestion();
+}
+
+function getQuestionsForCurrent(){
+  const g=GALAXIES[game.galaxy];
+  let qs=QUESTIONS[g.id][game.planet]||[];
+  if(isYoung()){
+    const easy=qs.filter(q=>q.easy);
+    if(easy.length>=8)qs=easy;
+  }
+  return qs.slice(0,10);
+}
+
+function renderQuestion(){
+  const g=GALAXIES[game.galaxy];
+  const qs=getQuestionsForCurrent();
+  if(game.qIdx>=qs.length){endPlanet();return}
+  const q=qs[game.qIdx];
+  document.getElementById('qPlanet').textContent=`${g.emoji} ${g.planets[game.planet]}`;
+  document.getElementById('qNum').textContent=`${game.qIdx+1}/${qs.length}`;
+  document.getElementById('lives').innerHTML=Array.from({length:3},(_,i)=>`<span class="heart${i>=game.lives?' lost':''}">❤️</span>`).join('');
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('hintBtn').style.display=getPlayer().coins>=5?'inline-block':'none';
+  const ans=document.getElementById('answers');ans.innerHTML='';
+  q.o.forEach((opt,i)=>{
+    const b=document.createElement('button');
+    b.className='answer-btn';b.textContent=opt;
+    b.onclick=()=>answer(i,q,b);
+    ans.appendChild(b);
+  });
+}
+
+function useHint(){
+  const p=getPlayer();
+  if(p.coins<5)return;
+  p.coins-=5;save();
+  document.getElementById('hudCoins').textContent=p.coins;
+  document.getElementById('hintBtn').style.display='none';
+  const qs=getQuestionsForCurrent();
+  const q=qs[game.qIdx];
+  const buttons=document.querySelectorAll('#answers .answer-btn');
+  let removed=0;
+  for(let i=0;i<buttons.length&&removed<2;i++){
+    if(i!==q.a&&!buttons[i].classList.contains('hint-eliminated')){
+      buttons[i].classList.add('hint-eliminated');removed++;
+    }
+  }
+  toast('Pista usada -5💰');
+}
+
+function answer(idx,q,btn){
+  document.querySelectorAll('#answers .answer-btn').forEach(b=>b.disabled=true);
+  const p=getPlayer();
+  p.totalAnswered++;
+  if(idx===q.a){
+    btn.classList.add('correct');
+    sndCorrect();sndCoin();
+    p.totalCorrect++;p.currentStreak++;
+    if(p.currentStreak>p.bestStreak)p.bestStreak=p.currentStreak;
+    p.coins+=isYoung()?3:5;
+    game.correct++;
+    feedback('✓ ¡Correcto!','success');
+  }else{
+    btn.classList.add('wrong');
+    document.querySelectorAll('#answers .answer-btn')[q.a].classList.add('correct');
+    sndWrong();
+    p.currentStreak=0;
+    game.lives--;
+    game.wrong.push(q);
+    feedback('✗ Incorrecto','fail');
+  }
+  save();
+  setTimeout(()=>{
+    if(game.lives<=0){endPlanet(true);return}
+    game.qIdx++;
+    renderQuestion();
+  },1300);
+}
+
+function endPlanet(failed=false){
+  const g=GALAXIES[game.galaxy];
+  const planetKey=g.id+'-'+game.planet;
+  const p=getPlayer();
+  show('result');
+  if(failed){
+    sndLose();
+    document.getElementById('resultEmoji').textContent='😢';
+    document.getElementById('resultTitle').textContent='Sin vidas';
+    document.getElementById('resultText').textContent='Te quedaste sin vidas, pero puedes intentarlo de nuevo. ¡Vamos!';
+    document.getElementById('nextBtn').style.display='none';
+  }else{
+    const passed=game.correct>=Math.ceil(getQuestionsForCurrent().length*.6);
+    if(passed&&!p.planetsBeaten.includes(planetKey)){
+      p.planetsBeaten.push(planetKey);
+      const stars=game.correct>=10?3:game.correct>=8?2:1;
+      p.stars+=stars;
+      p.coins+=20+stars*10;
+      sndWin();confetti();
+      document.getElementById('resultEmoji').textContent='🎉';
+      document.getElementById('resultTitle').textContent='¡Planeta conquistado!';
+      document.getElementById('resultText').textContent=`${stars===3?'⭐⭐⭐ ¡Perfecto!':stars===2?'⭐⭐ ¡Genial!':'⭐ ¡Bien!'} Aciertos: ${game.correct}/${getQuestionsForCurrent().length}`;
+    }else{
+      sndLose();
+      document.getElementById('resultEmoji').textContent='😅';
+      document.getElementById('resultTitle').textContent='Intenta otra vez';
+      document.getElementById('resultText').textContent=`Aciertos: ${game.correct}/${getQuestionsForCurrent().length}. Necesitas más para conquistar el planeta.`;
+    }
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+  save();
+  checkAchievements();
+}
+
+function nextPlanet(){
+  const g=GALAXIES[game.galaxy];
+  const p=getPlayer();
+  // find next unconquered planet in this galaxy
+  let next=g.planets.findIndex((_,i)=>!p.planetsBeaten.includes(g.id+'-'+i));
+  if(next>=0){startPlanet(game.galaxy,next)}
+  else if(p.planetsBeaten.filter(k=>k.startsWith(g.id+'-')).length>=5&&!p.bossesBeaten.includes(g.id)){
+    startBoss(game.galaxy);
+  }else{goToMap()}
+}
+
+// ========== BOSS ==========
+function startBoss(galIdx){
+  const g=GALAXIES[galIdx];
+  game.galaxy=galIdx;
+  game.bossHp=100;game.playerHp=100;
+  // Mix questions from all 5 planets, 12 random
+  let pool=[];
+  for(let i=0;i<5;i++)pool=pool.concat(QUESTIONS[g.id][i]);
+  if(isYoung())pool=pool.filter(q=>q.easy).length>=10?pool.filter(q=>q.easy):pool;
+  pool=pool.sort(()=>Math.random()-.5).slice(0,12);
+  game.bossQs=pool;game.bossQIdx=0;
+  show('boss');
+  document.getElementById('bossEmoji').textContent=g.boss.emoji;
+  document.getElementById('bossName').textContent=g.boss.name;
+  renderBossQ();
+}
+
+function renderBossQ(){
+  if(game.bossHp<=0){bossWin();return}
+  if(game.playerHp<=0){bossLose();return}
+  if(game.bossQIdx>=game.bossQs.length){
+    if(game.bossHp<=game.playerHp)bossWin();else bossLose();
+    return;
+  }
+  const q=game.bossQs[game.bossQIdx];
+  document.getElementById('bossHp').style.width=game.bossHp+'%';
+  document.getElementById('playerHp').style.width=game.playerHp+'%';
+  document.getElementById('bossQText').textContent=q.q;
+  const ans=document.getElementById('bossAnswers');ans.innerHTML='';
+  q.o.forEach((opt,i)=>{
+    const b=document.createElement('button');b.className='answer-btn';b.textContent=opt;
+    b.onclick=()=>bossAnswer(i,q,b);
+    ans.appendChild(b);
+  });
+}
+
+function bossAnswer(idx,q,btn){
+  document.querySelectorAll('#bossAnswers .answer-btn').forEach(b=>b.disabled=true);
+  const p=getPlayer();p.totalAnswered++;
+  if(idx===q.a){
+    btn.classList.add('correct');sndCorrect();
+    p.totalCorrect++;p.currentStreak++;if(p.currentStreak>p.bestStreak)p.bestStreak=p.currentStreak;
+    game.bossHp-=12;
+    feedback('⚔️ Golpe certero!','success');
+  }else{
+    btn.classList.add('wrong');
+    document.querySelectorAll('#bossAnswers .answer-btn')[q.a].classList.add('correct');
+    sndWrong();
+    p.currentStreak=0;
+    game.playerHp-=15;
+    feedback('💥 Te golpearon','fail');
+  }
+  save();
+  setTimeout(()=>{game.bossQIdx++;renderBossQ()},1300);
+}
+
+function bossWin(){
+  const g=GALAXIES[game.galaxy];
+  const p=getPlayer();
+  if(!p.bossesBeaten.includes(g.id)){
+    p.bossesBeaten.push(g.id);
+    p.stars+=10;p.coins+=100;
+  }
+  save();
+  sndWin();confetti(60);
+  show('result');
+  document.getElementById('resultEmoji').textContent='👑';
+  document.getElementById('resultTitle').textContent='¡JEFE DERROTADO!';
+  document.getElementById('resultText').textContent=`Has vencido a ${g.boss.name}. +10⭐ +100💰. Galaxia conquistada!`;
+  document.getElementById('nextBtn').style.display='none';
+  checkAchievements();
+  if(p.bossesBeaten.length>=6)setTimeout(()=>show('cert'),2500);
+}
+
+function bossLose(){
+  sndLose();
+  show('result');
+  document.getElementById('resultEmoji').textContent='💀';
+  document.getElementById('resultTitle').textContent='Derrota';
+  document.getElementById('resultText').textContent='El jefe fue más fuerte esta vez. ¡Inténtalo de nuevo!';
+  document.getElementById('nextBtn').style.display='none';
+}
+
+// ========== SHOP ==========
+function renderShop(){
+  const p=getPlayer();
+  const grid=document.getElementById('shopGrid');grid.innerHTML='';
+  SHOP.forEach(it=>{
+    const owned=p.items.includes(it.id);
+    const div=document.createElement('div');
+    div.className='shop-item'+(owned?' owned':'');
+    div.innerHTML=`<div class="emoji">${it.emoji}</div><div class="name">${it.name}</div><div class="price">${owned?'✅ Comprado':it.price+'💰'}</div>`;
+    if(!owned){
+      const b=document.createElement('button');
+      b.className='btn btn-small';b.textContent='Comprar';
+      b.disabled=p.coins<it.price;
+      b.onclick=()=>buyItem(it);
+      div.appendChild(b);
+    }
+    grid.appendChild(div);
+  });
+}
+function buyItem(it){
+  const p=getPlayer();
+  if(p.coins<it.price)return;
+  p.coins-=it.price;p.items.push(it.id);save();
+  sndCoin();toast(`¡${it.emoji} ${it.name} comprado!`);
+  renderShop();renderMap();
+  checkAchievements();
+}
+
+// ========== ACHIEVEMENTS ==========
+function checkAchievements(){
+  const p=getPlayer();
+  ACHIEVEMENTS.forEach(a=>{
+    if(!p.achievements.includes(a.id)&&a.cond(p)){
+      p.achievements.push(a.id);save();
+      toast(`🏆 ¡Logro desbloqueado!\n${a.emoji} ${a.name}`,3500);
+      sndWin();
+    }
+  });
+}
+function renderAchievements(){
+  const p=getPlayer();
+  const grid=document.getElementById('achGrid');grid.innerHTML='';
+  ACHIEVEMENTS.forEach(a=>{
+    const got=p.achievements.includes(a.id);
+    const div=document.createElement('div');
+    div.className='achievement'+(got?' unlocked':'');
+    div.innerHTML=`<span class="emoji">${a.emoji}</span><div class="name">${a.name}</div><div class="desc">${a.desc}</div>`;
+    grid.appendChild(div);
+  });
+}
+
+// ========== STATS ==========
+function renderStats(){
+  const p=getPlayer();
+  const acc=p.totalAnswered>0?Math.round(p.totalCorrect/p.totalAnswered*100):0;
+  const grid=document.getElementById('statsGrid');grid.innerHTML='';
+  const stats=[
+    {n:p.planetsBeaten.length,l:'Planetas'},
+    {n:p.bossesBeaten.length+'/6',l:'Jefes'},
+    {n:p.stars,l:'Estrellas'},
+    {n:p.coins,l:'Monedas'},
+    {n:acc+'%',l:'Precisión'},
+    {n:p.bestStreak,l:'Mejor Racha'},
+    {n:p.totalCorrect,l:'Aciertos'},
+    {n:p.achievements.length+'/'+ACHIEVEMENTS.length,l:'Logros'}
+  ];
+  stats.forEach(s=>{
+    const d=document.createElement('div');d.className='stat-box';
+    d.innerHTML=`<div class="num">${s.n}</div><div class="label">${s.l}</div>`;
+    grid.appendChild(d);
+  });
+}
+
+// ========== CERTIFICATE ==========
+function renderCert(){
+  document.getElementById('certName').textContent=state.currentPlayer==='emmanuel'?'⚡ Emmanuel "El Saiyajin" ⚡':'⛏️ Emiliano "El Constructor" ⛏️';
+}
+
+// ========== RESET ==========
+function confirmReset(){
+  if(confirm('¿Reiniciar todo el progreso de '+(state.currentPlayer==='emmanuel'?'Emmanuel':'Emiliano')+'? Esta acción no se puede deshacer.')){
+    state[state.currentPlayer]=JSON.parse(JSON.stringify(initialPlayer));
+    save();renderMap();
+    toast('Progreso reiniciado');
+  }
+}
+
+// ========== SNAKE ==========
+let snakeState={x:5,y:5,dx:1,dy:0,body:[],food:{x:10,y:10},score:0,grid:16,size:20};
+let snakeLoop=null;
+function snakeStart(){
+  snakeState={x:5,y:5,dx:1,dy:0,body:[{x:5,y:5}],food:{x:10,y:10},score:0,grid:16,size:20};
+  document.getElementById('snakeScore').textContent=0;
+  document.getElementById('snakeBest').textContent=state.snakeBest||0;
+  if(snakeLoop)clearInterval(snakeLoop);
+  snakeLoop=setInterval(snakeStep,140);
+  snakeRender();
+}
+function snakeDir(dx,dy){
+  if(dx===-snakeState.dx&&dy===-snakeState.dy)return;
+  snakeState.dx=dx;snakeState.dy=dy;
+}
+function snakeStep(){
+  snakeState.x+=snakeState.dx;snakeState.y+=snakeState.dy;
+  if(snakeState.x<0||snakeState.x>=snakeState.grid||snakeState.y<0||snakeState.y>=snakeState.grid){snakeOver();return}
+  if(snakeState.body.some(s=>s.x===snakeState.x&&s.y===snakeState.y)){snakeOver();return}
+  snakeState.body.unshift({x:snakeState.x,y:snakeState.y});
+  if(snakeState.x===snakeState.food.x&&snakeState.y===snakeState.food.y){
+    snakeState.score++;sndCoin();
+    document.getElementById('snakeScore').textContent=snakeState.score;
+    do{
+      snakeState.food={x:Math.floor(Math.random()*snakeState.grid),y:Math.floor(Math.random()*snakeState.grid)};
+    }while(snakeState.body.some(s=>s.x===snakeState.food.x&&s.y===snakeState.food.y));
+  }else snakeState.body.pop();
+  snakeRender();
+}
+function snakeRender(){
+  const c=document.getElementById('snake-canvas'),ctx=c.getContext('2d');
+  ctx.fillStyle='#0a0020';ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle='#ff5252';
+  ctx.beginPath();ctx.arc(snakeState.food.x*snakeState.size+10,snakeState.food.y*snakeState.size+10,8,0,Math.PI*2);ctx.fill();
+  snakeState.body.forEach((s,i)=>{
+    ctx.fillStyle=i===0?'#ffd700':'#4caf50';
+    ctx.fillRect(s.x*snakeState.size+1,s.y*snakeState.size+1,snakeState.size-2,snakeState.size-2);
+  });
+}
+function snakeOver(){
+  clearInterval(snakeLoop);snakeLoop=null;sndLose();
+  if(snakeState.score>(state.snakeBest||0)){state.snakeBest=snakeState.score;save()}
+  document.getElementById('snakeBest').textContent=state.snakeBest||0;
+  toast('¡Game Over! Puntos: '+snakeState.score);
+}
+
+// ========== TIC TAC TOE ==========
+let tttBoard=[],tttGameOver=false,tttScores={human:0,comp:0,draws:0};
+function tttStart(){
+  tttBoard=Array(9).fill(null);tttGameOver=false;
+  document.getElementById('tttHuman').textContent=tttScores.human;
+  document.getElementById('tttComp').textContent=tttScores.comp;
+  document.getElementById('tttDraws').textContent=tttScores.draws;
+  document.getElementById('tttStatus').textContent='Tu turno (X)';
+  const board=document.getElementById('tttBoard');board.innerHTML='';
+  for(let i=0;i<9;i++){
+    const c=document.createElement('div');c.className='tictac-cell';c.dataset.i=i;
+    c.onclick=()=>tttClick(i);board.appendChild(c);
+  }
+}
+function tttClick(i){
+  if(tttGameOver||tttBoard[i])return;
+  tttBoard[i]='X';tttUpdate();sndCoin();
+  if(tttCheck('X')){tttEnd('¡Ganaste! 🎉','human');return}
+  if(tttBoard.every(c=>c)){tttEnd('Empate','draws');return}
+  document.getElementById('tttStatus').textContent='Pensando...';
+  setTimeout(tttCompMove,500);
+}
+function tttCompMove(){
+  // try to win
+  for(let i=0;i<9;i++)if(!tttBoard[i]){tttBoard[i]='O';if(tttCheck('O')){tttUpdate();sndWrong();tttEnd('Ganó la PC 😢','comp');return}tttBoard[i]=null}
+  // block
+  for(let i=0;i<9;i++)if(!tttBoard[i]){tttBoard[i]='X';if(tttCheck('X')){tttBoard[i]='O';tttUpdate();if(tttBoard.every(c=>c)){tttEnd('Empate','draws')}else document.getElementById('tttStatus').textContent='Tu turno (X)';return}tttBoard[i]=null}
+  // center
+  if(!tttBoard[4]){tttBoard[4]='O';tttUpdate();if(tttBoard.every(c=>c)){tttEnd('Empate','draws')}else document.getElementById('tttStatus').textContent='Tu turno (X)';return}
+  // corner or random
+  const corners=[0,2,6,8].filter(i=>!tttBoard[i]);
+  if(corners.length){tttBoard[corners[Math.floor(Math.random()*corners.length)]]='O';tttUpdate();if(tttBoard.every(c=>c)){tttEnd('Empate','draws')}else document.getElementById('tttStatus').textContent='Tu turno (X)';return}
+  const empty=tttBoard.map((v,i)=>v?null:i).filter(v=>v!==null);
+  if(empty.length){tttBoard[empty[0]]='O';tttUpdate();if(tttBoard.every(c=>c))tttEnd('Empate','draws');else document.getElementById('tttStatus').textContent='Tu turno (X)'}
+}
+function tttUpdate(){
+  document.querySelectorAll('.tictac-cell').forEach((c,i)=>{
+    c.textContent=tttBoard[i]||'';c.classList.remove('x','o');
+    if(tttBoard[i]==='X')c.classList.add('x');
+    if(tttBoard[i]==='O')c.classList.add('o');
+  });
+}
+function tttCheck(p){
+  const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  return wins.some(w=>w.every(i=>tttBoard[i]===p));
+}
+function tttEnd(msg,winner){
+  tttGameOver=true;
+  document.getElementById('tttStatus').textContent=msg;
+  tttScores[winner]++;
+  document.getElementById('tttHuman').textContent=tttScores.human;
+  document.getElementById('tttComp').textContent=tttScores.comp;
+  document.getElementById('tttDraws').textContent=tttScores.draws;
+  if(winner==='human'){sndWin();confetti(20)}
+}
+
+// ========== MEMORY ==========
+let memCards=[],memFlipped=[],memMatched=0,memMoves=0,memTimer=null,memBusy=false;
+const MEM_EMOJIS=['🚀','⭐','🪐','🌙','☀️','🛸','👽','🌌','🦄','🐉','🦊','🐱'];
+function memStart(){
+  memCards=[];memFlipped=[];memMatched=0;memMoves=0;memBusy=false;
+  document.getElementById('memMoves').textContent=0;
+  document.getElementById('memPairs').textContent='0';
+  const pairs=[...MEM_EMOJIS,...MEM_EMOJIS].sort(()=>Math.random()-.5);
+  const grid=document.getElementById('memGrid');
+  grid.style.gridTemplateColumns='repeat(6,1fr)';
+  grid.innerHTML='';
+  pairs.forEach((e,i)=>{
+    const c=document.createElement('div');c.className='mem-card';c.textContent=e;
+    c.dataset.i=i;c.dataset.e=e;
+    c.onclick=()=>memFlip(c);
+    memCards.push(c);grid.appendChild(c);
+  });
+}
+function memFlip(c){
+  if(memBusy||c.classList.contains('flipped')||c.classList.contains('matched'))return;
+  c.classList.add('flipped');memFlipped.push(c);sndCoin();
+  if(memFlipped.length===2){
+    memBusy=true;memMoves++;
+    document.getElementById('memMoves').textContent=memMoves;
+    if(memFlipped[0].dataset.e===memFlipped[1].dataset.e){
+      memTimer=setTimeout(()=>{
+        memFlipped.forEach(c=>{c.classList.add('matched');c.classList.remove('flipped')});
+        memMatched++;sndCorrect();
+        document.getElementById('memPairs').textContent=memMatched;
+        memFlipped=[];memBusy=false;
+        if(memMatched===12){confetti(40);sndWin();toast('¡Completado en '+memMoves+' movs!')}
+      },500);
+    }else{
+      memTimer=setTimeout(()=>{
+        memFlipped.forEach(c=>c.classList.remove('flipped'));
+        memFlipped=[];memBusy=false;
+      },800);
+    }
+  }
+}
+
+// ========== INIT ==========
+function init(){
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>{
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
+  }
+  document.getElementById('soundBtn').textContent=state.soundOn?'🔊':'🔇';
+  // resume audio context on first interaction
+  document.addEventListener('touchstart',()=>{if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume()},{once:true});
+  document.addEventListener('click',()=>{if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume()},{once:true});
+  // keyboard support for snake
+  document.addEventListener('keydown',e=>{
+    if(game.screen!=='snake')return;
+    if(e.key==='ArrowUp')snakeDir(0,-1);
+    else if(e.key==='ArrowDown')snakeDir(0,1);
+    else if(e.key==='ArrowLeft')snakeDir(-1,0);
+    else if(e.key==='ArrowRight')snakeDir(1,0);
+  });
+  // swipe support for snake on mobile
+  let tx=0,ty=0;
+  document.getElementById('snake-canvas').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+  document.getElementById('snake-canvas').addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+    if(Math.abs(dx)>Math.abs(dy)){if(dx>20)snakeDir(1,0);else if(dx<-20)snakeDir(-1,0)}
+    else{if(dy>20)snakeDir(0,1);else if(dy<-20)snakeDir(0,-1)}
+  },{passive:true});
+}
+init();
+</script>
+</body>
+</html>
