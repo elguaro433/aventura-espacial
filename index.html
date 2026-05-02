@@ -214,6 +214,35 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 #mario-canvas{display:block;margin:10px auto;background:radial-gradient(ellipse at 30% 30%,#3a1f5e,#1a0033 60%,#0a0020 100%);border:3px solid #ffd700;border-radius:8px;box-shadow:0 0 18px rgba(255,215,0,.4);max-width:95vw;height:auto}
 /* DINO RUNNER */
 #dino-canvas{display:block;margin:10px auto;background:linear-gradient(180deg,#ffd194 0%,#ffb74d 40%,#f9a826 70%,#dba85a 100%);border:3px solid #ffd700;border-radius:12px;box-shadow:0 0 22px rgba(255,215,0,.45);max-width:96vw;height:auto;aspect-ratio:2.81}
+/* DICCIONARIO */
+.dict-search-row{display:flex;gap:8px;width:100%;max-width:600px;margin:14px auto;flex-wrap:wrap;justify-content:center}
+.dict-input{flex:1;min-width:200px;padding:14px 18px;border-radius:18px;border:3px solid rgba(255,215,0,.5);background:rgba(255,255,255,.08);color:#fff;font-size:16px;font-family:inherit;outline:none;transition:border .2s}
+.dict-input:focus{border-color:#ffd700;background:rgba(255,255,255,.14)}
+.dict-input::placeholder{color:rgba(255,255,255,.5)}
+.dict-cats{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:700px;margin:0 auto 12px}
+.dict-cat-btn{padding:6px 12px;background:rgba(255,255,255,.08);border:2px solid rgba(255,215,0,.3);border-radius:14px;color:#ffd700;font-size:12px;font-weight:bold;cursor:pointer;font-family:inherit}
+.dict-cat-btn:hover,.dict-cat-btn.active{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a0033;border-color:#ffd700}
+.dict-result{width:100%;max-width:700px;margin:14px auto;min-height:120px}
+.dict-card{background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.04));border:3px solid #ffd700;border-radius:22px;padding:18px;backdrop-filter:blur(10px);box-shadow:0 0 24px rgba(255,215,0,.3)}
+.dict-row{display:flex;align-items:center;gap:10px;padding:10px 6px;border-bottom:1px solid rgba(255,215,0,.15);flex-wrap:wrap}
+.dict-row:last-child{border-bottom:none}
+.dict-flag{font-size:24px;width:32px;text-align:center}
+.dict-lang{font-weight:bold;color:#ffd700;font-size:13px;text-transform:uppercase;min-width:80px}
+.dict-word{flex:1;font-size:clamp(18px,4vw,24px);color:#fff;font-weight:bold}
+.dict-tts{background:rgba(33,150,243,.3);border:2px solid #2196f3;border-radius:50%;width:38px;height:38px;color:#fff;font-size:16px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dict-tts:active{background:rgba(33,150,243,.6)}
+.dict-examples{margin-top:14px;padding-top:14px;border-top:2px dashed rgba(255,215,0,.3)}
+.dict-examples-title{color:#ffd700;font-size:13px;font-weight:bold;margin-bottom:8px;text-align:center}
+.dict-example{display:flex;align-items:flex-start;gap:8px;padding:6px 4px;font-size:13px;color:rgba(255,255,255,.9);line-height:1.5}
+.dict-example .dict-flag{font-size:16px;width:22px}
+.dict-example-text{flex:1}
+.dict-suggestions{width:100%;max-width:700px;margin:8px auto;text-align:center}
+.dict-suggestion-title{color:#ffd700;font-size:12px;font-weight:bold;margin-bottom:6px;opacity:.85}
+.dict-sugg-list{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.dict-sugg{padding:5px 10px;background:rgba(33,150,243,.2);border:2px solid rgba(33,150,243,.5);border-radius:12px;color:#fff;font-size:12px;cursor:pointer;font-family:inherit}
+.dict-sugg:hover,.dict-sugg:active{background:rgba(33,150,243,.5)}
+.dict-empty{text-align:center;padding:24px;color:rgba(255,255,255,.7);font-size:14px;line-height:1.6}
+.dict-online-btn{margin-top:10px;padding:10px 16px;background:linear-gradient(135deg,#9c27b0,#673ab7);border:none;border-radius:14px;color:#fff;font-weight:bold;cursor:pointer;font-family:inherit}
 /* ============= RESPONSIVE ============= */
 /* Tablet (≤1024px) */
 @media (max-width:1024px){
@@ -369,6 +398,23 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
     </p>
     <button class="btn" onclick="startGame()">▶ EMPEZAR</button>
     <button class="btn btn-purple" onclick="show('classic')">🎮 Juegos Clásicos</button>
+    <button class="btn btn-blue" onclick="show('dict')">📖 Diccionario</button>
+  </div>
+</div>
+
+<!-- DICCIONARIO -->
+<div class="screen" id="dict">
+  <div class="center">
+    <h1><span class="emoji">📖</span> Diccionario</h1>
+    <p style="text-align:center;font-size:13px;opacity:.85;max-width:600px">Escribe una palabra en español, francés, inglés o catalán y te doy la traducción a los 4 idiomas + ejemplos.</p>
+    <div class="dict-search-row">
+      <input type="text" id="dictInput" class="dict-input" placeholder="Escribe una palabra..." autocomplete="off" autocapitalize="off">
+      <button class="btn btn-green" onclick="dictSearch()">🔍 Buscar</button>
+    </div>
+    <div class="dict-cats" id="dictCats"></div>
+    <div id="dictResult" class="dict-result"></div>
+    <div id="dictSuggestions" class="dict-suggestions"></div>
+    <button class="btn btn-purple" onclick="show('intro')">← Volver</button>
   </div>
 </div>
 
@@ -1505,6 +1551,7 @@ function show(id){
   if(id==='chess')chessStart();
   if(id==='mario')marioStart();
   if(id==='dino')dinoStart();
+  if(id==='dict')dictInit();
   // stop minigames if leaving
   if(id!=='snake'&&snakeLoop){clearInterval(snakeLoop);snakeLoop=null}
   if(id!=='memo'&&memTimer){clearTimeout(memTimer);memTimer=null}
@@ -3493,6 +3540,281 @@ function drawBird(ctx,o){
   ctx.fillStyle='#5d4037';
   ctx.fillRect(x+22,y+22,2,4);
   ctx.fillRect(x+30,y+22,2,4);
+}
+
+// ========== DICCIONARIO MULTILINGÜE (ES ↔ FR ↔ EN ↔ CA) ==========
+// Vocabulario alineado al currículum CE1/CM1 + Llengua i Medi catalana
+const DICT=[
+// ANIMALES
+{es:'gato',fr:'chat',en:'cat',ca:'gat',cat:'animales',ex:{es:'El gato duerme en el sofá.',fr:'Le chat dort sur le canapé.',en:'The cat sleeps on the couch.',ca:'El gat dorm al sofà.'}},
+{es:'perro',fr:'chien',en:'dog',ca:'gos',cat:'animales',ex:{es:'Mi perro es muy grande.',fr:'Mon chien est très grand.',en:'My dog is very big.',ca:'El meu gos és molt gran.'}},
+{es:'pájaro',fr:'oiseau',en:'bird',ca:'ocell',cat:'animales',ex:{es:'El pájaro vuela alto.',fr:'L\'oiseau vole haut.',en:'The bird flies high.',ca:'L\'ocell vola alt.'}},
+{es:'pez',fr:'poisson',en:'fish',ca:'peix',cat:'animales',ex:{es:'El pez nada en el agua.',fr:'Le poisson nage dans l\'eau.',en:'The fish swims in the water.',ca:'El peix neda a l\'aigua.'}},
+{es:'caballo',fr:'cheval',en:'horse',ca:'cavall',cat:'animales',ex:{es:'El caballo corre rápido.',fr:'Le cheval court vite.',en:'The horse runs fast.',ca:'El cavall corre ràpid.'}},
+{es:'vaca',fr:'vache',en:'cow',ca:'vaca',cat:'animales',ex:{es:'La vaca da leche.',fr:'La vache donne du lait.',en:'The cow gives milk.',ca:'La vaca dóna llet.'}},
+{es:'conejo',fr:'lapin',en:'rabbit',ca:'conill',cat:'animales',ex:{es:'El conejo come zanahorias.',fr:'Le lapin mange des carottes.',en:'The rabbit eats carrots.',ca:'El conill menja pastanagues.'}},
+{es:'ratón',fr:'souris',en:'mouse',ca:'ratolí',cat:'animales',ex:{es:'El ratón es pequeño.',fr:'La souris est petite.',en:'The mouse is small.',ca:'El ratolí és petit.'}},
+{es:'oso',fr:'ours',en:'bear',ca:'ós',cat:'animales',ex:{es:'El oso vive en el bosque.',fr:'L\'ours vit dans la forêt.',en:'The bear lives in the forest.',ca:'L\'ós viu al bosc.'}},
+{es:'lobo',fr:'loup',en:'wolf',ca:'llop',cat:'animales',ex:{es:'El lobo aúlla a la luna.',fr:'Le loup hurle à la lune.',en:'The wolf howls at the moon.',ca:'El llop udola a la lluna.'}},
+{es:'león',fr:'lion',en:'lion',ca:'lleó',cat:'animales',ex:{es:'El león es el rey.',fr:'Le lion est le roi.',en:'The lion is the king.',ca:'El lleó és el rei.'}},
+{es:'tigre',fr:'tigre',en:'tiger',ca:'tigre',cat:'animales',ex:{es:'El tigre tiene rayas.',fr:'Le tigre a des rayures.',en:'The tiger has stripes.',ca:'El tigre té ratlles.'}},
+{es:'tortuga',fr:'tortue',en:'turtle',ca:'tortuga',cat:'animales',ex:{es:'La tortuga camina lento.',fr:'La tortue marche lentement.',en:'The turtle walks slowly.',ca:'La tortuga camina a poc a poc.'}},
+{es:'oveja',fr:'mouton',en:'sheep',ca:'ovella',cat:'animales',ex:{es:'La oveja tiene lana.',fr:'Le mouton a de la laine.',en:'The sheep has wool.',ca:'L\'ovella té llana.'}},
+{es:'pato',fr:'canard',en:'duck',ca:'ànec',cat:'animales',ex:{es:'El pato nada en el lago.',fr:'Le canard nage dans le lac.',en:'The duck swims in the lake.',ca:'L\'ànec neda al llac.'}},
+{es:'pollo',fr:'poulet',en:'chicken',ca:'pollastre',cat:'animales',ex:{es:'Comemos pollo asado.',fr:'Nous mangeons du poulet rôti.',en:'We eat roasted chicken.',ca:'Mengem pollastre rostit.'}},
+{es:'cerdo',fr:'cochon',en:'pig',ca:'porc',cat:'animales',ex:{es:'El cerdo es rosa.',fr:'Le cochon est rose.',en:'The pig is pink.',ca:'El porc és rosa.'}},
+{es:'mariposa',fr:'papillon',en:'butterfly',ca:'papallona',cat:'animales',ex:{es:'La mariposa es bonita.',fr:'Le papillon est beau.',en:'The butterfly is pretty.',ca:'La papallona és bonica.'}},
+// COLORES
+{es:'rojo',fr:'rouge',en:'red',ca:'vermell',cat:'colores',ex:{es:'El tomate es rojo.',fr:'La tomate est rouge.',en:'The tomato is red.',ca:'El tomàquet és vermell.'}},
+{es:'azul',fr:'bleu',en:'blue',ca:'blau',cat:'colores',ex:{es:'El cielo es azul.',fr:'Le ciel est bleu.',en:'The sky is blue.',ca:'El cel és blau.'}},
+{es:'verde',fr:'vert',en:'green',ca:'verd',cat:'colores',ex:{es:'La hierba es verde.',fr:'L\'herbe est verte.',en:'The grass is green.',ca:'L\'herba és verda.'}},
+{es:'amarillo',fr:'jaune',en:'yellow',ca:'groc',cat:'colores',ex:{es:'El sol es amarillo.',fr:'Le soleil est jaune.',en:'The sun is yellow.',ca:'El sol és groc.'}},
+{es:'negro',fr:'noir',en:'black',ca:'negre',cat:'colores',ex:{es:'La noche es negra.',fr:'La nuit est noire.',en:'The night is black.',ca:'La nit és negra.'}},
+{es:'blanco',fr:'blanc',en:'white',ca:'blanc',cat:'colores',ex:{es:'La nieve es blanca.',fr:'La neige est blanche.',en:'The snow is white.',ca:'La neu és blanca.'}},
+{es:'rosa',fr:'rose',en:'pink',ca:'rosa',cat:'colores',ex:{es:'La flor es rosa.',fr:'La fleur est rose.',en:'The flower is pink.',ca:'La flor és rosa.'}},
+{es:'morado',fr:'violet',en:'purple',ca:'lila',cat:'colores',ex:{es:'La uva es morada.',fr:'Le raisin est violet.',en:'The grape is purple.',ca:'El raïm és lila.'}},
+{es:'naranja',fr:'orange',en:'orange',ca:'taronja',cat:'colores',ex:{es:'Me gusta el naranja.',fr:'J\'aime l\'orange.',en:'I like orange.',ca:'M\'agrada el taronja.'}},
+{es:'gris',fr:'gris',en:'gray',ca:'gris',cat:'colores',ex:{es:'El elefante es gris.',fr:'L\'éléphant est gris.',en:'The elephant is gray.',ca:'L\'elefant és gris.'}},
+{es:'marrón',fr:'marron',en:'brown',ca:'marró',cat:'colores',ex:{es:'El chocolate es marrón.',fr:'Le chocolat est marron.',en:'The chocolate is brown.',ca:'La xocolata és marró.'}},
+// NÚMEROS
+{es:'uno',fr:'un',en:'one',ca:'un',cat:'numeros',ex:{es:'Tengo un libro.',fr:'J\'ai un livre.',en:'I have one book.',ca:'Tinc un llibre.'}},
+{es:'dos',fr:'deux',en:'two',ca:'dos',cat:'numeros',ex:{es:'Hay dos gatos.',fr:'Il y a deux chats.',en:'There are two cats.',ca:'Hi ha dos gats.'}},
+{es:'tres',fr:'trois',en:'three',ca:'tres',cat:'numeros',ex:{es:'Tres niños juegan.',fr:'Trois enfants jouent.',en:'Three children play.',ca:'Tres nens juguen.'}},
+{es:'cuatro',fr:'quatre',en:'four',ca:'quatre',cat:'numeros',ex:{es:'La mesa tiene cuatro patas.',fr:'La table a quatre pieds.',en:'The table has four legs.',ca:'La taula té quatre potes.'}},
+{es:'cinco',fr:'cinq',en:'five',ca:'cinc',cat:'numeros',ex:{es:'Cinco dedos en la mano.',fr:'Cinq doigts dans la main.',en:'Five fingers on the hand.',ca:'Cinc dits a la mà.'}},
+{es:'seis',fr:'six',en:'six',ca:'sis',cat:'numeros',ex:{es:'Son las seis.',fr:'Il est six heures.',en:'It is six o\'clock.',ca:'Són les sis.'}},
+{es:'siete',fr:'sept',en:'seven',ca:'set',cat:'numeros',ex:{es:'Siete días en la semana.',fr:'Sept jours dans la semaine.',en:'Seven days in a week.',ca:'Set dies a la setmana.'}},
+{es:'ocho',fr:'huit',en:'eight',ca:'vuit',cat:'numeros',ex:{es:'El pulpo tiene ocho patas.',fr:'Le poulpe a huit pattes.',en:'The octopus has eight legs.',ca:'El pop té vuit potes.'}},
+{es:'nueve',fr:'neuf',en:'nine',ca:'nou',cat:'numeros',ex:{es:'Tengo nueve años.',fr:'J\'ai neuf ans.',en:'I am nine years old.',ca:'Tinc nou anys.'}},
+{es:'diez',fr:'dix',en:'ten',ca:'deu',cat:'numeros',ex:{es:'Diez monedas de oro.',fr:'Dix pièces d\'or.',en:'Ten gold coins.',ca:'Deu monedes d\'or.'}},
+{es:'cero',fr:'zéro',en:'zero',ca:'zero',cat:'numeros',ex:{es:'Hace cero grados.',fr:'Il fait zéro degré.',en:'It is zero degrees.',ca:'Fa zero graus.'}},
+{es:'cien',fr:'cent',en:'hundred',ca:'cent',cat:'numeros',ex:{es:'Cien euros.',fr:'Cent euros.',en:'A hundred euros.',ca:'Cent euros.'}},
+{es:'mil',fr:'mille',en:'thousand',ca:'mil',cat:'numeros',ex:{es:'Mil estrellas.',fr:'Mille étoiles.',en:'A thousand stars.',ca:'Mil estrelles.'}},
+// FAMILIA
+{es:'mamá',fr:'maman',en:'mom',ca:'mare',cat:'familia',ex:{es:'Mi mamá cocina muy bien.',fr:'Ma maman cuisine très bien.',en:'My mom cooks very well.',ca:'La meva mare cuina molt bé.'}},
+{es:'papá',fr:'papa',en:'dad',ca:'pare',cat:'familia',ex:{es:'Mi papá trabaja en casa.',fr:'Mon papa travaille à la maison.',en:'My dad works at home.',ca:'El meu pare treballa a casa.'}},
+{es:'hermano',fr:'frère',en:'brother',ca:'germà',cat:'familia',ex:{es:'Tengo un hermano mayor.',fr:'J\'ai un grand frère.',en:'I have an older brother.',ca:'Tinc un germà gran.'}},
+{es:'hermana',fr:'sœur',en:'sister',ca:'germana',cat:'familia',ex:{es:'Mi hermana es pequeña.',fr:'Ma sœur est petite.',en:'My sister is small.',ca:'La meva germana és petita.'}},
+{es:'abuelo',fr:'grand-père',en:'grandfather',ca:'avi',cat:'familia',ex:{es:'Visito a mi abuelo.',fr:'Je rends visite à mon grand-père.',en:'I visit my grandfather.',ca:'Visito el meu avi.'}},
+{es:'abuela',fr:'grand-mère',en:'grandmother',ca:'àvia',cat:'familia',ex:{es:'Mi abuela hace galletas.',fr:'Ma grand-mère fait des biscuits.',en:'My grandmother bakes cookies.',ca:'La meva àvia fa galetes.'}},
+{es:'tío',fr:'oncle',en:'uncle',ca:'oncle',cat:'familia',ex:{es:'Mi tío vive lejos.',fr:'Mon oncle habite loin.',en:'My uncle lives far away.',ca:'El meu oncle viu lluny.'}},
+{es:'tía',fr:'tante',en:'aunt',ca:'tia',cat:'familia',ex:{es:'Mi tía es muy divertida.',fr:'Ma tante est très drôle.',en:'My aunt is very funny.',ca:'La meva tia és molt divertida.'}},
+{es:'primo',fr:'cousin',en:'cousin',ca:'cosí',cat:'familia',ex:{es:'Mi primo juega al fútbol.',fr:'Mon cousin joue au football.',en:'My cousin plays football.',ca:'El meu cosí juga a futbol.'}},
+{es:'familia',fr:'famille',en:'family',ca:'família',cat:'familia',ex:{es:'Mi familia es grande.',fr:'Ma famille est grande.',en:'My family is big.',ca:'La meva família és gran.'}},
+// CUERPO
+{es:'cabeza',fr:'tête',en:'head',ca:'cap',cat:'cuerpo',ex:{es:'Me duele la cabeza.',fr:'J\'ai mal à la tête.',en:'My head hurts.',ca:'Em fa mal el cap.'}},
+{es:'ojo',fr:'œil',en:'eye',ca:'ull',cat:'cuerpo',ex:{es:'Tengo los ojos azules.',fr:'J\'ai les yeux bleus.',en:'I have blue eyes.',ca:'Tinc els ulls blaus.'}},
+{es:'boca',fr:'bouche',en:'mouth',ca:'boca',cat:'cuerpo',ex:{es:'Abre la boca.',fr:'Ouvre la bouche.',en:'Open your mouth.',ca:'Obre la boca.'}},
+{es:'nariz',fr:'nez',en:'nose',ca:'nas',cat:'cuerpo',ex:{es:'Mi nariz huele bien.',fr:'Mon nez sent bon.',en:'My nose smells good.',ca:'El meu nas fa bona olor.'}},
+{es:'mano',fr:'main',en:'hand',ca:'mà',cat:'cuerpo',ex:{es:'Lava tus manos.',fr:'Lave-toi les mains.',en:'Wash your hands.',ca:'Renta\'t les mans.'}},
+{es:'pie',fr:'pied',en:'foot',ca:'peu',cat:'cuerpo',ex:{es:'Camino con los pies.',fr:'Je marche avec les pieds.',en:'I walk with my feet.',ca:'Camino amb els peus.'}},
+{es:'pierna',fr:'jambe',en:'leg',ca:'cama',cat:'cuerpo',ex:{es:'Tengo dos piernas.',fr:'J\'ai deux jambes.',en:'I have two legs.',ca:'Tinc dues cames.'}},
+{es:'brazo',fr:'bras',en:'arm',ca:'braç',cat:'cuerpo',ex:{es:'Levanta el brazo.',fr:'Lève le bras.',en:'Raise your arm.',ca:'Aixeca el braç.'}},
+{es:'pelo',fr:'cheveux',en:'hair',ca:'cabell',cat:'cuerpo',ex:{es:'Mi pelo es largo.',fr:'Mes cheveux sont longs.',en:'My hair is long.',ca:'El meu cabell és llarg.'}},
+{es:'oreja',fr:'oreille',en:'ear',ca:'orella',cat:'cuerpo',ex:{es:'Escucho con las orejas.',fr:'J\'écoute avec les oreilles.',en:'I listen with my ears.',ca:'Escolto amb les orelles.'}},
+// COMIDA
+{es:'pan',fr:'pain',en:'bread',ca:'pa',cat:'comida',ex:{es:'Como pan con mantequilla.',fr:'Je mange du pain avec du beurre.',en:'I eat bread with butter.',ca:'Menjo pa amb mantega.'}},
+{es:'agua',fr:'eau',en:'water',ca:'aigua',cat:'comida',ex:{es:'Bebo agua fría.',fr:'Je bois de l\'eau froide.',en:'I drink cold water.',ca:'Bec aigua freda.'}},
+{es:'leche',fr:'lait',en:'milk',ca:'llet',cat:'comida',ex:{es:'La leche es blanca.',fr:'Le lait est blanc.',en:'Milk is white.',ca:'La llet és blanca.'}},
+{es:'queso',fr:'fromage',en:'cheese',ca:'formatge',cat:'comida',ex:{es:'Me gusta el queso.',fr:'J\'aime le fromage.',en:'I like cheese.',ca:'M\'agrada el formatge.'}},
+{es:'huevo',fr:'œuf',en:'egg',ca:'ou',cat:'comida',ex:{es:'Como un huevo frito.',fr:'Je mange un œuf au plat.',en:'I eat a fried egg.',ca:'Menjo un ou ferrat.'}},
+{es:'manzana',fr:'pomme',en:'apple',ca:'poma',cat:'comida',ex:{es:'La manzana es roja.',fr:'La pomme est rouge.',en:'The apple is red.',ca:'La poma és vermella.'}},
+{es:'plátano',fr:'banane',en:'banana',ca:'plàtan',cat:'comida',ex:{es:'El plátano es amarillo.',fr:'La banane est jaune.',en:'The banana is yellow.',ca:'El plàtan és groc.'}},
+{es:'naranja (fruta)',fr:'orange',en:'orange',ca:'taronja',cat:'comida',ex:{es:'Bebo zumo de naranja.',fr:'Je bois du jus d\'orange.',en:'I drink orange juice.',ca:'Bec suc de taronja.'}},
+{es:'pollo (comida)',fr:'poulet',en:'chicken',ca:'pollastre',cat:'comida',ex:{es:'Cenamos pollo.',fr:'Nous dînons du poulet.',en:'We have chicken for dinner.',ca:'Sopem pollastre.'}},
+{es:'pescado',fr:'poisson',en:'fish',ca:'peix',cat:'comida',ex:{es:'El pescado es saludable.',fr:'Le poisson est sain.',en:'Fish is healthy.',ca:'El peix és saludable.'}},
+{es:'arroz',fr:'riz',en:'rice',ca:'arròs',cat:'comida',ex:{es:'El arroz es blanco.',fr:'Le riz est blanc.',en:'Rice is white.',ca:'L\'arròs és blanc.'}},
+{es:'pasta',fr:'pâtes',en:'pasta',ca:'pasta',cat:'comida',ex:{es:'Me encanta la pasta.',fr:'J\'adore les pâtes.',en:'I love pasta.',ca:'M\'encanta la pasta.'}},
+{es:'pizza',fr:'pizza',en:'pizza',ca:'pizza',cat:'comida',ex:{es:'La pizza está rica.',fr:'La pizza est délicieuse.',en:'The pizza is delicious.',ca:'La pizza és deliciosa.'}},
+// CASA
+{es:'casa',fr:'maison',en:'house',ca:'casa',cat:'casa',ex:{es:'Mi casa es grande.',fr:'Ma maison est grande.',en:'My house is big.',ca:'La meva casa és gran.'}},
+{es:'puerta',fr:'porte',en:'door',ca:'porta',cat:'casa',ex:{es:'Abre la puerta.',fr:'Ouvre la porte.',en:'Open the door.',ca:'Obre la porta.'}},
+{es:'ventana',fr:'fenêtre',en:'window',ca:'finestra',cat:'casa',ex:{es:'Mira por la ventana.',fr:'Regarde par la fenêtre.',en:'Look out the window.',ca:'Mira per la finestra.'}},
+{es:'mesa',fr:'table',en:'table',ca:'taula',cat:'casa',ex:{es:'Comemos en la mesa.',fr:'Nous mangeons à table.',en:'We eat at the table.',ca:'Mengem a taula.'}},
+{es:'silla',fr:'chaise',en:'chair',ca:'cadira',cat:'casa',ex:{es:'Siéntate en la silla.',fr:'Assieds-toi sur la chaise.',en:'Sit on the chair.',ca:'Seu a la cadira.'}},
+{es:'cama',fr:'lit',en:'bed',ca:'llit',cat:'casa',ex:{es:'Duermo en mi cama.',fr:'Je dors dans mon lit.',en:'I sleep in my bed.',ca:'Dormo al meu llit.'}},
+{es:'cocina',fr:'cuisine',en:'kitchen',ca:'cuina',cat:'casa',ex:{es:'Mamá está en la cocina.',fr:'Maman est dans la cuisine.',en:'Mom is in the kitchen.',ca:'La mare és a la cuina.'}},
+{es:'baño',fr:'salle de bain',en:'bathroom',ca:'bany',cat:'casa',ex:{es:'Voy al baño.',fr:'Je vais à la salle de bain.',en:'I go to the bathroom.',ca:'Vaig al bany.'}},
+// ESCUELA
+{es:'escuela',fr:'école',en:'school',ca:'escola',cat:'escuela',ex:{es:'Voy a la escuela.',fr:'Je vais à l\'école.',en:'I go to school.',ca:'Vaig a l\'escola.'}},
+{es:'libro',fr:'livre',en:'book',ca:'llibre',cat:'escuela',ex:{es:'Leo un libro nuevo.',fr:'Je lis un nouveau livre.',en:'I read a new book.',ca:'Llegeixo un llibre nou.'}},
+{es:'lápiz',fr:'crayon',en:'pencil',ca:'llapis',cat:'escuela',ex:{es:'Escribo con el lápiz.',fr:'J\'écris avec le crayon.',en:'I write with the pencil.',ca:'Escric amb el llapis.'}},
+{es:'cuaderno',fr:'cahier',en:'notebook',ca:'llibreta',cat:'escuela',ex:{es:'Abre el cuaderno.',fr:'Ouvre le cahier.',en:'Open the notebook.',ca:'Obre la llibreta.'}},
+{es:'profesor',fr:'professeur',en:'teacher',ca:'professor',cat:'escuela',ex:{es:'El profesor es amable.',fr:'Le professeur est gentil.',en:'The teacher is kind.',ca:'El professor és amable.'}},
+{es:'clase',fr:'classe',en:'class',ca:'classe',cat:'escuela',ex:{es:'La clase empieza pronto.',fr:'La classe commence bientôt.',en:'Class starts soon.',ca:'La classe comença aviat.'}},
+{es:'amigo',fr:'ami',en:'friend',ca:'amic',cat:'escuela',ex:{es:'Mi mejor amigo es Pedro.',fr:'Mon meilleur ami est Pedro.',en:'My best friend is Pedro.',ca:'El meu millor amic és el Pere.'}},
+{es:'estudiar',fr:'étudier',en:'study',ca:'estudiar',cat:'escuela',ex:{es:'Tengo que estudiar.',fr:'Je dois étudier.',en:'I have to study.',ca:'He d\'estudiar.'}},
+// VERBOS
+{es:'ser',fr:'être',en:'be',ca:'ser',cat:'verbos',ex:{es:'Quiero ser doctor.',fr:'Je veux être docteur.',en:'I want to be a doctor.',ca:'Vull ser metge.'}},
+{es:'tener',fr:'avoir',en:'have',ca:'tenir',cat:'verbos',ex:{es:'Tengo hambre.',fr:'J\'ai faim.',en:'I am hungry.',ca:'Tinc gana.'}},
+{es:'comer',fr:'manger',en:'eat',ca:'menjar',cat:'verbos',ex:{es:'Comer fruta es bueno.',fr:'Manger des fruits est bon.',en:'Eating fruit is good.',ca:'Menjar fruita és bo.'}},
+{es:'beber',fr:'boire',en:'drink',ca:'beure',cat:'verbos',ex:{es:'Hay que beber agua.',fr:'Il faut boire de l\'eau.',en:'You must drink water.',ca:'Cal beure aigua.'}},
+{es:'dormir',fr:'dormir',en:'sleep',ca:'dormir',cat:'verbos',ex:{es:'Voy a dormir.',fr:'Je vais dormir.',en:'I am going to sleep.',ca:'Vaig a dormir.'}},
+{es:'jugar',fr:'jouer',en:'play',ca:'jugar',cat:'verbos',ex:{es:'Me gusta jugar.',fr:'J\'aime jouer.',en:'I like to play.',ca:'M\'agrada jugar.'}},
+{es:'correr',fr:'courir',en:'run',ca:'córrer',cat:'verbos',ex:{es:'Correr es divertido.',fr:'Courir est amusant.',en:'Running is fun.',ca:'Córrer és divertit.'}},
+{es:'andar',fr:'marcher',en:'walk',ca:'caminar',cat:'verbos',ex:{es:'Andar todos los días.',fr:'Marcher tous les jours.',en:'Walk every day.',ca:'Caminar cada dia.'}},
+{es:'leer',fr:'lire',en:'read',ca:'llegir',cat:'verbos',ex:{es:'Me gusta leer libros.',fr:'J\'aime lire des livres.',en:'I like to read books.',ca:'M\'agrada llegir llibres.'}},
+{es:'escribir',fr:'écrire',en:'write',ca:'escriure',cat:'verbos',ex:{es:'Voy a escribir una carta.',fr:'Je vais écrire une lettre.',en:'I will write a letter.',ca:'Escriuré una carta.'}},
+{es:'hablar',fr:'parler',en:'speak',ca:'parlar',cat:'verbos',ex:{es:'Hablo francés.',fr:'Je parle français.',en:'I speak French.',ca:'Parlo francès.'}},
+{es:'mirar',fr:'regarder',en:'watch',ca:'mirar',cat:'verbos',ex:{es:'Mira el cielo.',fr:'Regarde le ciel.',en:'Watch the sky.',ca:'Mira el cel.'}},
+{es:'escuchar',fr:'écouter',en:'listen',ca:'escoltar',cat:'verbos',ex:{es:'Escucha la música.',fr:'Écoute la musique.',en:'Listen to the music.',ca:'Escolta la música.'}},
+{es:'ir',fr:'aller',en:'go',ca:'anar',cat:'verbos',ex:{es:'Voy a casa.',fr:'Je vais à la maison.',en:'I am going home.',ca:'Vaig a casa.'}},
+{es:'venir',fr:'venir',en:'come',ca:'venir',cat:'verbos',ex:{es:'Ven aquí.',fr:'Viens ici.',en:'Come here.',ca:'Vine aquí.'}},
+{es:'hacer',fr:'faire',en:'do',ca:'fer',cat:'verbos',ex:{es:'¿Qué haces?',fr:'Que fais-tu ?',en:'What are you doing?',ca:'Què fas?'}},
+{es:'ver',fr:'voir',en:'see',ca:'veure',cat:'verbos',ex:{es:'Voy a ver una peli.',fr:'Je vais voir un film.',en:'I am going to see a movie.',ca:'Vaig a veure una pel·lícula.'}},
+{es:'querer',fr:'vouloir',en:'want',ca:'voler',cat:'verbos',ex:{es:'Quiero un helado.',fr:'Je veux une glace.',en:'I want an ice cream.',ca:'Vull un gelat.'}},
+// SALUDOS Y FRASES
+{es:'hola',fr:'bonjour',en:'hello',ca:'hola',cat:'frases',ex:{es:'Hola, ¿cómo estás?',fr:'Bonjour, comment vas-tu ?',en:'Hello, how are you?',ca:'Hola, com estàs?'}},
+{es:'adiós',fr:'au revoir',en:'goodbye',ca:'adéu',cat:'frases',ex:{es:'Adiós, hasta mañana.',fr:'Au revoir, à demain.',en:'Goodbye, see you tomorrow.',ca:'Adéu, fins demà.'}},
+{es:'gracias',fr:'merci',en:'thank you',ca:'gràcies',cat:'frases',ex:{es:'Muchas gracias.',fr:'Merci beaucoup.',en:'Thank you very much.',ca:'Moltes gràcies.'}},
+{es:'por favor',fr:'s\'il vous plaît',en:'please',ca:'si us plau',cat:'frases',ex:{es:'Agua, por favor.',fr:'De l\'eau, s\'il vous plaît.',en:'Water, please.',ca:'Aigua, si us plau.'}},
+{es:'sí',fr:'oui',en:'yes',ca:'sí',cat:'frases',ex:{es:'Sí, claro.',fr:'Oui, bien sûr.',en:'Yes, of course.',ca:'Sí, és clar.'}},
+{es:'no',fr:'non',en:'no',ca:'no',cat:'frases',ex:{es:'No, gracias.',fr:'Non, merci.',en:'No, thanks.',ca:'No, gràcies.'}},
+{es:'buenos días',fr:'bonjour',en:'good morning',ca:'bon dia',cat:'frases',ex:{es:'¡Buenos días, mamá!',fr:'Bonjour, maman !',en:'Good morning, mom!',ca:'Bon dia, mama!'}},
+{es:'buenas noches',fr:'bonne nuit',en:'good night',ca:'bona nit',cat:'frases',ex:{es:'Buenas noches, papá.',fr:'Bonne nuit, papa.',en:'Good night, dad.',ca:'Bona nit, pare.'}},
+{es:'¿cómo estás?',fr:'comment ça va ?',en:'how are you?',ca:'com estàs?',cat:'frases',ex:{es:'Hola, ¿cómo estás?',fr:'Salut, comment ça va ?',en:'Hi, how are you?',ca:'Hola, com estàs?'}},
+{es:'me llamo',fr:'je m\'appelle',en:'my name is',ca:'em dic',cat:'frases',ex:{es:'Me llamo Emiliano.',fr:'Je m\'appelle Emiliano.',en:'My name is Emiliano.',ca:'Em dic Emiliano.'}},
+{es:'lo siento',fr:'désolé',en:'sorry',ca:'ho sento',cat:'frases',ex:{es:'Lo siento mucho.',fr:'Je suis vraiment désolé.',en:'I am very sorry.',ca:'Ho sento molt.'}},
+{es:'te quiero',fr:'je t\'aime',en:'I love you',ca:'t\'estimo',cat:'frases',ex:{es:'Te quiero mucho.',fr:'Je t\'aime beaucoup.',en:'I love you very much.',ca:'T\'estimo molt.'}},
+// NATURALEZA
+{es:'sol',fr:'soleil',en:'sun',ca:'sol',cat:'naturaleza',ex:{es:'El sol brilla.',fr:'Le soleil brille.',en:'The sun shines.',ca:'El sol brilla.'}},
+{es:'luna',fr:'lune',en:'moon',ca:'lluna',cat:'naturaleza',ex:{es:'La luna es bonita.',fr:'La lune est belle.',en:'The moon is beautiful.',ca:'La lluna és bonica.'}},
+{es:'estrella',fr:'étoile',en:'star',ca:'estrella',cat:'naturaleza',ex:{es:'Veo una estrella.',fr:'Je vois une étoile.',en:'I see a star.',ca:'Veig una estrella.'}},
+{es:'cielo',fr:'ciel',en:'sky',ca:'cel',cat:'naturaleza',ex:{es:'El cielo está azul.',fr:'Le ciel est bleu.',en:'The sky is blue.',ca:'El cel és blau.'}},
+{es:'nube',fr:'nuage',en:'cloud',ca:'núvol',cat:'naturaleza',ex:{es:'Hay muchas nubes.',fr:'Il y a beaucoup de nuages.',en:'There are many clouds.',ca:'Hi ha molts núvols.'}},
+{es:'lluvia',fr:'pluie',en:'rain',ca:'pluja',cat:'naturaleza',ex:{es:'La lluvia cae.',fr:'La pluie tombe.',en:'The rain falls.',ca:'La pluja cau.'}},
+{es:'nieve',fr:'neige',en:'snow',ca:'neu',cat:'naturaleza',ex:{es:'En invierno hay nieve.',fr:'En hiver il y a de la neige.',en:'In winter there is snow.',ca:'A l\'hivern hi ha neu.'}},
+{es:'árbol',fr:'arbre',en:'tree',ca:'arbre',cat:'naturaleza',ex:{es:'El árbol es alto.',fr:'L\'arbre est grand.',en:'The tree is tall.',ca:'L\'arbre és alt.'}},
+{es:'flor',fr:'fleur',en:'flower',ca:'flor',cat:'naturaleza',ex:{es:'La flor huele bien.',fr:'La fleur sent bon.',en:'The flower smells good.',ca:'La flor fa bona olor.'}},
+{es:'montaña',fr:'montagne',en:'mountain',ca:'muntanya',cat:'naturaleza',ex:{es:'Andorra tiene montañas.',fr:'L\'Andorre a des montagnes.',en:'Andorra has mountains.',ca:'Andorra té muntanyes.'}},
+{es:'mar',fr:'mer',en:'sea',ca:'mar',cat:'naturaleza',ex:{es:'El mar es grande.',fr:'La mer est grande.',en:'The sea is big.',ca:'El mar és gran.'}},
+{es:'río',fr:'rivière',en:'river',ca:'riu',cat:'naturaleza',ex:{es:'El río corre.',fr:'La rivière coule.',en:'The river flows.',ca:'El riu corre.'}},
+// TIEMPO
+{es:'día',fr:'jour',en:'day',ca:'dia',cat:'tiempo',ex:{es:'Hoy es un buen día.',fr:'Aujourd\'hui est un bon jour.',en:'Today is a good day.',ca:'Avui és un bon dia.'}},
+{es:'noche',fr:'nuit',en:'night',ca:'nit',cat:'tiempo',ex:{es:'Por la noche duermo.',fr:'La nuit, je dors.',en:'At night I sleep.',ca:'A la nit dormo.'}},
+{es:'hoy',fr:'aujourd\'hui',en:'today',ca:'avui',cat:'tiempo',ex:{es:'Hoy es lunes.',fr:'Aujourd\'hui c\'est lundi.',en:'Today is Monday.',ca:'Avui és dilluns.'}},
+{es:'mañana',fr:'demain',en:'tomorrow',ca:'demà',cat:'tiempo',ex:{es:'Mañana voy al cole.',fr:'Demain je vais à l\'école.',en:'Tomorrow I go to school.',ca:'Demà vaig a l\'escola.'}},
+{es:'ayer',fr:'hier',en:'yesterday',ca:'ahir',cat:'tiempo',ex:{es:'Ayer fue domingo.',fr:'Hier c\'était dimanche.',en:'Yesterday was Sunday.',ca:'Ahir va ser diumenge.'}},
+{es:'semana',fr:'semaine',en:'week',ca:'setmana',cat:'tiempo',ex:{es:'La semana tiene 7 días.',fr:'La semaine a 7 jours.',en:'A week has 7 days.',ca:'La setmana té 7 dies.'}},
+{es:'mes',fr:'mois',en:'month',ca:'mes',cat:'tiempo',ex:{es:'Enero es el primer mes.',fr:'Janvier est le premier mois.',en:'January is the first month.',ca:'Gener és el primer mes.'}},
+{es:'año',fr:'an',en:'year',ca:'any',cat:'tiempo',ex:{es:'Tengo 10 años.',fr:'J\'ai 10 ans.',en:'I am 10 years old.',ca:'Tinc 10 anys.'}},
+{es:'hora',fr:'heure',en:'hour',ca:'hora',cat:'tiempo',ex:{es:'¿Qué hora es?',fr:'Quelle heure est-il ?',en:'What time is it?',ca:'Quina hora és?'}},
+// ANDORRA
+{es:'Andorra',fr:'Andorre',en:'Andorra',ca:'Andorra',cat:'andorra',ex:{es:'Vivo en Andorra.',fr:'J\'habite en Andorre.',en:'I live in Andorra.',ca:'Visc a Andorra.'}},
+{es:'parroquia',fr:'paroisse',en:'parish',ca:'parròquia',cat:'andorra',ex:{es:'Andorra tiene 7 parroquias.',fr:'L\'Andorre a 7 paroisses.',en:'Andorra has 7 parishes.',ca:'Andorra té 7 parròquies.'}},
+{es:'esquí',fr:'ski',en:'ski',ca:'esquí',cat:'andorra',ex:{es:'Voy a esquiar.',fr:'Je vais skier.',en:'I am going skiing.',ca:'Vaig a esquiar.'}},
+{es:'nieve (deporte)',fr:'neige',en:'snow',ca:'neu',cat:'andorra',ex:{es:'Hay nieve en la pista.',fr:'Il y a de la neige sur la piste.',en:'There is snow on the slope.',ca:'Hi ha neu a la pista.'}},
+{es:'pirineos',fr:'pyrénées',en:'pyrenees',ca:'pirineus',cat:'andorra',ex:{es:'Los Pirineos son altos.',fr:'Les Pyrénées sont hautes.',en:'The Pyrenees are high.',ca:'Els Pirineus són alts.'}}
+];
+const DICT_CATS=[
+  {id:'all',name:'Todas',emoji:'📚'},
+  {id:'animales',name:'Animales',emoji:'🐱'},
+  {id:'colores',name:'Colores',emoji:'🎨'},
+  {id:'numeros',name:'Números',emoji:'🔢'},
+  {id:'familia',name:'Familia',emoji:'👨‍👩‍👧'},
+  {id:'cuerpo',name:'Cuerpo',emoji:'👁️'},
+  {id:'comida',name:'Comida',emoji:'🍎'},
+  {id:'casa',name:'Casa',emoji:'🏠'},
+  {id:'escuela',name:'Escuela',emoji:'📝'},
+  {id:'verbos',name:'Verbos',emoji:'🏃'},
+  {id:'frases',name:'Frases',emoji:'💬'},
+  {id:'naturaleza',name:'Naturaleza',emoji:'🌳'},
+  {id:'tiempo',name:'Tiempo',emoji:'⏰'},
+  {id:'andorra',name:'Andorra',emoji:'🏔️'}
+];
+const DICT_FLAGS={es:'🇪🇸',fr:'🇫🇷',en:'🇬🇧',ca:'🎗️'};
+const DICT_LANGS={es:'Español',fr:'Français',en:'English',ca:'Català'};
+const DICT_TTSLANGS={es:'es-ES',fr:'fr-FR',en:'en-US',ca:'ca-ES'};
+let dictActiveCat='all';
+function dictNorm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w\s]/g,'').trim()}
+function dictRenderCats(){
+  const c=document.getElementById('dictCats');if(!c)return;
+  c.innerHTML=DICT_CATS.map(cat=>`<button class="dict-cat-btn${cat.id===dictActiveCat?' active':''}" onclick="dictFilterCat('${cat.id}')">${cat.emoji} ${cat.name}</button>`).join('');
+}
+function dictFilterCat(id){
+  dictActiveCat=id;dictRenderCats();
+  // Sugerir palabras de esa categoría
+  const sugg=document.getElementById('dictSuggestions');
+  const list=id==='all'?DICT.slice(0,12):DICT.filter(w=>w.cat===id).slice(0,18);
+  sugg.innerHTML=`<div class="dict-suggestion-title">${id==='all'?'💡 Palabras populares':'💡 Categoría '+(DICT_CATS.find(c=>c.id===id)||{}).name}</div><div class="dict-sugg-list">${list.map(w=>`<span class="dict-sugg" onclick="dictPick('${w.es.replace(/'/g,'&apos;')}')">${w.es}</span>`).join('')}</div>`;
+}
+function dictPick(word){
+  document.getElementById('dictInput').value=word;
+  dictSearch();
+}
+function dictSearch(){
+  const q=dictNorm(document.getElementById('dictInput').value);
+  const result=document.getElementById('dictResult');
+  if(!q){result.innerHTML='<div class="dict-empty">Escribe una palabra arriba o toca una sugerencia.</div>';return}
+  // Buscar coincidencia exacta primero, luego prefijo, luego cualquier ocurrencia
+  let entry=DICT.find(w=>['es','fr','en','ca'].some(l=>dictNorm(w[l])===q));
+  if(!entry)entry=DICT.find(w=>['es','fr','en','ca'].some(l=>dictNorm(w[l]).startsWith(q)));
+  if(!entry)entry=DICT.find(w=>['es','fr','en','ca'].some(l=>dictNorm(w[l]).includes(q)));
+  if(entry){dictRenderEntry(entry);return}
+  // No encontrada: ofrecer búsqueda online
+  result.innerHTML=`<div class="dict-card"><div class="dict-empty">No encontré "<b>${document.getElementById('dictInput').value}</b>" en el diccionario interno.<br><br>Puedes buscarla en línea (necesita internet):</div><div style="text-align:center"><button class="dict-online-btn" onclick="dictOnline()">🌐 Buscar online (Google Translate)</button></div></div>`;
+}
+function dictOnline(){
+  const q=encodeURIComponent(document.getElementById('dictInput').value.trim());
+  if(!q)return;
+  const url='https://translate.google.com/?sl=auto&tl=es&text='+q+'&op=translate';
+  window.open(url,'_blank','noopener');
+}
+function dictRenderEntry(entry){
+  const result=document.getElementById('dictResult');
+  const langs=['es','fr','en','ca'];
+  const rows=langs.map(l=>`
+    <div class="dict-row">
+      <span class="dict-flag">${DICT_FLAGS[l]}</span>
+      <span class="dict-lang">${DICT_LANGS[l]}</span>
+      <span class="dict-word">${entry[l]}</span>
+      <button class="dict-tts" onclick="dictSpeak('${(entry[l]||'').replace(/'/g,'&apos;')}','${DICT_TTSLANGS[l]}')" title="Escuchar">🔊</button>
+    </div>`).join('');
+  const examples=langs.map(l=>`
+    <div class="dict-example">
+      <span class="dict-flag">${DICT_FLAGS[l]}</span>
+      <span class="dict-example-text">${entry.ex[l]}</span>
+      <button class="dict-tts" style="width:30px;height:30px;font-size:13px" onclick="dictSpeak('${(entry.ex[l]||'').replace(/'/g,'&apos;')}','${DICT_TTSLANGS[l]}')">🔊</button>
+    </div>`).join('');
+  const cat=DICT_CATS.find(c=>c.id===entry.cat);
+  result.innerHTML=`<div class="dict-card">
+    <div style="text-align:center;margin-bottom:10px;color:#ffd700;font-weight:bold">${cat?cat.emoji+' '+cat.name:''}</div>
+    ${rows}
+    <div class="dict-examples">
+      <div class="dict-examples-title">📝 Ejemplos</div>
+      ${examples}
+    </div>
+  </div>`;
+  // Reproduce automáticamente la palabra en el idioma de origen detectado
+  const inputN=dictNorm(document.getElementById('dictInput').value);
+  let speakLang='es';
+  for(const l of langs)if(dictNorm(entry[l])===inputN){speakLang=l;break}
+  setTimeout(()=>dictSpeak(entry[speakLang],DICT_TTSLANGS[speakLang]),200);
+}
+function dictSpeak(text,lang){
+  if(!('speechSynthesis' in window))return;
+  try{
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text.replace(/&apos;/g,"'"));
+    u.lang=lang||'es-ES';u.rate=.9;u.pitch=1;u.volume=1;
+    const voices=window.speechSynthesis.getVoices();
+    const m=voices.find(v=>v.lang===u.lang)||voices.find(v=>v.lang.startsWith(u.lang.split('-')[0]));
+    if(m)u.voice=m;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+function dictInit(){
+  document.getElementById('dictInput').value='';
+  document.getElementById('dictResult').innerHTML='<div class="dict-empty">Escribe una palabra arriba o toca una sugerencia.</div>';
+  dictActiveCat='all';
+  dictRenderCats();
+  dictFilterCat('all');
+  // Enter para buscar
+  const inp=document.getElementById('dictInput');
+  if(inp&&!inp.dataset.bound){
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();dictSearch()}});
+    inp.dataset.bound='1';
+  }
 }
 
 // ========== INIT ==========
