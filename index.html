@@ -1152,8 +1152,9 @@ const SHOP=[
 
 // ========== AVATARS ==========
 // Fotos reales de los hermanos como astronautas (Cité de l'espace, Toulouse)
-const AVATAR_EMMANUEL_PHOTO=`<img class="avatar-img" src="avatar-emmanuel.jpg" alt="Emmanuel" loading="eager">`;
-const AVATAR_EMILIANO_PHOTO=`<img class="avatar-img" src="avatar-emiliano.jpg" alt="Emiliano" loading="eager">`;
+// Cache-buster en el query: si actualizamos las fotos hay que subir el sufijo (v5, v6...)
+const AVATAR_EMMANUEL_PHOTO=`<img class="avatar-img" src="avatar-emmanuel.jpg?v=5" alt="Emmanuel" loading="eager">`;
+const AVATAR_EMILIANO_PHOTO=`<img class="avatar-img" src="avatar-emiliano.jpg?v=5" alt="Emiliano" loading="eager">`;
 // Mantenemos los SVG como fallback si la imagen no carga (offline primera vez antes del SW)
 const AVATAR_EMMANUEL_SVG=`<svg class="avatar-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
 <defs><radialGradient id="aura1" cx="50%" cy="50%"><stop offset="60%" stop-color="#ffd700" stop-opacity="0"/><stop offset="100%" stop-color="#ffd700" stop-opacity=".7"/></radialGradient></defs>
