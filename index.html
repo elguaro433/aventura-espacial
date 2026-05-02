@@ -52,16 +52,16 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 @keyframes cardShine{50%,100%{transform:translateX(100%)}}
 .avatar-container{width:140px;height:140px;margin:0 auto 10px;border-radius:50%;overflow:hidden;border:4px solid #ffd700;box-shadow:0 0 20px rgba(255,215,0,.5);position:relative;background:linear-gradient(135deg,#1a0033,#0a0020)}
 .avatar-svg{width:100%;height:100%;display:block}
-.avatar-img{width:100%;height:100%;object-fit:cover;object-position:center 18%;display:block}
+.avatar-img{width:100%;height:100%;object-fit:cover;object-position:center center;display:block}
 .avatar-mini{width:40px;height:40px;border-radius:50%;border:2px solid #ffd700;display:inline-block;vertical-align:middle;margin-right:8px;overflow:hidden;background:#1a0033}
-.avatar-mini svg,.avatar-mini img{width:100%;height:100%;object-fit:cover;object-position:center 18%}
+.avatar-mini svg,.avatar-mini img{width:100%;height:100%;object-fit:cover;object-position:center center}
 .player-name{font-size:22px;font-weight:bold;margin:8px 0 4px;color:#ffd700}
 .player-nick{font-size:14px;color:#fff;opacity:.85;font-style:italic}
 .player-age{font-size:12px;opacity:.7;margin-top:4px}
 .hud{display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,.5);border:2px solid rgba(255,215,0,.4);border-radius:16px;padding:10px 14px;margin-bottom:14px;flex-wrap:wrap;gap:10px}
 .hud-info{display:flex;align-items:center;gap:6px;font-size:14px}
 .hud-stat{background:rgba(255,255,255,.1);border-radius:10px;padding:4px 10px;font-size:14px;font-weight:bold}
-.galaxy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;padding:10px;width:100%;max-width:900px;margin:0 auto}
+.galaxy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:10px;width:100%;max-width:900px;margin:0 auto}
 .galaxy-card{background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:2px solid rgba(255,215,0,.3);border-radius:18px;padding:14px;text-align:center;cursor:pointer;transition:all .3s;position:relative;min-height:160px;display:flex;flex-direction:column;justify-content:space-between;align-items:center}
 .galaxy-card:active{transform:scale(.96)}
 .galaxy-card.locked{opacity:.4;cursor:not-allowed;filter:grayscale(70%)}
