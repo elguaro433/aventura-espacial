@@ -438,6 +438,104 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   .player-card{width:30vw;padding:8px}
   .avatar-container{width:70px;height:70px}
 }
+
+/* ============= TABLET PORTRAIT (vertical) ============= */
+/* Tablet 7-10 pulgadas en vertical: el ancho es limitado, hay que aprovechar el alto */
+@media (orientation:portrait) and (min-width:480px) and (max-width:1100px){
+  /* Canvases que llenan todo el ancho disponible respetando aspect-ratio */
+  #snake-canvas{width:min(92vw,500px);max-height:60vh;height:auto;aspect-ratio:1}
+  #tetris-canvas{width:min(60vw,300px);height:auto;aspect-ratio:.5;max-height:65vh}
+  #mario-canvas{width:97vw;max-width:97vw;height:auto;aspect-ratio:1.71}
+  #dino-canvas{width:97vw;max-width:97vw;height:auto;aspect-ratio:3.33}
+  .tictac-board{width:min(80vw,420px);height:min(80vw,420px)}
+  .memory-grid{width:min(95vw,520px)}
+  .c4-board{width:min(90vw,460px)}
+  .g2048-board{width:min(85vw,440px)}
+  .chess-board{width:min(95vw,480px)}
+  .mines-board{width:min(96vw,460px)}
+  /* Galaxia y juegos clásicos: 2 columnas para mejor uso del alto */
+  .galaxy-grid{grid-template-columns:repeat(2,1fr)}
+  .classic-grid{grid-template-columns:repeat(2,1fr)}
+  /* HUD del mapa: vertical-friendly, wraps si hace falta */
+  .hud{flex-wrap:wrap;justify-content:center;gap:8px}
+  /* Tabs centradas */
+  .tabs{justify-content:center;flex-wrap:wrap}
+  /* DPAD más cómodo abajo */
+  .dpad{margin:14px auto}
+  .dpad-btn{width:60px;height:60px;font-size:26px}
+}
+
+/* ============= TABLET LANDSCAPE (horizontal) ============= */
+/* Tablet 7-10 pulgadas en horizontal: aprovechamos el ancho, comprimimos altura */
+@media (orientation:landscape) and (min-width:768px) and (max-height:900px){
+  .screen{padding:8px 14px}
+  /* Canvases que respetan altura disponible */
+  #snake-canvas{width:auto;max-width:60vw;height:min(80vh,500px);aspect-ratio:1}
+  #tetris-canvas{height:min(85vh,500px);width:auto;aspect-ratio:.5}
+  #mario-canvas{width:auto;max-width:95vw;height:min(75vh,500px);aspect-ratio:1.71}
+  #dino-canvas{width:auto;max-width:97vw;height:min(60vh,360px);aspect-ratio:3.33}
+  .tictac-board{width:min(60vh,400px);height:min(60vh,400px)}
+  .memory-grid{width:min(80vh,520px)}
+  .c4-board{width:min(70vh,440px)}
+  .g2048-board{width:min(70vh,420px)}
+  .chess-board{width:min(75vh,480px)}
+  .mines-board{width:min(80vh,500px)}
+  /* Galaxia: 3 columnas como en desktop */
+  .galaxy-grid{grid-template-columns:repeat(3,1fr)}
+  .classic-grid{grid-template-columns:repeat(5,1fr)}
+  /* HUD compacto en horizontal */
+  .hud{padding:6px 10px;font-size:12px}
+  .hud-stat{padding:3px 7px;font-size:12px}
+  /* Tetris en landscape: canvas + sidebar lado a lado */
+  /* DPAD a la derecha del canvas si hay espacio */
+  .dpad{margin:8px auto}
+  .dpad-btn{width:50px;height:50px;font-size:22px}
+  /* Hero más pequeño en landscape */
+  .hero-rocket{font-size:60px;margin:6px auto}
+  h1{margin-bottom:4px}
+  h2{margin-bottom:6px}
+  .player-card{width:min(280px,30vw)}
+  .avatar-container{width:90px;height:90px}
+  /* Pregunta + respuestas se ven mejor con grid 2x2 */
+  .answers{grid-template-columns:repeat(2,1fr);gap:10px;max-width:min(700px,80vw)}
+}
+
+/* ============= PHONE PORTRAIT (vertical estrecho) ============= */
+/* Móvil vertical: canvases full-width */
+@media (orientation:portrait) and (max-width:480px){
+  #snake-canvas{width:96vw;height:auto;aspect-ratio:1}
+  #tetris-canvas{width:min(70vw,260px);height:auto;aspect-ratio:.5}
+  #mario-canvas{width:99vw;max-width:99vw;height:auto;aspect-ratio:1.71}
+  #dino-canvas{width:99vw;max-width:99vw;height:auto;aspect-ratio:3.33}
+}
+
+/* ============= PHONE LANDSCAPE (horizontal estrecho) ============= */
+/* Móvil horizontal: poco alto, canvases respetan altura */
+@media (orientation:landscape) and (max-width:900px){
+  .screen{padding:6px}
+  .hero-rocket{font-size:40px;margin:2px auto}
+  h1{font-size:18px;margin:4px 0}
+  h2{font-size:14px;margin:2px 0}
+  #snake-canvas{height:min(75vh,360px);width:auto;aspect-ratio:1}
+  #tetris-canvas{height:min(85vh,420px);width:auto;aspect-ratio:.5}
+  #mario-canvas{height:min(70vh,400px);width:auto;aspect-ratio:1.71}
+  #dino-canvas{height:min(55vh,260px);width:auto;aspect-ratio:3.33}
+  .tictac-board{width:min(45vh,260px);height:min(45vh,260px)}
+  .memory-grid{width:min(60vh,380px)}
+  .c4-board{width:min(55vh,340px)}
+  .g2048-board{width:min(55vh,320px)}
+  .chess-board{width:min(60vh,360px)}
+  .mines-board{width:min(65vh,380px)}
+  .dpad-btn{width:42px;height:42px;font-size:18px}
+  .hud{padding:5px 8px;font-size:10px}
+  .hud-stat{padding:2px 5px;font-size:10px}
+  .player-card{width:30vw;padding:8px}
+  .avatar-container{width:65px;height:65px}
+}
+
+/* Indicador de cambio de orientación: pequeño tip al rotar */
+.orientation-hint{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);border:2px solid #ffd700;color:#ffd700;padding:8px 16px;border-radius:18px;font-size:12px;z-index:1500;pointer-events:none;animation:fadeOut 3s ease-out forwards}
+@keyframes fadeOut{0%{opacity:0;transform:translateX(-50%) translateY(10px)}10%{opacity:1;transform:translateX(-50%) translateY(0)}80%{opacity:1}100%{opacity:0}}
 </style>
 </head>
 <body>
@@ -931,19 +1029,25 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 
 <script>
 // ========== HiDPI / Canvas ==========
-// Configura el canvas para pantallas Retina/HiDPI: el backing store es N veces más grande
-// que el tamaño CSS, pero el contexto se escala así no tienes que tocar nada del código de dibujo.
+// Configura el canvas para pantallas Retina/HiDPI sin romper el CSS responsive.
+// IMPORTANTE: NO sobreescribimos canvas.style.width/height — dejamos que CSS las controle.
+// Solo ajustamos el backing store (canvas.width/height) y aplicamos transform al contexto
+// para que el código de dibujo siga usando coordenadas lógicas (cssW × cssH).
 function setupHiDPI(canvas, cssW, cssH){
   if(!canvas)return;
   const dpr = Math.min(window.devicePixelRatio || 1, 3);
-  if(canvas._dprApplied === dpr && canvas._cssW === cssW && canvas._cssH === cssH)return;
-  canvas.width = cssW * dpr;
-  canvas.height = cssH * dpr;
-  canvas.style.width = cssW + 'px';
-  canvas.style.height = cssH + 'px';
+  // Solo ajusta el backing store si cambió algo (evita parpadeo)
+  const targetW = Math.round(cssW * dpr);
+  const targetH = Math.round(cssH * dpr);
+  if(canvas.width !== targetW || canvas.height !== targetH){
+    canvas.width = targetW;
+    canvas.height = targetH;
+  }
+  // Limpia cualquier style.width/height fijo (de versiones previas) para que CSS mande
+  if(canvas.style.width&&canvas.style.width.endsWith('px'))canvas.style.removeProperty('width');
+  if(canvas.style.height&&canvas.style.height.endsWith('px'))canvas.style.removeProperty('height');
   const ctx = canvas.getContext('2d');
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  canvas._dprApplied = dpr; canvas._cssW = cssW; canvas._cssH = cssH;
 }
 
 // ========== STORAGE ==========
@@ -3967,107 +4071,174 @@ function chessValidMove(sr,sc,r,c){
 const MARIO_VW=720,MARIO_VH=420,MARIO_GROUND_Y=360;
 // Mundo: ground = segmentos sólidos del suelo (gaps entre ellos = caída)
 const MARIO_LEVELS=[
-  { // Nivel 1 - aprendizaje
-    width:1920,
-    ground:[[0,420],[490,830],[890,1280],[1340,1920]],
+  { // Nivel 1 - aprendizaje (3600 px = casi el doble)
+    width:3600,
+    ground:[[0,420],[490,830],[890,1280],[1340,1700],[1780,2150],[2230,2600],[2680,3050],[3120,3600]],
     platforms:[
       {x:200,y:300,w:80},{x:330,y:240,w:80},{x:520,y:240,w:90},{x:680,y:200,w:70},
       {x:920,y:280,w:80},{x:1080,y:230,w:80},{x:1240,y:280,w:80},
-      {x:1420,y:220,w:90},{x:1620,y:180,w:90},{x:1800,y:230,w:80}
+      {x:1420,y:220,w:90},{x:1620,y:180,w:90},
+      {x:1820,y:240,w:80},{x:1980,y:200,w:80},
+      {x:2270,y:240,w:80},{x:2430,y:190,w:80},
+      {x:2730,y:230,w:80},{x:2900,y:180,w:80},{x:3080,y:230,w:80},
+      {x:3260,y:200,w:90},{x:3450,y:170,w:80}
     ],
-    movePlats:[{x:380,y:280,w:60,minX:330,maxX:480,vx:1.2}],
+    movePlats:[
+      {x:380,y:280,w:60,minX:330,maxX:480,vx:1.2},
+      {x:2150,y:160,w:70,minX:2100,maxX:2330,vx:1.5},
+      {x:3160,y:140,w:70,minX:3100,maxX:3300,vx:1.7}
+    ],
     boxes:[
       {x:280,y:230,content:'coin'},
       {x:730,y:140,content:'star'},
-      {x:1700,y:160,content:'1up'}
+      {x:1700,y:160,content:'1up'},
+      {x:2480,y:140,content:'coin'},
+      {x:3200,y:120,content:'star'}
     ],
-    pipes:[{x:430,h:50},{x:1290,h:60}],
+    pipes:[{x:430,h:50},{x:1290,h:60},{x:2180,h:50},{x:2640,h:60}],
     coins:[
       {x:240,y:260},{x:370,y:200},{x:560,y:200},{x:710,y:160},
       {x:960,y:240},{x:1120,y:190},{x:1280,y:240},
-      {x:1465,y:180},{x:1665,y:140},{x:1840,y:190},
+      {x:1465,y:180},{x:1665,y:140},
+      {x:1860,y:200},{x:2020,y:160},{x:2200,y:120},
+      {x:2310,y:200},{x:2470,y:150},
+      {x:2770,y:190},{x:2940,y:140},{x:3120,y:190},
+      {x:3300,y:160},{x:3490,y:130},
       {x:80,y:330},{x:120,y:330},{x:160,y:330},
       {x:560,y:330},{x:600,y:330},{x:640,y:330},{x:680,y:330},
-      {x:1480,y:330},{x:1520,y:330},{x:1560,y:330}
+      {x:1480,y:330},{x:1520,y:330},{x:1560,y:330},
+      {x:1820,y:330},{x:1860,y:330},{x:1900,y:330},
+      {x:2280,y:330},{x:2320,y:330},
+      {x:2740,y:330},{x:2780,y:330},{x:2820,y:330},
+      {x:3180,y:330},{x:3220,y:330},{x:3260,y:330}
     ],
-    stars:[{x:1820,y:140}],
+    stars:[{x:1820,y:140},{x:3520,y:130}],
     enemies:[
       {x:600,y:336,patrol:[490,820]},
-      {x:1000,y:336,patrol:[890,1270]}
+      {x:1000,y:336,patrol:[890,1270]},
+      {x:1500,y:336,patrol:[1340,1690]},
+      {x:1950,y:336,patrol:[1780,2140]},
+      {x:2400,y:336,patrol:[2230,2590]},
+      {x:2850,y:336,patrol:[2680,3040]}
     ],
-    goal:{x:1880,y:MARIO_GROUND_Y-50}
+    goal:{x:3560,y:MARIO_GROUND_Y-50}
   },
-  { // Nivel 2 - intermedio
-    width:2400,
-    ground:[[0,360],[450,720],[820,1100],[1200,1500],[1620,1980],[2080,2400]],
+  { // Nivel 2 - intermedio (4400 px)
+    width:4400,
+    ground:[[0,360],[450,720],[820,1100],[1200,1500],[1620,1980],[2080,2400],[2480,2820],[2900,3220],[3300,3640],[3720,4080],[4160,4400]],
     platforms:[
       {x:180,y:280,w:80},{x:340,y:230,w:80},{x:520,y:200,w:80},
       {x:760,y:260,w:80},{x:920,y:200,w:90},{x:1100,y:240,w:80},
       {x:1280,y:200,w:80},{x:1430,y:240,w:80},
       {x:1660,y:220,w:80},{x:1820,y:180,w:80},
-      {x:2020,y:220,w:80},{x:2200,y:180,w:80}
+      {x:2020,y:220,w:80},{x:2200,y:180,w:80},
+      {x:2520,y:230,w:80},{x:2680,y:190,w:80},
+      {x:2940,y:240,w:80},{x:3100,y:200,w:80},
+      {x:3340,y:230,w:80},{x:3500,y:180,w:80},
+      {x:3760,y:240,w:80},{x:3920,y:190,w:80},{x:4080,y:160,w:80},
+      {x:4250,y:200,w:90}
     ],
     movePlats:[
       {x:600,y:200,w:70,minX:580,maxX:760,vx:1.5},
-      {x:1700,y:140,w:70,minX:1660,maxX:1900,vx:1.8}
+      {x:1700,y:140,w:70,minX:1660,maxX:1900,vx:1.8},
+      {x:2780,y:160,w:70,minX:2740,maxX:2940,vx:1.9},
+      {x:3600,y:140,w:70,minX:3550,maxX:3760,vx:2}
     ],
     boxes:[
       {x:300,y:280,content:'coin'},
       {x:870,y:140,content:'star'},
       {x:1340,y:140,content:'1up'},
-      {x:2150,y:200,content:'coin'}
+      {x:2150,y:200,content:'coin'},
+      {x:2620,y:130,content:'star'},
+      {x:3200,y:140,content:'1up'},
+      {x:4040,y:100,content:'star'}
     ],
-    pipes:[{x:380,h:60},{x:680,h:50},{x:1170,h:60},{x:1570,h:50},{x:2030,h:70}],
+    pipes:[{x:380,h:60},{x:680,h:50},{x:1170,h:60},{x:1570,h:50},{x:2030,h:70},{x:2440,h:60},{x:2860,h:55},{x:3260,h:65},{x:3680,h:50}],
     coins:[
       {x:220,y:240},{x:380,y:190},{x:560,y:160},
       {x:800,y:220},{x:960,y:160},{x:1140,y:200},
       {x:1320,y:160},{x:1470,y:200},
       {x:1700,y:180},{x:1860,y:140},
       {x:2060,y:180},{x:2240,y:140},
+      {x:2560,y:190},{x:2720,y:150},
+      {x:2980,y:200},{x:3140,y:160},
+      {x:3380,y:190},{x:3540,y:140},
+      {x:3800,y:200},{x:3960,y:150},{x:4120,y:120},
       {x:60,y:330},{x:100,y:330},{x:140,y:330},
       {x:850,y:330},{x:890,y:330},
-      {x:1300,y:330},{x:1340,y:330}
+      {x:1300,y:330},{x:1340,y:330},
+      {x:2520,y:330},{x:2560,y:330},
+      {x:2940,y:330},{x:2980,y:330},
+      {x:3340,y:330},{x:3380,y:330},
+      {x:3760,y:330},{x:3800,y:330},{x:3840,y:330}
     ],
-    stars:[{x:2350,y:120}],
+    stars:[{x:2350,y:120},{x:4280,y:140}],
     enemies:[
       {x:200,y:336,patrol:[0,350]},
       {x:550,y:336,patrol:[450,710]},
       {x:950,y:336,patrol:[820,1090]},
-      {x:1700,y:336,patrol:[1620,1970]}
+      {x:1700,y:336,patrol:[1620,1970]},
+      {x:2200,y:336,patrol:[2080,2390]},
+      {x:2600,y:336,patrol:[2480,2810]},
+      {x:3000,y:336,patrol:[2900,3210]},
+      {x:3450,y:336,patrol:[3300,3630]},
+      {x:3850,y:336,patrol:[3720,4070]}
     ],
-    goal:{x:2360,y:MARIO_GROUND_Y-50}
+    goal:{x:4360,y:MARIO_GROUND_Y-50}
   },
-  { // Nivel 3 - desafío + BOSS
-    width:2880,
-    ground:[[0,300],[400,640],[760,980],[1100,1340],[1460,1700],[1820,2080],[2200,2540],[2640,2880]],
+  { // Nivel 3 - desafío épico (5400 px)
+    width:5400,
+    ground:[[0,300],[400,640],[760,980],[1100,1340],[1460,1700],[1820,2080],[2200,2540],[2640,2880],[2960,3220],[3300,3580],[3660,3940],[4020,4300],[4380,4700],[4780,5100],[5180,5400]],
     platforms:[
       {x:150,y:260,w:70},{x:280,y:200,w:70},{x:480,y:240,w:70},
       {x:630,y:180,w:70},{x:840,y:240,w:70},{x:1000,y:180,w:70},
       {x:1190,y:240,w:70},{x:1340,y:180,w:70},{x:1530,y:240,w:70},
       {x:1700,y:180,w:70},{x:1900,y:240,w:70},{x:2060,y:180,w:70},
-      {x:2270,y:240,w:70},{x:2440,y:180,w:80}
+      {x:2270,y:240,w:70},{x:2440,y:180,w:80},
+      {x:2700,y:230,w:70},{x:2860,y:190,w:70},
+      {x:3020,y:240,w:70},{x:3180,y:200,w:70},{x:3360,y:170,w:70},
+      {x:3540,y:230,w:70},{x:3720,y:190,w:70},{x:3880,y:160,w:70},
+      {x:4060,y:230,w:70},{x:4220,y:200,w:70},{x:4400,y:170,w:70},
+      {x:4580,y:230,w:70},{x:4740,y:190,w:70},{x:4900,y:160,w:80},
+      {x:5080,y:200,w:90},{x:5260,y:170,w:80}
     ],
     movePlats:[
       {x:1380,y:240,w:80,minX:1340,maxX:1530,vx:2},
-      {x:2120,y:180,w:80,minX:2080,maxX:2270,vx:2.2}
+      {x:2120,y:180,w:80,minX:2080,maxX:2270,vx:2.2},
+      {x:2950,y:160,w:70,minX:2900,maxX:3140,vx:2.3},
+      {x:3640,y:140,w:70,minX:3590,maxX:3820,vx:2.4},
+      {x:4500,y:130,w:70,minX:4440,maxX:4680,vx:2.5}
     ],
     boxes:[
       {x:200,y:200,content:'coin'},
       {x:920,y:140,content:'star'},
       {x:1430,y:140,content:'1up'},
-      {x:2360,y:140,content:'star'}
+      {x:2360,y:140,content:'star'},
+      {x:2940,y:130,content:'1up'},
+      {x:3680,y:130,content:'star'},
+      {x:4400,y:120,content:'1up'},
+      {x:5180,y:120,content:'star'}
     ],
-    boss:{x:2700,y:MARIO_GROUND_Y-50,hp:3},
-    pipes:[{x:330,h:60},{x:680,h:80},{x:1030,h:50},{x:1380,h:70},{x:1750,h:60},{x:2120,h:80},{x:2580,h:50}],
+    boss:{x:5200,y:MARIO_GROUND_Y-50,hp:3},
+    pipes:[{x:330,h:60},{x:680,h:80},{x:1030,h:50},{x:1380,h:70},{x:1750,h:60},{x:2120,h:80},{x:2580,h:50},{x:2900,h:65},{x:3240,h:75},{x:3600,h:55},{x:3980,h:80},{x:4340,h:65},{x:4720,h:55}],
     coins:[
       {x:190,y:220},{x:320,y:160},{x:520,y:200},{x:670,y:140},
       {x:880,y:200},{x:1040,y:140},{x:1230,y:200},{x:1380,y:140},
       {x:1570,y:200},{x:1740,y:140},{x:1940,y:200},{x:2100,y:140},
       {x:2310,y:200},{x:2480,y:140},
+      {x:2740,y:190},{x:2900,y:150},
+      {x:3060,y:200},{x:3220,y:160},{x:3400,y:130},
+      {x:3580,y:190},{x:3760,y:150},{x:3920,y:120},
+      {x:4100,y:190},{x:4260,y:160},{x:4440,y:130},
+      {x:4620,y:190},{x:4780,y:150},{x:4940,y:120},
+      {x:5120,y:160},{x:5300,y:130},
       {x:60,y:270},{x:100,y:270},
-      {x:830,y:330},{x:870,y:330},{x:910,y:330}
+      {x:830,y:330},{x:870,y:330},{x:910,y:330},
+      {x:2700,y:330},{x:2740,y:330},
+      {x:3700,y:330},{x:3740,y:330},
+      {x:4400,y:330},{x:4440,y:330},{x:4480,y:330}
     ],
-    stars:[],
+    stars:[{x:5300,y:140}],
     enemies:[
       {x:200,y:336,patrol:[0,290]},
       {x:500,y:336,patrol:[400,630]},
@@ -4075,9 +4246,16 @@ const MARIO_LEVELS=[
       {x:1200,y:336,patrol:[1100,1330]},
       {x:1550,y:336,patrol:[1460,1690]},
       {x:1900,y:336,patrol:[1820,2070]},
-      {x:2300,y:336,patrol:[2200,2530]}
+      {x:2300,y:336,patrol:[2200,2530]},
+      {x:2750,y:336,patrol:[2640,2870]},
+      {x:3050,y:336,patrol:[2960,3210]},
+      {x:3400,y:336,patrol:[3300,3570]},
+      {x:3750,y:336,patrol:[3660,3930]},
+      {x:4150,y:336,patrol:[4020,4290]},
+      {x:4500,y:336,patrol:[4380,4690]},
+      {x:4900,y:336,patrol:[4780,5090]}
     ],
-    goal:{x:2840,y:MARIO_GROUND_Y-50}
+    goal:{x:5360,y:MARIO_GROUND_Y-50}
   }
 ];
 let marioPlayer,marioLevel,marioLives,marioScore,marioWorld,marioCam,marioPickups,marioEnemies,marioMovePlats=[];
@@ -4781,102 +4959,247 @@ function dinoRender(){
   ctx.textAlign='left';
 }
 function drawDino(ctx,p){
+  // T-Rex realista con curvas, gradientes, escamas y sombras volumétricas
   const x=p.x,y=p.y;
+  const t=performance.now();
   ctx.save();
-  // Sombra
+  // Paleta verde T-Rex
+  const C={dark:'#2e5c1c',main:'#4a8a2a',light:'#7cb342',belly:'#c5e1a5',accent:'#1b3d0f',scale:'#5d9b3a'};
+  // Sombra elíptica suave en el suelo
   if(p.onGround){
-    ctx.fillStyle='rgba(0,0,0,.3)';
-    ctx.beginPath();ctx.ellipse(x+(p.crouch?34:24),DINO_GROUND+2,p.crouch?32:22,4,0,0,Math.PI*2);ctx.fill();
+    const sg=ctx.createRadialGradient(x+(p.crouch?34:24),DINO_GROUND+2,2,x+(p.crouch?34:24),DINO_GROUND+2,p.crouch?34:24);
+    sg.addColorStop(0,'rgba(0,0,0,.45)');sg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=sg;
+    ctx.beginPath();ctx.ellipse(x+(p.crouch?34:24),DINO_GROUND+2,p.crouch?34:24,5,0,0,Math.PI*2);ctx.fill();
   }
+
   if(p.crouch&&p.onGround){
-    // === AGACHADO ===
-    ctx.fillStyle='#558b2f';
-    ctx.fillRect(x,y+14,60,26);
-    ctx.fillStyle='#7cb342';
-    ctx.fillRect(x+6,y+22,48,16);
-    ctx.fillStyle='#558b2f';
-    ctx.fillRect(x+44,y+8,28,22);
-    ctx.fillStyle='#3e6b1f';
-    ctx.fillRect(x+62,y+22,10,3);
-    ctx.fillStyle='#fff';
-    ctx.fillRect(x+64,y+25,2,2);
-    ctx.fillRect(x+68,y+25,2,2);
-    ctx.fillStyle='#fff';ctx.fillRect(x+58,y+12,5,5);
-    ctx.fillStyle='#000';ctx.fillRect(x+60,y+13,3,3);
-    const legAlt=Math.floor(performance.now()/80)%2;
-    ctx.fillStyle='#3e6b1f';
-    ctx.fillRect(x+12,y+38,7,3+legAlt*3);
-    ctx.fillRect(x+34,y+38,7,3+(1-legAlt)*3);
-    ctx.fillStyle='#fff';
-    ctx.fillRect(x+12,y+41+legAlt*3,2,1);
-    ctx.fillRect(x+17,y+41+legAlt*3,2,1);
-  }else{
-    // === DE PIE ===
-    // cola
-    ctx.fillStyle='#558b2f';
+    // === AGACHADO (perfil estirado, hocico delante) ===
+    // Cola estirada hacia atrás
+    ctx.fillStyle=C.main;
     ctx.beginPath();
-    ctx.moveTo(x,y+30);
-    ctx.lineTo(x-14,y+22);
-    ctx.lineTo(x-18,y+34);
-    ctx.lineTo(x,y+42);
+    ctx.moveTo(x-4,y+24);
+    ctx.quadraticCurveTo(x-18,y+18,x-26,y+22);
+    ctx.lineTo(x-28,y+30);
+    ctx.quadraticCurveTo(x-14,y+34,x-2,y+34);
     ctx.closePath();ctx.fill();
-    // cuerpo
-    ctx.fillStyle='#558b2f';
-    ctx.fillRect(x+2,y+18,38,42);
-    ctx.fillStyle='#9ccc65';
-    ctx.fillRect(x+10,y+30,26,28);
-    ctx.fillStyle='#558b2f';
-    ctx.beginPath();ctx.arc(x+30,y+24,12,0,Math.PI*2);ctx.fill();
-    // cabeza
-    ctx.fillStyle='#558b2f';
-    ctx.fillRect(x+32,y,30,28);
-    ctx.beginPath();ctx.arc(x+62,y+10,10,0,Math.PI*2);ctx.fill();
-    ctx.fillRect(x+60,y+12,12,12);
-    // boca
-    ctx.fillStyle='#3e6b1f';
-    ctx.fillRect(x+58,y+22,14,2);
-    // dientes
+    // Punta cola más oscura
+    ctx.fillStyle=C.dark;
+    ctx.beginPath();ctx.moveTo(x-22,y+22);ctx.lineTo(x-28,y+25);ctx.lineTo(x-22,y+30);ctx.closePath();ctx.fill();
+
+    // Cuerpo (ovalado horizontal)
+    const bodyG=ctx.createLinearGradient(x,y+14,x,y+40);
+    bodyG.addColorStop(0,C.light);bodyG.addColorStop(.5,C.main);bodyG.addColorStop(1,C.dark);
+    ctx.fillStyle=bodyG;
+    ctx.beginPath();ctx.ellipse(x+28,y+28,32,15,0,0,Math.PI*2);ctx.fill();
+    // Vientre claro
+    ctx.fillStyle=C.belly;
+    ctx.beginPath();ctx.ellipse(x+30,y+34,22,7,0,0,Math.PI);ctx.fill();
+
+    // Cabeza alargada con hocico
+    ctx.fillStyle=C.main;
+    ctx.beginPath();
+    ctx.moveTo(x+44,y+12);
+    ctx.quadraticCurveTo(x+62,y+6,x+74,y+14);
+    ctx.quadraticCurveTo(x+78,y+22,x+72,y+28);
+    ctx.lineTo(x+44,y+28);
+    ctx.closePath();ctx.fill();
+    // Mandíbula inferior
+    ctx.fillStyle=C.dark;
+    ctx.beginPath();
+    ctx.moveTo(x+50,y+25);
+    ctx.quadraticCurveTo(x+64,y+30,x+72,y+27);
+    ctx.lineTo(x+72,y+30);
+    ctx.quadraticCurveTo(x+62,y+33,x+50,y+30);
+    ctx.closePath();ctx.fill();
+    // Línea boca
+    ctx.strokeStyle=C.accent;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x+50,y+27);ctx.lineTo(x+72,y+27);ctx.stroke();
+    // Dientes
     ctx.fillStyle='#fff';
-    ctx.fillRect(x+60,y+16,2,3);
-    ctx.fillRect(x+64,y+16,2,3);
-    ctx.fillRect(x+68,y+16,2,3);
-    // ojo grande con destello
-    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x+50,y+8,4,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#000';ctx.beginPath();ctx.arc(x+51,y+9,2.5,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x+52,y+8,1,0,Math.PI*2);ctx.fill();
-    // ceja
-    ctx.fillStyle='#3e6b1f';
-    ctx.fillRect(x+46,y+3,10,2);
-    // bracitos cortos T-Rex
-    ctx.fillStyle='#558b2f';
-    ctx.fillRect(x+24,y+30,5,8);
-    ctx.fillStyle='#fff';
-    ctx.fillRect(x+25,y+38,1,2);
-    ctx.fillRect(x+27,y+38,1,2);
-    // patas
-    if(p.onGround){
-      const legAlt=Math.floor(performance.now()/80)%2;
-      ctx.fillStyle='#3e6b1f';
-      ctx.fillRect(x+8,y+58,9,3+legAlt*4);
-      ctx.fillRect(x+24,y+58,9,3+(1-legAlt)*4);
-      ctx.fillStyle='#fff';
-      ctx.fillRect(x+8,y+62+legAlt*4,2,1);
-      ctx.fillRect(x+12,y+62+legAlt*4,2,1);
-      ctx.fillRect(x+24,y+62+(1-legAlt)*4,2,1);
-      ctx.fillRect(x+28,y+62+(1-legAlt)*4,2,1);
-    }else{
-      ctx.fillStyle='#3e6b1f';
-      ctx.fillRect(x+8,y+58,9,5);
-      ctx.fillRect(x+24,y+58,9,5);
-      ctx.fillStyle='#fff';
-      ctx.fillRect(x+8,y+62,2,1);ctx.fillRect(x+12,y+62,2,1);
-      ctx.fillRect(x+24,y+62,2,1);ctx.fillRect(x+28,y+62,2,1);
+    ctx.beginPath();ctx.moveTo(x+58,y+27);ctx.lineTo(x+59,y+30);ctx.lineTo(x+60,y+27);ctx.fill();
+    ctx.beginPath();ctx.moveTo(x+63,y+27);ctx.lineTo(x+64,y+31);ctx.lineTo(x+65,y+27);ctx.fill();
+    ctx.beginPath();ctx.moveTo(x+68,y+27);ctx.lineTo(x+69,y+30);ctx.lineTo(x+70,y+27);ctx.fill();
+    // Fosa nasal
+    ctx.fillStyle=C.accent;
+    ctx.beginPath();ctx.arc(x+72,y+18,1.5,0,Math.PI*2);ctx.fill();
+    // Ojo redondo con iris ámbar
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x+58,y+15,3.5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#ff9800';ctx.beginPath();ctx.arc(x+59,y+15,2.5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#000';ctx.beginPath();ctx.arc(x+60,y+15,1.4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x+60.5,y+14.5,.6,0,Math.PI*2);ctx.fill();
+    // Ceja agresiva
+    ctx.strokeStyle=C.accent;ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(x+53,y+10);ctx.lineTo(x+62,y+12);ctx.stroke();
+
+    // Escamas espalda (pequeños picos)
+    ctx.fillStyle=C.dark;
+    for(let i=0;i<5;i++){
+      const sx=x+8+i*8;
+      ctx.beginPath();ctx.moveTo(sx,y+15);ctx.lineTo(sx+2,y+12);ctx.lineTo(sx+4,y+15);ctx.fill();
     }
-    // escamas espalda
-    ctx.fillStyle='#3e6b1f';
-    ctx.fillRect(x+14,y+18,3,3);
-    ctx.fillRect(x+22,y+16,3,3);
-    ctx.fillRect(x+30,y+18,3,3);
+    // Patas (con animación)
+    const legAlt=Math.floor(t/80)%2;
+    ctx.fillStyle=C.dark;
+    // Pata 1
+    ctx.beginPath();ctx.moveTo(x+18,y+38);ctx.lineTo(x+22,y+38);ctx.lineTo(x+24,y+44+legAlt*2);ctx.lineTo(x+16,y+44+legAlt*2);ctx.closePath();ctx.fill();
+    // Pata 2
+    ctx.beginPath();ctx.moveTo(x+38,y+38);ctx.lineTo(x+42,y+38);ctx.lineTo(x+44,y+44+(1-legAlt)*2);ctx.lineTo(x+36,y+44+(1-legAlt)*2);ctx.closePath();ctx.fill();
+    // Garras
+    ctx.fillStyle='#fff';
+    [16,20,36,40].forEach((cx,i)=>{
+      const off=(i<2?legAlt:1-legAlt)*2;
+      ctx.beginPath();ctx.moveTo(x+cx,y+44+off);ctx.lineTo(x+cx+2,y+47+off);ctx.lineTo(x+cx+1,y+44+off);ctx.fill();
+    });
+  }else{
+    // === DE PIE (postura erguida T-Rex) ===
+    // Cola larga y curva
+    ctx.fillStyle=C.main;
+    ctx.beginPath();
+    ctx.moveTo(x+4,y+34);
+    ctx.quadraticCurveTo(x-10,y+22,x-22,y+18);
+    ctx.lineTo(x-24,y+24);
+    ctx.quadraticCurveTo(x-12,y+32,x+4,y+44);
+    ctx.closePath();ctx.fill();
+    // Punta cola oscura
+    ctx.fillStyle=C.dark;
+    ctx.beginPath();ctx.moveTo(x-18,y+18);ctx.lineTo(x-24,y+22);ctx.lineTo(x-18,y+26);ctx.closePath();ctx.fill();
+    // Sombra debajo de la cola
+    ctx.fillStyle='rgba(0,0,0,.15)';
+    ctx.beginPath();ctx.moveTo(x-10,y+34);ctx.quadraticCurveTo(x,y+38,x+6,y+44);ctx.lineTo(x-2,y+44);ctx.closePath();ctx.fill();
+
+    // CUERPO ovalado vertical con gradiente
+    const bodyG=ctx.createLinearGradient(x,y+18,x,y+60);
+    bodyG.addColorStop(0,C.light);bodyG.addColorStop(.4,C.main);bodyG.addColorStop(1,C.dark);
+    ctx.fillStyle=bodyG;
+    ctx.beginPath();ctx.ellipse(x+20,y+40,18,22,0,0,Math.PI*2);ctx.fill();
+    // Vientre claro
+    ctx.fillStyle=C.belly;
+    ctx.beginPath();ctx.ellipse(x+22,y+48,11,13,0,0,Math.PI*2);ctx.fill();
+    // Sombra lateral del cuerpo
+    ctx.fillStyle='rgba(0,0,0,.18)';
+    ctx.beginPath();ctx.ellipse(x+10,y+42,5,18,0,0,Math.PI*2);ctx.fill();
+
+    // CUELLO grueso
+    ctx.fillStyle=C.main;
+    ctx.beginPath();
+    ctx.moveTo(x+22,y+22);
+    ctx.quadraticCurveTo(x+36,y+12,x+42,y+10);
+    ctx.lineTo(x+44,y+22);
+    ctx.quadraticCurveTo(x+34,y+26,x+24,y+30);
+    ctx.closePath();ctx.fill();
+
+    // CABEZA grande con hocico definido
+    ctx.fillStyle=C.main;
+    ctx.beginPath();
+    ctx.moveTo(x+38,y);
+    ctx.quadraticCurveTo(x+58,y-4,x+70,y+4);
+    ctx.quadraticCurveTo(x+76,y+12,x+72,y+20);
+    ctx.lineTo(x+58,y+22);
+    ctx.quadraticCurveTo(x+42,y+22,x+38,y+18);
+    ctx.closePath();ctx.fill();
+    // Sombra inferior cabeza (volumen)
+    ctx.fillStyle='rgba(0,0,0,.18)';
+    ctx.beginPath();
+    ctx.moveTo(x+42,y+18);ctx.lineTo(x+72,y+18);ctx.lineTo(x+70,y+22);ctx.lineTo(x+44,y+22);ctx.closePath();ctx.fill();
+    // Mandíbula inferior protruding
+    ctx.fillStyle=C.dark;
+    ctx.beginPath();
+    ctx.moveTo(x+48,y+18);
+    ctx.quadraticCurveTo(x+62,y+24,x+72,y+20);
+    ctx.lineTo(x+72,y+22);
+    ctx.quadraticCurveTo(x+62,y+27,x+48,y+22);
+    ctx.closePath();ctx.fill();
+    // Línea de la boca
+    ctx.strokeStyle=C.accent;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x+48,y+20);ctx.lineTo(x+72,y+20);ctx.stroke();
+    // DIENTES afilados (triángulos)
+    ctx.fillStyle='#fff';
+    [54,60,66].forEach(dx=>{
+      ctx.beginPath();ctx.moveTo(x+dx,y+20);ctx.lineTo(x+dx+1.5,y+24);ctx.lineTo(x+dx+3,y+20);ctx.fill();
+    });
+    // Fosa nasal
+    ctx.fillStyle=C.accent;
+    ctx.beginPath();ctx.ellipse(x+70,y+8,1.5,2,0,0,Math.PI*2);ctx.fill();
+    // OJO con iris ámbar y brillo
+    ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.arc(x+54,y+8,4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#ff9800';
+    ctx.beginPath();ctx.arc(x+55,y+8,3,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#000';
+    ctx.beginPath();ctx.arc(x+56,y+8,1.6,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.arc(x+56.6,y+7.4,.7,0,Math.PI*2);ctx.fill();
+    // Ceja agresiva
+    ctx.strokeStyle=C.accent;ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.moveTo(x+48,y+2);ctx.quadraticCurveTo(x+54,y+1,x+60,y+4);ctx.stroke();
+
+    // ESCAMAS dorso (cresta de picos)
+    ctx.fillStyle=C.dark;
+    for(let i=0;i<6;i++){
+      const sx=x+10+i*5,sy=y+22+(i<3?-i*1.5:(5-i)*1.5);
+      ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx+2.5,sy-3);ctx.lineTo(sx+5,sy);ctx.fill();
+    }
+    // Escamas decorativas en el cuerpo
+    ctx.fillStyle=C.scale;
+    [[14,32],[20,36],[26,32],[14,42],[22,46],[28,42],[20,52]].forEach(([dx,dy])=>{
+      ctx.beginPath();ctx.arc(x+dx,y+dy,1.5,0,Math.PI*2);ctx.fill();
+    });
+
+    // BRAZOS pequeños T-Rex (con garras)
+    ctx.fillStyle=C.main;
+    ctx.beginPath();
+    ctx.moveTo(x+24,y+34);
+    ctx.quadraticCurveTo(x+30,y+38,x+30,y+44);
+    ctx.lineTo(x+26,y+44);
+    ctx.quadraticCurveTo(x+24,y+38,x+22,y+34);
+    ctx.closePath();ctx.fill();
+    // Garras del brazo
+    ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.moveTo(x+27,y+44);ctx.lineTo(x+28,y+47);ctx.lineTo(x+29,y+44);ctx.fill();
+    ctx.beginPath();ctx.moveTo(x+24,y+44);ctx.lineTo(x+25,y+47);ctx.lineTo(x+26,y+44);ctx.fill();
+
+    // PATAS musculosas con animación
+    if(p.onGround){
+      const legAlt=Math.floor(t/80)%2;
+      // Muslo
+      ctx.fillStyle=C.main;
+      ctx.beginPath();ctx.ellipse(x+14,y+54,5,8,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.ellipse(x+28,y+54,5,8,0,0,Math.PI*2);ctx.fill();
+      // Pantorrilla + pie
+      ctx.fillStyle=C.dark;
+      ctx.beginPath();
+      ctx.moveTo(x+10,y+58);ctx.lineTo(x+18,y+58);
+      ctx.lineTo(x+19,y+62+legAlt*3);ctx.lineTo(x+9,y+62+legAlt*3);
+      ctx.closePath();ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(x+24,y+58);ctx.lineTo(x+32,y+58);
+      ctx.lineTo(x+33,y+62+(1-legAlt)*3);ctx.lineTo(x+23,y+62+(1-legAlt)*3);
+      ctx.closePath();ctx.fill();
+      // Garras grandes (3 dedos)
+      ctx.fillStyle='#fff';
+      [9,12,15].forEach(dx=>{
+        ctx.beginPath();ctx.moveTo(x+dx,y+62+legAlt*3);ctx.lineTo(x+dx+1.5,y+65+legAlt*3);ctx.lineTo(x+dx+3,y+62+legAlt*3);ctx.fill();
+      });
+      [23,26,29].forEach(dx=>{
+        ctx.beginPath();ctx.moveTo(x+dx,y+62+(1-legAlt)*3);ctx.lineTo(x+dx+1.5,y+65+(1-legAlt)*3);ctx.lineTo(x+dx+3,y+62+(1-legAlt)*3);ctx.fill();
+      });
+    }else{
+      // En el aire: patas recogidas
+      ctx.fillStyle=C.main;
+      ctx.beginPath();ctx.ellipse(x+14,y+54,5,8,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.ellipse(x+28,y+54,5,8,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=C.dark;
+      ctx.beginPath();ctx.ellipse(x+14,y+62,4,4,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.ellipse(x+28,y+62,4,4,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#fff';
+      [12,14,16].forEach(dx=>{
+        ctx.beginPath();ctx.moveTo(x+dx,y+64);ctx.lineTo(x+dx+1,y+66);ctx.lineTo(x+dx+2,y+64);ctx.fill();
+      });
+      [26,28,30].forEach(dx=>{
+        ctx.beginPath();ctx.moveTo(x+dx,y+64);ctx.lineTo(x+dx+1,y+66);ctx.lineTo(x+dx+2,y+64);ctx.fill();
+      });
+    }
   }
   ctx.restore();
 }
@@ -5806,6 +6129,40 @@ function init(){
   // Listeners online/offline para actualizar banner en tiempo real
   window.addEventListener('online',()=>{updateOfflineBanner();toast('🌐 Conectado a internet')});
   window.addEventListener('offline',()=>{updateOfflineBanner();toast('📡 Sin conexión · Mini‑Enciclopedia y juego siguen funcionando')});
+
+  // === ROTACIÓN / RESIZE para tablet ===
+  // Cuando el usuario rota la tablet o redimensiona la ventana, los canvas con HiDPI
+  // necesitan recalcular su backing store (porque el tamaño CSS cambió).
+  // Reescalamos el canvas activo según la pantalla en juego, y forzamos un re-render.
+  let lastOrientation=window.screen&&window.screen.orientation?window.screen.orientation.angle:0;
+  function handleResize(){
+    // Re-aplica HiDPI sobre los canvases activos según la pantalla actual
+    if(game.screen==='snake'&&typeof setupHiDPI==='function'){setupHiDPI(document.getElementById('snake-canvas'),320,320);if(typeof snakeRender==='function')snakeRender()}
+    if(game.screen==='tetris'){setupHiDPI(document.getElementById('tetris-canvas'),240,480);setupHiDPI(document.getElementById('tetris-next-canvas'),80,80);if(typeof tetrisRender==='function')tetrisRender()}
+    if(game.screen==='mario'){setupHiDPI(document.getElementById('mario-canvas'),MARIO_VW,MARIO_VH);if(typeof marioRender==='function'&&marioPlayer)marioRender()}
+    if(game.screen==='dino'){setupHiDPI(document.getElementById('dino-canvas'),DINO_W,DINO_H);if(typeof dinoRender==='function'&&dinoPlayer)dinoRender()}
+  }
+  // Debounce: agrupar rápidos resize en uno solo
+  let resizeTO=null;
+  window.addEventListener('resize',()=>{if(resizeTO)clearTimeout(resizeTO);resizeTO=setTimeout(handleResize,150)});
+  // orientationchange dispara antes que resize en algunos browsers; reaccionamos también
+  window.addEventListener('orientationchange',()=>{
+    if(resizeTO)clearTimeout(resizeTO);
+    resizeTO=setTimeout(()=>{
+      handleResize();
+      // Hint visual breve indicando la nueva orientación
+      const isLandscape=window.matchMedia('(orientation:landscape)').matches;
+      const old=document.querySelector('.orientation-hint');if(old)old.remove();
+      const hint=document.createElement('div');hint.className='orientation-hint';
+      hint.textContent=isLandscape?'📱 Modo horizontal':'📱 Modo vertical';
+      document.body.appendChild(hint);
+      setTimeout(()=>hint.remove(),3100);
+    },200);
+  });
+  // Para Visual Viewport (teclado virtual en móvil que cambia tamaño)
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize',()=>{if(resizeTO)clearTimeout(resizeTO);resizeTO=setTimeout(handleResize,200)});
+  }
   // URLs ocultas: ?admin=padres → editor de contenido / ?padres=1 → analytics
   // Pensadas para que tú entres directo desde la barra del navegador.
   try{
