@@ -256,6 +256,28 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .wiki-loader{text-align:center;padding:30px;color:#ffd700;font-size:14px}
 .wiki-loader::after{content:'';display:inline-block;width:14px;height:14px;border:3px solid #ffd700;border-top-color:transparent;border-radius:50%;animation:spin 0.7s linear infinite;margin-left:8px;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* MODO PADRES */
+.parents-section{background:rgba(255,255,255,.06);border:2px solid rgba(255,215,0,.3);border-radius:18px;padding:16px;margin:10px 0}
+.parents-section h3{color:#ffd700;text-align:left;font-size:16px;margin-bottom:10px;border-bottom:1px solid rgba(255,215,0,.2);padding-bottom:6px}
+.parents-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-bottom:1px dashed rgba(255,255,255,.08)}
+.parents-row:last-child{border-bottom:none}
+.parents-key{opacity:.85}
+.parents-val{font-weight:bold;color:#ffd700}
+.parents-bar{display:flex;align-items:center;gap:8px;font-size:12px;padding:5px 0}
+.parents-bar-name{min-width:100px;opacity:.85}
+.parents-bar-track{flex:1;height:14px;background:rgba(255,255,255,.08);border-radius:7px;overflow:hidden;position:relative}
+.parents-bar-fill{height:100%;background:linear-gradient(90deg,#4caf50,#8bc34a);border-radius:7px}
+.parents-bar-fill.bad{background:linear-gradient(90deg,#f44336,#ff7043)}
+.parents-bar-val{min-width:50px;text-align:right;font-weight:bold;color:#ffd700}
+/* EDITOR ADMIN */
+.admin-form{background:rgba(255,255,255,.06);border:2px solid rgba(255,215,0,.3);border-radius:18px;padding:16px;margin:10px 0}
+.admin-form label{display:block;color:#ffd700;font-size:12px;font-weight:bold;margin:8px 0 4px;text-align:left}
+.admin-input,.admin-select{width:100%;padding:10px 14px;border-radius:12px;border:2px solid rgba(255,215,0,.4);background:rgba(0,0,0,.3);color:#fff;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box}
+.admin-input:focus,.admin-select:focus{border-color:#ffd700}
+.admin-options{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+.admin-correct-radio{display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;background:rgba(0,0,0,.3);padding:8px;border-radius:10px;border:2px solid transparent}
+.admin-correct-radio.checked{border-color:#4caf50;background:rgba(76,175,80,.15)}
+.admin-stats-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px}
 /* ============= RESPONSIVE ============= */
 /* Tablet (≤1024px) */
 @media (max-width:1024px){
@@ -437,6 +459,33 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   </div>
 </div>
 
+<!-- MODO PADRES (analytics) -->
+<div class="screen" id="parents">
+  <div class="center">
+    <h1><span class="emoji">👨‍👩‍👧</span> Modo Padres</h1>
+    <p style="text-align:center;font-size:13px;opacity:.85;max-width:600px">Resumen privado del uso del juego. Todo se guarda en este dispositivo, nada se envía a internet.</p>
+    <div id="parentsContent" style="width:100%;max-width:760px"></div>
+    <div class="row" style="margin-top:14px;flex-wrap:wrap">
+      <button class="btn btn-blue btn-small" onclick="exportProgress()">💾 Exportar todo</button>
+      <button class="btn btn-red btn-small" onclick="parentsResetAnalytics()">🗑 Borrar analytics</button>
+      <button class="btn btn-purple" onclick="goToMap()">← Volver al mapa</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDITOR ADMIN (URL ?admin=padres) -->
+<div class="screen" id="admin">
+  <div class="center">
+    <h1><span class="emoji">✏️</span> Editor de contenido</h1>
+    <p style="text-align:center;font-size:13px;opacity:.85;max-width:600px">Añade preguntas custom al juego o palabras al diccionario. Se guardan localmente y se mezclan con el contenido oficial.</p>
+    <div id="adminContent" style="width:100%;max-width:760px"></div>
+    <div class="row" style="margin-top:14px;flex-wrap:wrap">
+      <button class="btn btn-blue btn-small" onclick="adminExport()">💾 Exportar contenido</button>
+      <button class="btn btn-purple" onclick="show('intro')">← Volver</button>
+    </div>
+  </div>
+</div>
+
 <!-- DICCIONARIO -->
 <div class="screen" id="dict">
   <div class="center">
@@ -518,6 +567,12 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   <div class="tab-content" id="statsTab">
     <h2>📊 Estadísticas</h2>
     <div class="stats-grid" id="statsGrid"></div>
+    <div class="row" style="justify-content:center;margin-top:18px;flex-wrap:wrap;gap:8px">
+      <button class="btn btn-blue btn-small" onclick="exportProgress()">💾 Exportar progreso</button>
+      <button class="btn btn-green btn-small" onclick="importProgress()">📥 Importar progreso</button>
+      <button class="btn btn-purple btn-small" onclick="show('parents')">👨‍👩‍👧 Modo Padres</button>
+    </div>
+    <p style="text-align:center;font-size:11px;opacity:.6;margin-top:10px;max-width:500px;margin-left:auto;margin-right:auto">💡 Recomendado: exportar el progreso a un archivo de vez en cuando, para no perderlo si limpiamos la caché del navegador.</p>
   </div>
   <div class="tab-content" id="classicTab">
     <h2>🎮 Juegos Clásicos</h2>
@@ -818,23 +873,135 @@ const STORAGE_KEY = 'aventura_espacial_v1';
 function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){}}
 function load(){try{const d=localStorage.getItem(STORAGE_KEY);if(d)return JSON.parse(d)}catch(e){}return null}
 
-// ========== STATE ==========
+// ========== STATE + VERSIONING ==========
+// STATE_VERSION sube cuando cambia la estructura del state. migrateState() aplica
+// los cambios necesarios para que partidas guardadas en versiones anteriores
+// no se rompan. Documentar cada salto en el comentario del case correspondiente.
+const STATE_VERSION=2;
 const initialPlayer={stars:0,coins:0,xp:0,planetsBeaten:[],planetStars:{},bossesBeaten:[],items:[],achievements:[],totalCorrect:0,totalAnswered:0,bestStreak:0,currentStreak:0,welcomed:false,dailyDate:'',dailyCorrect:0,dailyStreak:0};
-let state=load()||{currentPlayer:null,emmanuel:JSON.parse(JSON.stringify(initialPlayer)),emiliano:JSON.parse(JSON.stringify(initialPlayer)),snakeBest:0,soundOn:true,ttsAuto:true};
-// Migración: completa campos nuevos en partidas guardadas antes de la v3
-['emmanuel','emiliano'].forEach(k=>{
-  if(!state[k])state[k]=JSON.parse(JSON.stringify(initialPlayer));
-  const p=state[k];
-  if(p.xp===undefined)p.xp=0;
-  if(!p.planetStars)p.planetStars={};
-  if(!p.dailyDate)p.dailyDate='';
-  if(p.dailyCorrect===undefined)p.dailyCorrect=0;
-  if(p.dailyStreak===undefined)p.dailyStreak=0;
-  // Si tenía planetas conquistados sin estrellas, dales 1⭐ por defecto
-  (p.planetsBeaten||[]).forEach(k2=>{if(!p.planetStars[k2])p.planetStars[k2]=1});
-});
-if(state.ttsAuto===undefined)state.ttsAuto=true;
+function freshState(){
+  return{
+    version:STATE_VERSION,
+    currentPlayer:null,
+    emmanuel:JSON.parse(JSON.stringify(initialPlayer)),
+    emiliano:JSON.parse(JSON.stringify(initialPlayer)),
+    snakeBest:0,
+    soundOn:true,
+    ttsAuto:true,
+    analytics:{sessions:[],gamesPlayed:{},questionsByGalaxy:{},questionsByPlanet:{},firstSeen:Date.now(),lastSeen:Date.now()},
+    customQuestions:{}, // {galaxyId: [[planetIdx pool extras]]} — para editor admin
+    customDict:[]      // diccionario extendido por el usuario
+  };
+}
+function migrateState(s){
+  if(!s)return freshState();
+  s.version=s.version||1;
+  // v1 → v2: añadir analytics, customQuestions, customDict, normalizar jugadores
+  if(s.version<2){
+    s.analytics=s.analytics||{sessions:[],gamesPlayed:{},questionsByGalaxy:{},questionsByPlanet:{},firstSeen:Date.now(),lastSeen:Date.now()};
+    s.customQuestions=s.customQuestions||{};
+    s.customDict=s.customDict||[];
+    s.version=2;
+  }
+  // Asegurar campos de jugadores (compat con v1 y migra player fields)
+  ['emmanuel','emiliano'].forEach(k=>{
+    if(!s[k])s[k]=JSON.parse(JSON.stringify(initialPlayer));
+    const p=s[k];
+    if(p.xp===undefined)p.xp=0;
+    if(!p.planetStars)p.planetStars={};
+    if(!p.dailyDate)p.dailyDate='';
+    if(p.dailyCorrect===undefined)p.dailyCorrect=0;
+    if(p.dailyStreak===undefined)p.dailyStreak=0;
+    (p.planetsBeaten||[]).forEach(k2=>{if(!p.planetStars[k2])p.planetStars[k2]=1});
+  });
+  if(s.ttsAuto===undefined)s.ttsAuto=true;
+  return s;
+}
+let state=migrateState(load())||freshState();
+// Track sesión cada vez que se carga
+state.analytics=state.analytics||{sessions:[],gamesPlayed:{},questionsByGalaxy:{},questionsByPlanet:{},firstSeen:Date.now()};
+state.analytics.lastSeen=Date.now();
 let game={screen:'intro',galaxy:0,planet:0,qIdx:0,lives:3,correct:0,wrong:[],bossHp:100,playerHp:100,bossQs:[],bossQIdx:0,history:['intro'],qPool:[]};
+
+// ========== EXPORT / IMPORT DE PROGRESO ==========
+// Permite hacer backup del progreso a un .json y restaurarlo en otra tablet
+// o tras limpiar caché. Sin servidor, sin login, 100% offline.
+function exportProgress(){
+  try{
+    const data=JSON.stringify(state,null,2);
+    const blob=new Blob([data],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const date=new Date().toISOString().split('T')[0];
+    a.href=url;
+    a.download='aventura-espacial-progreso-'+date+'.json';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url)},100);
+    toast('💾 Progreso descargado');
+  }catch(e){toast('❌ Error al exportar: '+e.message)}
+}
+function importProgress(){
+  if(!confirm('Vas a reemplazar tu progreso actual con el del archivo. ¿Estás seguro?\n\n(Recomendado: exporta primero el actual por si acaso.)'))return;
+  const input=document.createElement('input');
+  input.type='file';input.accept='application/json,.json';
+  input.onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      try{
+        const data=JSON.parse(ev.target.result);
+        if(!data||typeof data!=='object'||(!data.emmanuel&&!data.emiliano)){
+          toast('❌ El archivo no tiene formato válido');return;
+        }
+        const migrated=migrateState(data);
+        state=migrated;
+        save();
+        toast('✅ Progreso restaurado, recargando...',1500);
+        setTimeout(()=>location.reload(),1200);
+      }catch(err){toast('❌ Archivo no válido: '+err.message)}
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+// ========== ANALYTICS LOCAL (sin servidor, todo en localStorage) ==========
+// Métricas privadas para que tú como padre veas cómo van. Nada sale del dispositivo.
+function trackSession(who){
+  if(!state.analytics)return;
+  state.analytics.sessions=state.analytics.sessions||[];
+  // Solo registramos si la última sesión fue hace más de 30 min (sesiones distintas)
+  const last=state.analytics.sessions[state.analytics.sessions.length-1];
+  const now=Date.now();
+  if(!last||now-last.ts>30*60*1000){
+    state.analytics.sessions.push({ts:now,who:who||'anon'});
+    if(state.analytics.sessions.length>200)state.analytics.sessions=state.analytics.sessions.slice(-200);
+    save();
+  }
+}
+function trackGame(gameId){
+  if(!state.analytics)return;
+  state.analytics.gamesPlayed=state.analytics.gamesPlayed||{};
+  state.analytics.gamesPlayed[gameId]=(state.analytics.gamesPlayed[gameId]||0)+1;
+  save();
+}
+function trackAnswer(galaxyId,planetIdx,correct,who){
+  if(!state.analytics)return;
+  state.analytics.questionsByGalaxy=state.analytics.questionsByGalaxy||{};
+  state.analytics.questionsByPlanet=state.analytics.questionsByPlanet||{};
+  // Por galaxia
+  if(!state.analytics.questionsByGalaxy[galaxyId])state.analytics.questionsByGalaxy[galaxyId]={correct:0,wrong:0,em:{correct:0,wrong:0},el:{correct:0,wrong:0}};
+  const g=state.analytics.questionsByGalaxy[galaxyId];
+  const ch=who==='emmanuel'?'em':who==='emiliano'?'el':null;
+  if(correct){g.correct++;if(ch)g[ch].correct++}
+  else{g.wrong++;if(ch)g[ch].wrong++}
+  // Por planeta
+  const pk=galaxyId+'-'+planetIdx;
+  if(!state.analytics.questionsByPlanet[pk])state.analytics.questionsByPlanet[pk]={correct:0,wrong:0};
+  if(correct)state.analytics.questionsByPlanet[pk].correct++;
+  else state.analytics.questionsByPlanet[pk].wrong++;
+}
 
 // ========== LEVELS / RANGOS ==========
 // Sistema de progresión a largo plazo. XP se gana respondiendo bien y completando planetas/jefes.
@@ -1575,7 +1742,10 @@ function show(id){
   game.screen=id;
   if(id!==game.history[game.history.length-1])game.history.push(id);
   document.getElementById('soundBtn').style.display=id==='intro'?'none':'flex';
-  document.getElementById('backBtn').style.display=(id==='snake'||id==='tictac'||id==='memo'||id==='c4'||id==='g2048'||id==='mines'||id==='tetris'||id==='chess'||id==='mario'||id==='dino'||id==='classic'||id==='select')?'flex':'none';
+  document.getElementById('backBtn').style.display=(id==='snake'||id==='tictac'||id==='memo'||id==='c4'||id==='g2048'||id==='mines'||id==='tetris'||id==='chess'||id==='mario'||id==='dino'||id==='classic'||id==='select'||id==='parents'||id==='admin'||id==='dict'||id==='wiki')?'flex':'none';
+  // Tracking de juego clásico (lista de IDs que cuentan como "juego")
+  const trackedGames=['snake','tictac','memo','c4','g2048','mines','tetris','chess','mario','dino'];
+  if(trackedGames.includes(id))trackGame(id);
   if(id==='snake')snakeStart();
   if(id==='tictac')tttStart();
   if(id==='memo')memStart();
@@ -1588,6 +1758,8 @@ function show(id){
   if(id==='dino')dinoStart();
   if(id==='dict')dictInit();
   if(id==='wiki')wikiInit();
+  if(id==='parents')parentsRender();
+  if(id==='admin')adminRender();
   // stop minigames if leaving
   if(id!=='snake'&&snakeLoop){clearInterval(snakeLoop);snakeLoop=null}
   if(id!=='memo'&&memTimer){clearTimeout(memTimer);memTimer=null}
@@ -1640,6 +1812,7 @@ function startGame(){
 }
 function choosePlayer(p){
   state.currentPlayer=p;save();
+  trackSession(p);
   goToMap();
   const player=state[p];
   if(!player.welcomed){
@@ -1732,8 +1905,11 @@ function startPlanet(galIdx,planetIdx){
 // filtradas por nivel del jugador (Emiliano CE1 / Emmanuel CM1).
 function getPool(galaxyId,planetIdx){
   const node=QUESTIONS[galaxyId]&&QUESTIONS[galaxyId][planetIdx];
-  if(!node)return[];
-  return Array.isArray(node)?node:(node.pool||[]);
+  let base=[];
+  if(node)base=Array.isArray(node)?node:(node.pool||[]);
+  // Mezcla con preguntas custom añadidas vía editor admin
+  const custom=(state.customQuestions&&state.customQuestions[galaxyId]&&state.customQuestions[galaxyId][planetIdx])||[];
+  return base.concat(custom);
 }
 function pickQuestions(galaxyId,planetIdx,who){
   const pool=getPool(galaxyId,planetIdx);
@@ -1804,7 +1980,9 @@ function answer(idx,q,btn){
   document.querySelectorAll('#answers .answer-btn').forEach(b=>b.disabled=true);
   const p=getPlayer();
   p.totalAnswered++;
-  if(idx===q.a){
+  const isCorrect=idx===q.a;
+  trackAnswer(GALAXIES[game.galaxy].id,game.planet,isCorrect,state.currentPlayer);
+  if(isCorrect){
     btn.classList.add('correct');
     sndCorrect();sndCoin();
     p.totalCorrect++;p.currentStreak++;
@@ -1926,6 +2104,7 @@ function renderBossQ(){
 function bossAnswer(idx,q,btn){
   document.querySelectorAll('#bossAnswers .answer-btn').forEach(b=>b.disabled=true);
   const p=getPlayer();p.totalAnswered++;
+  trackAnswer(GALAXIES[game.galaxy].id,'boss',idx===q.a,state.currentPlayer);
   if(idx===q.a){
     btn.classList.add('correct');sndCorrect();
     p.totalCorrect++;p.currentStreak++;if(p.currentStreak>p.bestStreak)p.bestStreak=p.currentStreak;
@@ -3778,14 +3957,19 @@ function dictPick(word){
   document.getElementById('dictInput').value=word;
   dictSearch();
 }
+function dictAll(){
+  // Combina diccionario oficial + palabras custom añadidas en el editor admin
+  return DICT.concat(state.customDict||[]);
+}
 function dictSearch(){
   const q=dictNorm(document.getElementById('dictInput').value);
   const result=document.getElementById('dictResult');
   if(!q){result.innerHTML='<div class="dict-empty">Escribe una palabra arriba o toca una sugerencia.</div>';return}
+  const all=dictAll();
   // Buscar coincidencia exacta primero, luego prefijo, luego cualquier ocurrencia
-  let entry=DICT.find(w=>['es','fr','en','ca'].some(l=>dictNorm(w[l])===q));
-  if(!entry)entry=DICT.find(w=>['es','fr','en','ca'].some(l=>dictNorm(w[l]).startsWith(q)));
-  if(!entry)entry=DICT.find(w=>['es','fr','en','ca'].some(l=>dictNorm(w[l]).includes(q)));
+  let entry=all.find(w=>['es','fr','en','ca'].some(l=>dictNorm(w[l])===q));
+  if(!entry)entry=all.find(w=>['es','fr','en','ca'].some(l=>dictNorm(w[l]).startsWith(q)));
+  if(!entry)entry=all.find(w=>['es','fr','en','ca'].some(l=>dictNorm(w[l]).includes(q)));
   if(entry){dictRenderEntry(entry);return}
   // No encontrada: ofrecer búsqueda online
   result.innerHTML=`<div class="dict-card"><div class="dict-empty">No encontré "<b>${document.getElementById('dictInput').value}</b>" en el diccionario interno.<br><br>Puedes buscarla en línea (necesita internet):</div><div style="text-align:center"><button class="dict-online-btn" onclick="dictOnline()">🌐 Buscar online (Google Translate)</button></div></div>`;
@@ -3955,6 +4139,212 @@ function wikiNotFound(q){
   document.getElementById('wikiResult').innerHTML='<div class="wiki-card"><div class="dict-empty">No encontré "<b>'+q+'</b>" en Wikipedia '+wikiLang.toUpperCase()+'.<br>Intenta con otro término o cambia de idioma.</div></div>';
 }
 
+// ========== MODO PADRES (analytics) ==========
+function parentsRender(){
+  const a=state.analytics||{sessions:[],gamesPlayed:{},questionsByGalaxy:{},questionsByPlanet:{}};
+  const sessionsBy={emmanuel:0,emiliano:0};
+  (a.sessions||[]).forEach(s=>{if(sessionsBy[s.who]!==undefined)sessionsBy[s.who]++});
+  // Top 5 juegos clásicos
+  const games=Object.entries(a.gamesPlayed||{}).sort((x,y)=>y[1]-x[1]).slice(0,5);
+  const gameNames={snake:'🐍 Snake',tictac:'⭕ 3 en Raya',memo:'🃏 Memorama',c4:'🔴 Conecta 4',g2048:'🧮 2048',mines:'💣 Buscaminas',tetris:'🧱 Tetris',chess:'♟️ Ajedrez',mario:'🚀 Astro Bros',dino:'🦖 Dino Runner'};
+  const maxGames=games.length?games[0][1]:1;
+  // Estadísticas por niño
+  const renderChild=k=>{
+    const p=state[k]||{};
+    const total=p.totalAnswered||0;
+    const correct=p.totalCorrect||0;
+    const acc=total>0?Math.round(correct/total*100):0;
+    const lvl=getLevel(p.xp||0);
+    return `
+      <div class="parents-section">
+        <h3>${k==='emmanuel'?'⚡ Emmanuel (CM1)':'⛏️ Emiliano (CE1)'}</h3>
+        <div class="parents-row"><span class="parents-key">Nivel</span><span class="parents-val">${lvl.emoji} ${lvl.name} (L${lvl.n})</span></div>
+        <div class="parents-row"><span class="parents-key">XP total</span><span class="parents-val">${p.xp||0}</span></div>
+        <div class="parents-row"><span class="parents-key">Estrellas</span><span class="parents-val">⭐ ${p.stars||0}</span></div>
+        <div class="parents-row"><span class="parents-key">Monedas</span><span class="parents-val">💰 ${p.coins||0}</span></div>
+        <div class="parents-row"><span class="parents-key">Planetas conquistados</span><span class="parents-val">${(p.planetsBeaten||[]).length} / 30</span></div>
+        <div class="parents-row"><span class="parents-key">Jefes vencidos</span><span class="parents-val">${(p.bossesBeaten||[]).length} / 6</span></div>
+        <div class="parents-row"><span class="parents-key">Preguntas respondidas</span><span class="parents-val">${total}</span></div>
+        <div class="parents-row"><span class="parents-key">Aciertos</span><span class="parents-val">${correct} (${acc}%)</span></div>
+        <div class="parents-row"><span class="parents-key">Mejor racha</span><span class="parents-val">🔥 ${p.bestStreak||0}</span></div>
+        <div class="parents-row"><span class="parents-key">Sesiones</span><span class="parents-val">${sessionsBy[k]||0}</span></div>
+      </div>`;
+  };
+  // Áreas débiles por galaxia (más fallos)
+  const galRows=GALAXIES.map(g=>{
+    const data=(a.questionsByGalaxy||{})[g.id]||{correct:0,wrong:0};
+    const total=data.correct+data.wrong;
+    const acc=total>0?Math.round(data.correct/total*100):-1;
+    const isBad=acc>=0&&acc<60;
+    return {g,data,total,acc,isBad};
+  }).filter(r=>r.total>0).sort((x,y)=>x.acc-y.acc);
+  const galaxiesHtml=galRows.length?galRows.map(r=>`
+    <div class="parents-bar">
+      <span class="parents-bar-name">${r.g.emoji} ${r.g.name.replace('Galaxia ','')}</span>
+      <div class="parents-bar-track"><div class="parents-bar-fill${r.isBad?' bad':''}" style="width:${Math.max(2,r.acc)}%"></div></div>
+      <span class="parents-bar-val">${r.acc}% (${r.data.correct}/${r.total})</span>
+    </div>
+  `).join(''):'<div class="parents-row"><span class="parents-key">Aún sin datos. Cuando jueguen, aparecerán las áreas a reforzar aquí.</span></div>';
+  // Top juegos
+  const gamesHtml=games.length?games.map(([id,n])=>`
+    <div class="parents-bar">
+      <span class="parents-bar-name">${gameNames[id]||id}</span>
+      <div class="parents-bar-track"><div class="parents-bar-fill" style="width:${Math.round(n/maxGames*100)}%"></div></div>
+      <span class="parents-bar-val">${n} ▶</span>
+    </div>
+  `).join(''):'<div class="parents-row"><span class="parents-key">Aún no han jugado clásicos.</span></div>';
+  // Sesiones recientes
+  const recent=(a.sessions||[]).slice(-7).reverse().map(s=>{
+    const d=new Date(s.ts);
+    return `<div class="parents-row"><span class="parents-key">${d.toLocaleString()}</span><span class="parents-val">${s.who==='emmanuel'?'⚡ Emmanuel':s.who==='emiliano'?'⛏️ Emiliano':'?'}</span></div>`;
+  }).join('');
+  document.getElementById('parentsContent').innerHTML=`
+    ${renderChild('emmanuel')}
+    ${renderChild('emiliano')}
+    <div class="parents-section">
+      <h3>📚 Áreas a reforzar (ordenado por mayor dificultad)</h3>
+      ${galaxiesHtml}
+      <p style="font-size:11px;opacity:.65;margin-top:8px">🟢 Buen dominio · 🔴 Necesita refuerzo (&lt;60% aciertos)</p>
+    </div>
+    <div class="parents-section">
+      <h3>🎮 Juegos clásicos más usados</h3>
+      ${gamesHtml}
+    </div>
+    ${recent?`<div class="parents-section"><h3>⏱ Últimas 7 sesiones</h3>${recent}</div>`:''}
+  `;
+}
+function parentsResetAnalytics(){
+  if(!confirm('¿Borrar todos los datos de analytics? El progreso del juego (XP, planetas, monedas) NO se borra, solo las estadísticas.'))return;
+  state.analytics={sessions:[],gamesPlayed:{},questionsByGalaxy:{},questionsByPlanet:{},firstSeen:Date.now(),lastSeen:Date.now()};
+  save();
+  toast('🗑 Analytics borrados');
+  parentsRender();
+}
+
+// ========== EDITOR ADMIN (URL ?admin=padres) ==========
+function adminRender(){
+  const cq=state.customQuestions||{};
+  let totalCustom=0;
+  Object.values(cq).forEach(arr=>arr.forEach(p=>totalCustom+=(p||[]).length));
+  const customDictCount=(state.customDict||[]).length;
+  document.getElementById('adminContent').innerHTML=`
+    <div class="admin-form">
+      <h3 style="color:#ffd700;text-align:center;margin-bottom:12px">➕ Añadir nueva pregunta al juego</h3>
+      <label>Galaxia</label>
+      <select class="admin-select" id="adminGalaxy">
+        ${GALAXIES.map((g,i)=>`<option value="${g.id}">${g.emoji} ${g.name}</option>`).join('')}
+      </select>
+      <label>Planeta</label>
+      <select class="admin-select" id="adminPlanet"></select>
+      <label>Nivel</label>
+      <select class="admin-select" id="adminLevel">
+        <option value="">Ambos (CE1 + CM1)</option>
+        <option value="ce1">Solo CE1 (Emiliano)</option>
+        <option value="cm1">Solo CM1 (Emmanuel)</option>
+      </select>
+      <label>Pregunta</label>
+      <input type="text" class="admin-input" id="adminQuestion" placeholder="Ej: ¿Cuánto es 5 + 3?">
+      <label>4 opciones (marca la correcta)</label>
+      <div class="admin-options" id="adminOptions">
+        ${[0,1,2,3].map(i=>`
+          <label class="admin-correct-radio${i===0?' checked':''}" data-i="${i}" onclick="adminSetCorrect(${i})">
+            <input type="radio" name="correct" value="${i}" ${i===0?'checked':''}>
+            <input type="text" class="admin-input" id="adminOpt${i}" placeholder="Opción ${i+1}" style="margin:0;padding:6px 10px">
+          </label>
+        `).join('')}
+      </div>
+      <button class="btn btn-green" style="margin-top:14px;width:100%" onclick="adminAddQuestion()">➕ Añadir pregunta</button>
+    </div>
+    <div class="admin-form">
+      <h3 style="color:#ffd700;text-align:center;margin-bottom:12px">📖 Añadir palabra al diccionario</h3>
+      <label>🇪🇸 Español</label><input type="text" class="admin-input" id="dictAddEs">
+      <label>🇫🇷 Francés</label><input type="text" class="admin-input" id="dictAddFr">
+      <label>🇬🇧 Inglés</label><input type="text" class="admin-input" id="dictAddEn">
+      <label>🎗️ Catalán</label><input type="text" class="admin-input" id="dictAddCa">
+      <label>Categoría</label>
+      <select class="admin-select" id="dictAddCat">
+        ${(typeof DICT_CATS!=='undefined'?DICT_CATS:[]).filter(c=>c.id!=='all').map(c=>`<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('')}
+      </select>
+      <label>Ejemplo en español (los demás se autocompletan iguales)</label>
+      <input type="text" class="admin-input" id="dictAddExEs" placeholder="Ej: El perro es bonito.">
+      <button class="btn btn-green" style="margin-top:14px;width:100%" onclick="adminAddDictWord()">➕ Añadir palabra</button>
+    </div>
+    <div class="admin-form">
+      <h3 style="color:#ffd700;text-align:center;margin-bottom:12px">📊 Contenido custom actual</h3>
+      <div class="admin-stats-row"><span>Preguntas custom añadidas</span><span style="color:#ffd700;font-weight:bold">${totalCustom}</span></div>
+      <div class="admin-stats-row"><span>Palabras custom en diccionario</span><span style="color:#ffd700;font-weight:bold">${customDictCount}</span></div>
+      <button class="btn btn-red btn-small" style="margin-top:10px;width:100%" onclick="adminClearCustom()">🗑 Borrar todo el contenido custom</button>
+    </div>`;
+  // Llenar planetas según galaxia inicial
+  adminUpdatePlanets();
+  document.getElementById('adminGalaxy').addEventListener('change',adminUpdatePlanets);
+}
+function adminUpdatePlanets(){
+  const gid=document.getElementById('adminGalaxy').value;
+  const g=GALAXIES.find(x=>x.id===gid);
+  document.getElementById('adminPlanet').innerHTML=g.planets.map((p,i)=>`<option value="${i}">${i+1}. ${p}</option>`).join('');
+}
+function adminSetCorrect(i){
+  document.querySelectorAll('.admin-correct-radio').forEach(el=>el.classList.toggle('checked',el.dataset.i==i));
+  document.querySelector(`input[name="correct"][value="${i}"]`).checked=true;
+}
+function adminAddQuestion(){
+  const gid=document.getElementById('adminGalaxy').value;
+  const pi=parseInt(document.getElementById('adminPlanet').value,10);
+  const lvl=document.getElementById('adminLevel').value;
+  const q=document.getElementById('adminQuestion').value.trim();
+  const o=[0,1,2,3].map(i=>document.getElementById('adminOpt'+i).value.trim());
+  const a=parseInt(document.querySelector('input[name="correct"]:checked').value,10);
+  if(!q||o.some(x=>!x)){toast('⚠️ Rellena la pregunta y las 4 opciones');return}
+  state.customQuestions=state.customQuestions||{};
+  state.customQuestions[gid]=state.customQuestions[gid]||[[],[],[],[],[]];
+  while(state.customQuestions[gid].length<=pi)state.customQuestions[gid].push([]);
+  const entry={q,o,a};if(lvl)entry.level=lvl;
+  state.customQuestions[gid][pi].push(entry);
+  save();
+  toast('✅ Pregunta añadida');
+  // limpiar campos
+  document.getElementById('adminQuestion').value='';
+  [0,1,2,3].forEach(i=>document.getElementById('adminOpt'+i).value='');
+  adminRender(); // refresca contadores
+}
+function adminAddDictWord(){
+  const es=document.getElementById('dictAddEs').value.trim();
+  const fr=document.getElementById('dictAddFr').value.trim();
+  const en=document.getElementById('dictAddEn').value.trim();
+  const ca=document.getElementById('dictAddCa').value.trim();
+  const cat=document.getElementById('dictAddCat').value;
+  const exEs=document.getElementById('dictAddExEs').value.trim()||(es+' es bonito.');
+  if(!es||!fr||!en||!ca){toast('⚠️ Rellena las 4 traducciones');return}
+  state.customDict=state.customDict||[];
+  state.customDict.push({es,fr,en,ca,cat,ex:{es:exEs,fr:exEs,en:exEs,ca:exEs}});
+  save();
+  toast('✅ Palabra añadida al diccionario');
+  ['dictAddEs','dictAddFr','dictAddEn','dictAddCa','dictAddExEs'].forEach(id=>document.getElementById(id).value='');
+  adminRender();
+}
+function adminClearCustom(){
+  if(!confirm('¿Borrar TODAS las preguntas y palabras custom? El contenido oficial NO se toca.'))return;
+  state.customQuestions={};
+  state.customDict=[];
+  save();
+  toast('🗑 Contenido custom borrado');
+  adminRender();
+}
+function adminExport(){
+  try{
+    const out={questions:state.customQuestions||{},dict:state.customDict||[]};
+    const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='aventura-contenido-custom-'+new Date().toISOString().split('T')[0]+'.json';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url)},100);
+    toast('💾 Contenido descargado');
+  }catch(e){toast('❌ '+e.message)}
+}
+
 // ========== INIT ==========
 function init(){
   if('serviceWorker' in navigator){
@@ -3988,6 +4378,13 @@ function init(){
     window.speechSynthesis.getVoices();
     window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();
   }
+  // URLs ocultas: ?admin=padres → editor de contenido / ?padres=1 → analytics
+  // Pensadas para que tú entres directo desde la barra del navegador.
+  try{
+    const params=new URLSearchParams(location.search);
+    if(params.get('admin')==='padres')setTimeout(()=>show('admin'),50);
+    else if(params.get('padres'))setTimeout(()=>show('parents'),50);
+  }catch(e){}
   document.getElementById('soundBtn').textContent=state.soundOn?'🔊':'🔇';
   // resume audio context on first interaction
   document.addEventListener('touchstart',()=>{if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume()},{once:true});

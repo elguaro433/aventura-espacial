@@ -1,6 +1,9 @@
 // Service Worker - Permite que el juego funcione sin internet (offline)
 // Estrategia: network-first para HTML (siempre busca actualizaciones), cache-first para el resto.
-const CACHE_NAME = 'aventura-espacial-v12';
+// 20260502-115046 se reemplaza automáticamente en cada push con el timestamp UTC actual.
+// Esto significa: NO HAY QUE BUMPEAR LA VERSIÓN MANUALMENTE NUNCA MÁS.
+const BUILD_TIME = '20260502-115046'; // sustituido por sed en el push script
+const CACHE_NAME = 'aventura-espacial-' + BUILD_TIME;
 const urlsToCache = [
   './',
   './index.html',
