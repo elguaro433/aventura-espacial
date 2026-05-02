@@ -256,6 +256,10 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .wiki-loader{text-align:center;padding:30px;color:#ffd700;font-size:14px}
 .wiki-loader::after{content:'';display:inline-block;width:14px;height:14px;border:3px solid #ffd700;border-top-color:transparent;border-radius:50%;animation:spin 0.7s linear infinite;margin-left:8px;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* Banner offline */
+.offline-banner{background:linear-gradient(90deg,#f44336,#ff5722);color:#fff;padding:8px 14px;border-radius:14px;font-size:12px;font-weight:bold;text-align:center;margin:0 auto 10px;max-width:600px;animation:pulse-banner 2s infinite;border:2px solid #fff}
+@keyframes pulse-banner{0%,100%{opacity:1}50%{opacity:.7}}
+.tab.disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
 /* MODO PADRES */
 .parents-section{background:rgba(255,255,255,.06);border:2px solid rgba(255,215,0,.3);border-radius:18px;padding:16px;margin:10px 0}
 .parents-section h3{color:#ffd700;text-align:left;font-size:16px;margin-bottom:10px;border-bottom:1px solid rgba(255,215,0,.2);padding-bottom:6px}
@@ -438,23 +442,45 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   </div>
 </div>
 
-<!-- ENCICLOPEDIA WIKIPEDIA -->
+<!-- ENCICLOPEDIA (Mini offline + Wikipedia online) -->
 <div class="screen" id="wiki">
   <div class="center">
     <h1><span class="emoji">🌐</span> Enciclopedia</h1>
-    <p style="text-align:center;font-size:13px;opacity:.85;max-width:600px">Escribe cualquier tema (animal, planeta, país, deporte, persona, comida…) y te explico qué es, su origen y datos curiosos. Usa Wikipedia y necesita internet.</p>
-    <div class="wiki-langs">
-      <button class="wiki-lang-btn active" data-lang="es" onclick="wikiSetLang('es')">🇪🇸 Español</button>
-      <button class="wiki-lang-btn" data-lang="fr" onclick="wikiSetLang('fr')">🇫🇷 Français</button>
-      <button class="wiki-lang-btn" data-lang="en" onclick="wikiSetLang('en')">🇬🇧 English</button>
-      <button class="wiki-lang-btn" data-lang="ca" onclick="wikiSetLang('ca')">🎗️ Català</button>
+    <div id="offlineBanner" class="offline-banner" style="display:none">📡 Sin conexión · Solo Mini‑Enciclopedia disponible</div>
+    <div class="tabs" id="wikiTabs">
+      <div class="tab active" id="wikiTabMini" onclick="wikiSwitchTab('mini')">📚 Mini‑Enciclopedia (offline)</div>
+      <div class="tab" id="wikiTabOnline" onclick="wikiSwitchTab('online')">🌐 Wikipedia (online)</div>
     </div>
-    <div class="dict-search-row">
-      <input type="text" id="wikiInput" class="dict-input" placeholder="Escribe un tema (Marte, dinosaurio, Andorra...)..." autocomplete="off" autocapitalize="off">
-      <button class="btn btn-green" onclick="wikiDoSearch()">🔍 Buscar</button>
+    <div id="wikiPaneMini" class="tab-content active">
+      <p style="text-align:center;font-size:13px;opacity:.85;max-width:600px;margin:0 auto 10px">Enciclopedia interna escrita para niños 6‑12 años. Funciona sin internet en los 4 idiomas.</p>
+      <div class="wiki-langs">
+        <button class="wiki-lang-btn active" data-mlang="es" onclick="miniSetLang('es')">🇪🇸 Español</button>
+        <button class="wiki-lang-btn" data-mlang="fr" onclick="miniSetLang('fr')">🇫🇷 Français</button>
+        <button class="wiki-lang-btn" data-mlang="en" onclick="miniSetLang('en')">🇬🇧 English</button>
+        <button class="wiki-lang-btn" data-mlang="ca" onclick="miniSetLang('ca')">🎗️ Català</button>
+      </div>
+      <div class="dict-search-row">
+        <input type="text" id="miniInput" class="dict-input" placeholder="Sol, dinosaurios, Andorra, Marte..." autocomplete="off" autocapitalize="off">
+        <button class="btn btn-green" onclick="miniSearch()">🔍 Buscar</button>
+      </div>
+      <div id="miniCats" class="dict-cats"></div>
+      <div id="miniResult" class="dict-result"></div>
     </div>
-    <div id="wikiResult" class="dict-result"></div>
-    <div id="wikiSuggestions" class="dict-suggestions"></div>
+    <div id="wikiPaneOnline" class="tab-content">
+      <p style="text-align:center;font-size:13px;opacity:.85;max-width:600px;margin:0 auto 10px">Wikipedia en vivo en 4 idiomas. Para temas que no estén en la mini‑enciclopedia. Necesita internet.</p>
+      <div class="wiki-langs">
+        <button class="wiki-lang-btn active" data-lang="es" onclick="wikiSetLang('es')">🇪🇸 Español</button>
+        <button class="wiki-lang-btn" data-lang="fr" onclick="wikiSetLang('fr')">🇫🇷 Français</button>
+        <button class="wiki-lang-btn" data-lang="en" onclick="wikiSetLang('en')">🇬🇧 English</button>
+        <button class="wiki-lang-btn" data-lang="ca" onclick="wikiSetLang('ca')">🎗️ Català</button>
+      </div>
+      <div class="dict-search-row">
+        <input type="text" id="wikiInput" class="dict-input" placeholder="Cualquier tema..." autocomplete="off" autocapitalize="off">
+        <button class="btn btn-green" onclick="wikiDoSearch()">🔍 Buscar</button>
+      </div>
+      <div id="wikiResult" class="dict-result"></div>
+      <div id="wikiSuggestions" class="dict-suggestions"></div>
+    </div>
     <button class="btn btn-purple" onclick="show('intro')">← Volver</button>
   </div>
 </div>
@@ -796,6 +822,11 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 <div class="screen" id="mines">
   <div class="center">
     <h2><span class="emoji">💣</span> Buscaminas</h2>
+    <div class="row" style="gap:6px;margin-bottom:8px;flex-wrap:wrap">
+      <button class="dict-cat-btn" onclick="minesSetDifficulty('facil')">🟢 Fácil 8×8</button>
+      <button class="dict-cat-btn" onclick="minesSetDifficulty('medio')">🟡 Medio 10×10</button>
+      <button class="dict-cat-btn" onclick="minesSetDifficulty('dificil')">🔴 Difícil 12×12</button>
+    </div>
     <div class="hud" style="max-width:340px;width:100%">
       <div class="hud-stat">Minas: <span id="minesLeft">10</span></div>
       <div class="hud-stat">⏱ <span id="minesTime">0</span>s</div>
@@ -2057,7 +2088,7 @@ function show(id){
   if(id==='mario')marioStart();
   if(id==='dino')dinoStart();
   if(id==='dict')dictInit();
-  if(id==='wiki')wikiInit();
+  if(id==='wiki'){updateOfflineBanner();miniInit();wikiInit()}
   if(id==='parents')parentsRender();
   if(id==='admin')adminRender();
   // stop minigames if leaving
@@ -2544,16 +2575,19 @@ function confirmReset(){
   }
 }
 
-// ========== SNAKE ==========
-let snakeState={x:5,y:5,dx:1,dy:0,body:[],food:{x:10,y:10},score:0,grid:16,size:20};
+// ========== SNAKE (con velocidad creciente y manzana dorada especial) ==========
+let snakeState={x:5,y:5,dx:1,dy:0,body:[],food:{x:10,y:10},golden:null,score:0,grid:16,size:20,speed:140,goldenTimer:0};
 let snakeLoop=null;
 function snakeStart(){
-  snakeState={x:5,y:5,dx:1,dy:0,body:[{x:5,y:5}],food:{x:10,y:10},score:0,grid:16,size:20};
+  snakeState={x:5,y:5,dx:1,dy:0,body:[{x:5,y:5}],food:{x:10,y:10},golden:null,score:0,grid:16,size:20,speed:160,goldenTimer:0};
   document.getElementById('snakeScore').textContent=0;
   document.getElementById('snakeBest').textContent=state.snakeBest||0;
-  if(snakeLoop)clearInterval(snakeLoop);
-  snakeLoop=setInterval(snakeStep,140);
+  snakeRestartLoop();
   snakeRender();
+}
+function snakeRestartLoop(){
+  if(snakeLoop)clearInterval(snakeLoop);
+  snakeLoop=setInterval(snakeStep,snakeState.speed);
 }
 function snakeDir(dx,dy){
   if(dx===-snakeState.dx&&dy===-snakeState.dy)return;
@@ -2564,23 +2598,67 @@ function snakeStep(){
   if(snakeState.x<0||snakeState.x>=snakeState.grid||snakeState.y<0||snakeState.y>=snakeState.grid){snakeOver();return}
   if(snakeState.body.some(s=>s.x===snakeState.x&&s.y===snakeState.y)){snakeOver();return}
   snakeState.body.unshift({x:snakeState.x,y:snakeState.y});
+  // Comer manzana normal
   if(snakeState.x===snakeState.food.x&&snakeState.y===snakeState.food.y){
     snakeState.score++;sndCoin();
     document.getElementById('snakeScore').textContent=snakeState.score;
     do{
       snakeState.food={x:Math.floor(Math.random()*snakeState.grid),y:Math.floor(Math.random()*snakeState.grid)};
     }while(snakeState.body.some(s=>s.x===snakeState.food.x&&s.y===snakeState.food.y));
+    // Cada 5 manzanas: acelera la velocidad
+    if(snakeState.score%5===0&&snakeState.speed>60){
+      snakeState.speed=Math.max(60,snakeState.speed-10);
+      snakeRestartLoop();
+    }
+    // Cada 7 manzanas: spawnea dorada (dura 8 segundos, vale 3)
+    if(snakeState.score%7===0&&!snakeState.golden){
+      do{
+        snakeState.golden={x:Math.floor(Math.random()*snakeState.grid),y:Math.floor(Math.random()*snakeState.grid)};
+      }while(snakeState.body.some(s=>s.x===snakeState.golden.x&&s.y===snakeState.golden.y)||(snakeState.golden.x===snakeState.food.x&&snakeState.golden.y===snakeState.food.y));
+      snakeState.goldenTimer=Math.round(8000/snakeState.speed); // ~8s en ticks
+    }
+  }
+  // Comer dorada
+  else if(snakeState.golden&&snakeState.x===snakeState.golden.x&&snakeState.y===snakeState.golden.y){
+    snakeState.score+=3;sndWin();confetti(15);
+    document.getElementById('snakeScore').textContent=snakeState.score;
+    snakeState.golden=null;snakeState.goldenTimer=0;
   }else snakeState.body.pop();
+  // Decaer dorada
+  if(snakeState.goldenTimer>0){
+    snakeState.goldenTimer--;
+    if(snakeState.goldenTimer<=0)snakeState.golden=null;
+  }
   snakeRender();
 }
 function snakeRender(){
   const c=document.getElementById('snake-canvas'),ctx=c.getContext('2d');
-  ctx.fillStyle='#0a0020';ctx.fillRect(0,0,c.width,c.height);
+  // fondo galáctico
+  const g=ctx.createRadialGradient(c.width/2,c.height/2,20,c.width/2,c.height/2,c.width/2);
+  g.addColorStop(0,'#1a0033');g.addColorStop(1,'#0a0020');
+  ctx.fillStyle=g;ctx.fillRect(0,0,c.width,c.height);
+  // Manzana normal (roja)
+  ctx.shadowColor='#ff5252';ctx.shadowBlur=10;
   ctx.fillStyle='#ff5252';
   ctx.beginPath();ctx.arc(snakeState.food.x*snakeState.size+10,snakeState.food.y*snakeState.size+10,8,0,Math.PI*2);ctx.fill();
+  // Manzana dorada con halo pulsante
+  if(snakeState.golden){
+    const pulse=1+Math.sin(performance.now()/150)*0.15;
+    ctx.shadowColor='#ffd700';ctx.shadowBlur=20;
+    ctx.fillStyle='#ffd700';
+    ctx.beginPath();ctx.arc(snakeState.golden.x*snakeState.size+10,snakeState.golden.y*snakeState.size+10,8*pulse,0,Math.PI*2);ctx.fill();
+  }
+  ctx.shadowBlur=0;
+  // Cuerpo de la serpiente
   snakeState.body.forEach((s,i)=>{
-    ctx.fillStyle=i===0?'#ffd700':'#4caf50';
+    ctx.fillStyle=i===0?'#ffd700':(i%2?'#4caf50':'#388e3c');
     ctx.fillRect(s.x*snakeState.size+1,s.y*snakeState.size+1,snakeState.size-2,snakeState.size-2);
+    // Ojos en la cabeza
+    if(i===0){
+      ctx.fillStyle='#000';
+      ctx.fillRect(s.x*snakeState.size+5,s.y*snakeState.size+5,3,3);
+      ctx.fillRect(s.x*snakeState.size+12,s.y*snakeState.size+5,3,3);
+    }
   });
 }
 function snakeOver(){
@@ -2590,19 +2668,25 @@ function snakeOver(){
   toast('¡Game Over! Puntos: '+snakeState.score);
 }
 
-// ========== TIC TAC TOE ==========
-let tttBoard=[],tttGameOver=false,tttScores={human:0,comp:0,draws:0};
+// ========== TIC TAC TOE (con minimax y 3 dificultades) ==========
+let tttBoard=[],tttGameOver=false,tttScores={human:0,comp:0,draws:0},tttDifficulty='medium';
 function tttStart(){
   tttBoard=Array(9).fill(null);tttGameOver=false;
   document.getElementById('tttHuman').textContent=tttScores.human;
   document.getElementById('tttComp').textContent=tttScores.comp;
   document.getElementById('tttDraws').textContent=tttScores.draws;
-  document.getElementById('tttStatus').textContent='Tu turno (X)';
+  const diffLabel={easy:'Fácil 😊',medium:'Medio 🤔',hard:'Imposible 😈'}[tttDifficulty];
+  document.getElementById('tttStatus').innerHTML='Tu turno (X) · <button class="btn-small btn-blue" style="padding:4px 10px;font-size:11px;border:none;border-radius:8px;cursor:pointer;background:#2196f3;color:#fff" onclick="tttCycleDifficulty()">'+diffLabel+'</button>';
   const board=document.getElementById('tttBoard');board.innerHTML='';
   for(let i=0;i<9;i++){
     const c=document.createElement('div');c.className='tictac-cell';c.dataset.i=i;
     c.onclick=()=>tttClick(i);board.appendChild(c);
   }
+}
+function tttCycleDifficulty(){
+  const order=['easy','medium','hard'];
+  tttDifficulty=order[(order.indexOf(tttDifficulty)+1)%3];
+  tttStart();
 }
 function tttClick(i){
   if(tttGameOver||tttBoard[i])return;
@@ -2610,20 +2694,81 @@ function tttClick(i){
   if(tttCheck('X')){tttEnd('¡Ganaste! 🎉','human');return}
   if(tttBoard.every(c=>c)){tttEnd('Empate','draws');return}
   document.getElementById('tttStatus').textContent='Pensando...';
-  setTimeout(tttCompMove,500);
+  setTimeout(tttCompMove,400);
 }
 function tttCompMove(){
-  // try to win
-  for(let i=0;i<9;i++)if(!tttBoard[i]){tttBoard[i]='O';if(tttCheck('O')){tttUpdate();sndWrong();tttEnd('Ganó la PC 😢','comp');return}tttBoard[i]=null}
-  // block
-  for(let i=0;i<9;i++)if(!tttBoard[i]){tttBoard[i]='X';if(tttCheck('X')){tttBoard[i]='O';tttUpdate();if(tttBoard.every(c=>c)){tttEnd('Empate','draws')}else document.getElementById('tttStatus').textContent='Tu turno (X)';return}tttBoard[i]=null}
-  // center
-  if(!tttBoard[4]){tttBoard[4]='O';tttUpdate();if(tttBoard.every(c=>c)){tttEnd('Empate','draws')}else document.getElementById('tttStatus').textContent='Tu turno (X)';return}
-  // corner or random
+  let move;
+  if(tttDifficulty==='easy'){
+    // 80% aleatorio, 20% mejor
+    if(Math.random()<0.8){
+      const empty=tttBoard.map((v,i)=>v?null:i).filter(v=>v!==null);
+      move=empty[Math.floor(Math.random()*empty.length)];
+    }else move=tttMinimax();
+  }else if(tttDifficulty==='medium'){
+    // Mezcla: 50% gana/bloquea, 50% aleatorio - más perdonable para los niños
+    move=tttQuickAI();
+    if(Math.random()<0.4){
+      const empty=tttBoard.map((v,i)=>v?null:i).filter(v=>v!==null);
+      move=empty[Math.floor(Math.random()*empty.length)];
+    }
+  }else{
+    // imposible: minimax perfecto
+    move=tttMinimax();
+  }
+  if(move==null||move<0)return;
+  tttBoard[move]='O';tttUpdate();
+  if(tttCheck('O')){sndWrong();tttEnd('Ganó la PC 😢','comp');return}
+  if(tttBoard.every(c=>c)){tttEnd('Empate','draws');return}
+  const diffLabel={easy:'Fácil 😊',medium:'Medio 🤔',hard:'Imposible 😈'}[tttDifficulty];
+  document.getElementById('tttStatus').innerHTML='Tu turno (X) · <button class="btn-small btn-blue" style="padding:4px 10px;font-size:11px;border:none;border-radius:8px;cursor:pointer;background:#2196f3;color:#fff" onclick="tttCycleDifficulty()">'+diffLabel+'</button>';
+}
+function tttQuickAI(){
+  // Gana si puede, bloquea, centro, esquina, lateral
+  for(let i=0;i<9;i++)if(!tttBoard[i]){tttBoard[i]='O';if(tttCheck('O')){tttBoard[i]=null;return i}tttBoard[i]=null}
+  for(let i=0;i<9;i++)if(!tttBoard[i]){tttBoard[i]='X';if(tttCheck('X')){tttBoard[i]=null;return i}tttBoard[i]=null}
+  if(!tttBoard[4])return 4;
   const corners=[0,2,6,8].filter(i=>!tttBoard[i]);
-  if(corners.length){tttBoard[corners[Math.floor(Math.random()*corners.length)]]='O';tttUpdate();if(tttBoard.every(c=>c)){tttEnd('Empate','draws')}else document.getElementById('tttStatus').textContent='Tu turno (X)';return}
+  if(corners.length)return corners[Math.floor(Math.random()*corners.length)];
   const empty=tttBoard.map((v,i)=>v?null:i).filter(v=>v!==null);
-  if(empty.length){tttBoard[empty[0]]='O';tttUpdate();if(tttBoard.every(c=>c))tttEnd('Empate','draws');else document.getElementById('tttStatus').textContent='Tu turno (X)'}
+  return empty[0];
+}
+function tttMinimax(){
+  // Algoritmo minimax: evalúa todas las jugadas hasta el final del juego.
+  // La PC nunca pierde (en el peor caso, empata).
+  function score(b,player){
+    if(tttCheckBoard(b,'O'))return 10;
+    if(tttCheckBoard(b,'X'))return -10;
+    return 0;
+  }
+  function minimax(b,depth,isMax){
+    const s=score(b);
+    if(s===10)return s-depth;
+    if(s===-10)return s+depth;
+    if(b.every(c=>c))return 0;
+    if(isMax){
+      let best=-Infinity;
+      for(let i=0;i<9;i++)if(!b[i]){b[i]='O';best=Math.max(best,minimax(b,depth+1,false));b[i]=null}
+      return best;
+    }else{
+      let best=Infinity;
+      for(let i=0;i<9;i++)if(!b[i]){b[i]='X';best=Math.min(best,minimax(b,depth+1,true));b[i]=null}
+      return best;
+    }
+  }
+  let bestVal=-Infinity,bestMove=-1;
+  for(let i=0;i<9;i++){
+    if(!tttBoard[i]){
+      tttBoard[i]='O';
+      const v=minimax(tttBoard,0,false);
+      tttBoard[i]=null;
+      if(v>bestVal){bestVal=v;bestMove=i}
+    }
+  }
+  return bestMove;
+}
+function tttCheckBoard(b,p){
+  const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  return wins.some(w=>w.every(i=>b[i]===p));
 }
 function tttUpdate(){
   document.querySelectorAll('.tictac-cell').forEach((c,i)=>{
@@ -2646,16 +2791,27 @@ function tttEnd(msg,winner){
   if(winner==='human'){sndWin();confetti(20)}
 }
 
-// ========== MEMORY ==========
-let memCards=[],memFlipped=[],memMatched=0,memMoves=0,memTimer=null,memBusy=false;
-const MEM_EMOJIS=['🚀','⭐','🪐','🌙','☀️','🛸','👽','🌌','🦄','🐉','🦊','🐱'];
+// ========== MEMORY (con niveles y temas) ==========
+let memCards=[],memFlipped=[],memMatched=0,memMoves=0,memTimer=null,memBusy=false,memLevel=12,memTheme='espacio',memBest={};
+const MEM_THEMES={
+  espacio:['🚀','⭐','🪐','🌙','☀️','🛸','👽','🌌','🌠','💫','🌟','🪨','🌍','🔭','🌑','☄️','🛰️','✨'],
+  animales:['🐶','🐱','🦁','🐯','🐮','🐷','🐸','🦊','🐼','🐨','🦄','🐲','🐙','🦋','🐝','🦜','🦒','🦘'],
+  comida:['🍎','🍌','🍇','🍓','🍕','🍔','🌮','🍩','🍪','🍰','🍦','🥑','🥕','🌽','🥨','🧀','🍞','🥐'],
+  banderas:['🇦🇩','🇪🇸','🇫🇷','🇬🇧','🇮🇹','🇩🇪','🇯🇵','🇧🇷','🇲🇽','🇨🇦','🇺🇸','🇨🇳','🇮🇳','🇰🇷','🇦🇺','🇪🇬','🇿🇦','🇨🇴']
+};
 function memStart(){
+  if(!memBest)memBest={};
   memCards=[];memFlipped=[];memMatched=0;memMoves=0;memBusy=false;
   document.getElementById('memMoves').textContent=0;
-  document.getElementById('memPairs').textContent='0';
-  const pairs=[...MEM_EMOJIS,...MEM_EMOJIS].sort(()=>Math.random()-.5);
+  document.getElementById('memPairs').textContent='0/'+memLevel;
+  // Selecciona el tema
+  const pool=MEM_THEMES[memTheme]||MEM_THEMES.espacio;
+  const selected=pool.slice(0,memLevel);
+  const pairs=[...selected,...selected].sort(()=>Math.random()-.5);
   const grid=document.getElementById('memGrid');
-  grid.style.gridTemplateColumns='repeat(6,1fr)';
+  // Auto grid según número de parejas
+  const cols=memLevel<=8?4:memLevel<=12?6:6;
+  grid.style.gridTemplateColumns='repeat('+cols+',1fr)';
   grid.innerHTML='';
   pairs.forEach((e,i)=>{
     const c=document.createElement('div');c.className='mem-card';c.textContent=e;
@@ -2663,7 +2819,30 @@ function memStart(){
     c.onclick=()=>memFlip(c);
     memCards.push(c);grid.appendChild(c);
   });
+  // Render selectores arriba (niveles + temas)
+  memRenderControls();
 }
+function memRenderControls(){
+  const grid=document.getElementById('memGrid');
+  if(!grid||grid.dataset.controlsAdded)return;
+  const ctrl=document.createElement('div');
+  ctrl.style.cssText='grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:6px';
+  ctrl.innerHTML=
+    '<button class="dict-cat-btn'+(memLevel===6?' active':'')+'" onclick="memSetLevel(6)">📌 Fácil 6</button>'+
+    '<button class="dict-cat-btn'+(memLevel===8?' active':'')+'" onclick="memSetLevel(8)">📌 8</button>'+
+    '<button class="dict-cat-btn'+(memLevel===12?' active':'')+'" onclick="memSetLevel(12)">📌 12</button>'+
+    '<button class="dict-cat-btn'+(memLevel===15?' active':'')+'" onclick="memSetLevel(15)">📌 15</button>'+
+    '<button class="dict-cat-btn'+(memLevel===18?' active':'')+'" onclick="memSetLevel(18)">📌 Difícil 18</button>'+
+    '<span style="width:100%;height:4px"></span>'+
+    '<button class="dict-cat-btn'+(memTheme==='espacio'?' active':'')+'" onclick="memSetTheme(\'espacio\')">🌌 Espacio</button>'+
+    '<button class="dict-cat-btn'+(memTheme==='animales'?' active':'')+'" onclick="memSetTheme(\'animales\')">🐾 Animales</button>'+
+    '<button class="dict-cat-btn'+(memTheme==='comida'?' active':'')+'" onclick="memSetTheme(\'comida\')">🍎 Comida</button>'+
+    '<button class="dict-cat-btn'+(memTheme==='banderas'?' active':'')+'" onclick="memSetTheme(\'banderas\')">🚩 Banderas</button>';
+  grid.parentNode.insertBefore(ctrl,grid);
+  grid.dataset.controlsAdded='1';
+}
+function memSetLevel(n){memLevel=n;document.getElementById('memGrid').dataset.controlsAdded='';const old=document.getElementById('memGrid').previousElementSibling;if(old&&old.style.gridColumn)old.remove();memStart()}
+function memSetTheme(t){memTheme=t;document.getElementById('memGrid').dataset.controlsAdded='';const old=document.getElementById('memGrid').previousElementSibling;if(old&&old.style.gridColumn)old.remove();memStart()}
 function memFlip(c){
   if(memBusy||c.classList.contains('flipped')||c.classList.contains('matched'))return;
   c.classList.add('flipped');memFlipped.push(c);sndCoin();
@@ -2848,10 +3027,14 @@ function g2048CanMove(){
   return false;
 }
 
-// ========== BUSCAMINAS ==========
+// ========== BUSCAMINAS (con 3 dificultades) ==========
 let minesGrid=[],minesRevealed=[],minesFlagged=[],minesRows=10,minesCols=10,minesCount=15,minesGameOver=false,minesStartTime=0,minesTimer=null;
+let minesDifficulty='medio'; // facil/medio/dificil
+const MINES_DIFFS={facil:{r:8,c:8,m:10},medio:{r:10,c:10,m:15},dificil:{r:12,c:12,m:25}};
+function minesSetDifficulty(d){minesDifficulty=d;minesStart()}
 function minesStart(){
-  minesRows=10;minesCols=10;minesCount=15;
+  const d=MINES_DIFFS[minesDifficulty]||MINES_DIFFS.medio;
+  minesRows=d.r;minesCols=d.c;minesCount=d.m;
   minesGrid=Array.from({length:minesRows},()=>Array(minesCols).fill(0));
   minesRevealed=Array.from({length:minesRows},()=>Array(minesCols).fill(false));
   minesFlagged=Array.from({length:minesRows},()=>Array(minesCols).fill(false));
@@ -3034,18 +3217,44 @@ function tetrisRotate(){
 function tetrisRender(){
   const c=document.getElementById('tetris-canvas');if(!c)return;
   const ctx=c.getContext('2d');
-  ctx.fillStyle='#0a0020';ctx.fillRect(0,0,c.width,c.height);
+  // Fondo con degradado sutil
+  const bg=ctx.createLinearGradient(0,0,0,c.height);
+  bg.addColorStop(0,'#0a0020');bg.addColorStop(1,'#1a0033');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,c.width,c.height);
   const cs=c.width/TETRIS_W;
+  // Bloques colocados
   for(let r=0;r<TETRIS_H;r++)for(let cc=0;cc<TETRIS_W;cc++){
     if(tetrisGrid[r][cc]){ctx.fillStyle=tetrisGrid[r][cc];ctx.fillRect(cc*cs+1,r*cs+1,cs-2,cs-2)}
     else{ctx.strokeStyle='rgba(255,255,255,.05)';ctx.strokeRect(cc*cs,r*cs,cs,cs)}
   }
   if(tetrisPiece){
+    // GHOST PIECE: muestra dónde caería la pieza si haces drop
+    let ghostY=tetrisY;
+    while(!tetrisCollides(tetrisX,ghostY+1,tetrisPiece.shape))ghostY++;
+    if(ghostY>tetrisY){
+      ctx.strokeStyle=tetrisPiece.color;
+      ctx.lineWidth=2;
+      ctx.globalAlpha=0.35;
+      for(let r=0;r<tetrisPiece.shape.length;r++)for(let cc=0;cc<tetrisPiece.shape[0].length;cc++){
+        if(tetrisPiece.shape[r][cc]){
+          const ny=ghostY+r,nx=tetrisX+cc;
+          if(ny>=0)ctx.strokeRect(nx*cs+2,ny*cs+2,cs-4,cs-4);
+        }
+      }
+      ctx.globalAlpha=1;ctx.lineWidth=1;
+    }
+    // Pieza activa
     ctx.fillStyle=tetrisPiece.color;
     for(let r=0;r<tetrisPiece.shape.length;r++)for(let cc=0;cc<tetrisPiece.shape[0].length;cc++){
       if(tetrisPiece.shape[r][cc]){
         const ny=tetrisY+r,nx=tetrisX+cc;
-        if(ny>=0)ctx.fillRect(nx*cs+1,ny*cs+1,cs-2,cs-2);
+        if(ny>=0){
+          ctx.fillRect(nx*cs+1,ny*cs+1,cs-2,cs-2);
+          // Brillo
+          ctx.fillStyle='rgba(255,255,255,.3)';
+          ctx.fillRect(nx*cs+2,ny*cs+2,cs-4,3);
+          ctx.fillStyle=tetrisPiece.color;
+        }
       }
     }
   }
@@ -4261,9 +4470,25 @@ function dictPick(word){
   document.getElementById('dictInput').value=word;
   dictSearch();
 }
+// Diccionario expandido cargado asíncronamente desde data/dictionary-extra.json
+// Mini-enciclopedia cargada desde data/encyclopedia.json (offline-first)
+let DICT_EXTRA=[],ENCYCLOPEDIA=[];
+async function loadOfflineData(){
+  try{
+    const [dict,enc]=await Promise.all([
+      fetch('data/dictionary-extra.json').then(r=>r.ok?r.json():[]),
+      fetch('data/encyclopedia.json').then(r=>r.ok?r.json():[])
+    ]);
+    DICT_EXTRA=Array.isArray(dict)?dict:[];
+    ENCYCLOPEDIA=Array.isArray(enc)?enc:[];
+    console.log('[offline-data] dict-extra:',DICT_EXTRA.length,'wordsenc:',ENCYCLOPEDIA.length,'entries');
+  }catch(e){
+    console.warn('[offline-data] no cargó:',e.message);
+  }
+}
 function dictAll(){
-  // Combina diccionario oficial + palabras custom añadidas en el editor admin
-  return DICT.concat(state.customDict||[]);
+  // Combina diccionario inline + diccionario expandido (offline) + custom del usuario
+  return DICT.concat(DICT_EXTRA).concat(state.customDict||[]);
 }
 function dictSearch(){
   const q=dictNorm(document.getElementById('dictInput').value);
@@ -4441,6 +4666,124 @@ function wikiSpeak(){
 }
 function wikiNotFound(q){
   document.getElementById('wikiResult').innerHTML='<div class="wiki-card"><div class="dict-empty">No encontré "<b>'+q+'</b>" en Wikipedia '+wikiLang.toUpperCase()+'.<br>Intenta con otro término o cambia de idioma.</div></div>';
+}
+
+// ========== MINI-ENCICLOPEDIA (offline, datos de data/encyclopedia.json) ==========
+let miniLang='es',miniActiveCat='all';
+const MINI_CATS=[
+  {id:'all',name:'Todas',emoji:'📚'},
+  {id:'espacio',name:'Espacio',emoji:'🌌'},
+  {id:'animales',name:'Animales',emoji:'🐾'},
+  {id:'geografia',name:'Geografía',emoji:'🌍'},
+  {id:'ciencia',name:'Ciencia',emoji:'🔬'},
+  {id:'historia',name:'Historia',emoji:'📜'}
+];
+const MINI_TTSLANGS={es:'es-ES',fr:'fr-FR',en:'en-US',ca:'ca-ES'};
+function miniInit(){
+  document.getElementById('miniInput').value='';
+  miniLang='es';miniActiveCat='all';
+  document.querySelectorAll('[data-mlang]').forEach(b=>b.classList.toggle('active',b.dataset.mlang==='es'));
+  miniRenderCats();
+  miniFilterCat('all');
+  const inp=document.getElementById('miniInput');
+  if(inp&&!inp.dataset.bound){
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();miniSearch()}});
+    inp.dataset.bound='1';
+  }
+}
+function miniRenderCats(){
+  const c=document.getElementById('miniCats');if(!c)return;
+  c.innerHTML=MINI_CATS.map(cat=>`<button class="dict-cat-btn${cat.id===miniActiveCat?' active':''}" onclick="miniFilterCat('${cat.id}')">${cat.emoji} ${cat.name}</button>`).join('');
+}
+function miniFilterCat(catId){
+  miniActiveCat=catId;miniRenderCats();
+  const list=catId==='all'?ENCYCLOPEDIA:ENCYCLOPEDIA.filter(e=>e.cat===catId);
+  const result=document.getElementById('miniResult');
+  if(!list.length){result.innerHTML='<div class="dict-empty">Sin entradas en esta categoría aún.</div>';return}
+  result.innerHTML='<div class="dict-suggestion-title">'+list.length+' temas disponibles. Toca uno o busca arriba.</div><div class="dict-sugg-list">'+
+    list.map(e=>`<span class="dict-sugg" onclick="miniShow('${e.id}')">${e.emoji||'📖'} ${e.title[miniLang]||e.title.es}</span>`).join('')+
+  '</div>';
+}
+function miniSetLang(l){
+  miniLang=l;
+  document.querySelectorAll('[data-mlang]').forEach(b=>b.classList.toggle('active',b.dataset.mlang===l));
+  miniFilterCat(miniActiveCat);
+}
+function miniSearch(){
+  const q=(document.getElementById('miniInput').value||'').toLowerCase().trim();
+  if(!q){miniFilterCat(miniActiveCat);return}
+  const found=ENCYCLOPEDIA.filter(e=>{
+    const titles=[e.title.es,e.title.fr,e.title.en,e.title.ca].join(' ').toLowerCase();
+    return titles.includes(q)||e.id.includes(q);
+  });
+  if(found.length===1){miniShow(found[0].id);return}
+  const result=document.getElementById('miniResult');
+  if(!found.length){
+    result.innerHTML='<div class="dict-card"><div class="dict-empty">No encontré "<b>'+q+'</b>" en la mini‑enciclopedia.<br>Prueba en <b>Wikipedia (online)</b> arriba 👆 si tienes internet.</div></div>';
+    return;
+  }
+  result.innerHTML='<div class="dict-suggestion-title">'+found.length+' resultado(s):</div><div class="dict-sugg-list">'+
+    found.map(e=>`<span class="dict-sugg" onclick="miniShow('${e.id}')">${e.emoji||'📖'} ${e.title[miniLang]||e.title.es}</span>`).join('')+
+  '</div>';
+}
+function miniShow(id){
+  const entry=ENCYCLOPEDIA.find(e=>e.id===id);
+  if(!entry)return;
+  const t=entry.title[miniLang]||entry.title.es;
+  const txt=entry.text[miniLang]||entry.text.es;
+  const cat=MINI_CATS.find(c=>c.id===entry.cat);
+  const result=document.getElementById('miniResult');
+  result.innerHTML='<div class="wiki-card">'+
+    '<div style="text-align:center;font-size:60px;margin-bottom:10px">'+(entry.emoji||'📖')+'</div>'+
+    '<div class="wiki-title">'+t+'</div>'+
+    (cat?'<div class="wiki-desc">'+cat.emoji+' '+cat.name+'</div>':'')+
+    '<div class="wiki-extract">'+txt+'</div>'+
+    '<div class="wiki-actions">'+
+      '<button class="dict-tts" style="width:auto;padding:0 14px" onclick="miniSpeak(\''+id+'\')">🔊 Escuchar</button>'+
+      '<button class="dict-online-btn" onclick="miniBack()">📚 Ver más temas</button>'+
+    '</div>'+
+  '</div>';
+  setTimeout(()=>miniSpeakNow(t,MINI_TTSLANGS[miniLang]),250);
+}
+function miniBack(){miniFilterCat(miniActiveCat)}
+function miniSpeak(id){
+  const entry=ENCYCLOPEDIA.find(e=>e.id===id);if(!entry)return;
+  const t=entry.title[miniLang]||entry.title.es;
+  const txt=entry.text[miniLang]||entry.text.es;
+  miniSpeakNow(t+'. '+txt,MINI_TTSLANGS[miniLang]);
+}
+function miniSpeakNow(text,lang){
+  if(!('speechSynthesis' in window))return;
+  try{
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang=lang||'es-ES';u.rate=0.95;
+    const v=window.speechSynthesis.getVoices();
+    const m=v.find(x=>x.lang===u.lang)||v.find(x=>x.lang.startsWith(u.lang.split('-')[0]));
+    if(m)u.voice=m;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+// Tabs entre Mini-Enciclopedia y Wikipedia online
+function wikiSwitchTab(which){
+  const isOnline=which==='online';
+  document.getElementById('wikiTabMini').classList.toggle('active',!isOnline);
+  document.getElementById('wikiTabOnline').classList.toggle('active',isOnline);
+  document.getElementById('wikiPaneMini').classList.toggle('active',!isOnline);
+  document.getElementById('wikiPaneOnline').classList.toggle('active',isOnline);
+  if(isOnline&&!navigator.onLine){
+    document.getElementById('wikiResult').innerHTML='<div class="wiki-card"><div class="dict-empty">📡 Sin conexión. Wikipedia online no disponible.<br>Prueba la <b>Mini‑Enciclopedia</b> que sí funciona offline.</div></div>';
+  }
+  if(isOnline)wikiInit();
+  else miniInit();
+}
+function updateOfflineBanner(){
+  const banner=document.getElementById('offlineBanner');
+  if(!banner)return;
+  const isOnline=navigator.onLine;
+  banner.style.display=isOnline?'none':'block';
+  const onlineTab=document.getElementById('wikiTabOnline');
+  if(onlineTab)onlineTab.classList.toggle('disabled',!isOnline);
 }
 
 // ========== MODO PADRES (analytics) ==========
@@ -4698,6 +5041,11 @@ function init(){
     window.speechSynthesis.getVoices();
     window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();
   }
+  // Carga asíncrona de datos offline (diccionario expandido + mini-enciclopedia)
+  loadOfflineData();
+  // Listeners online/offline para actualizar banner en tiempo real
+  window.addEventListener('online',()=>{updateOfflineBanner();toast('🌐 Conectado a internet')});
+  window.addEventListener('offline',()=>{updateOfflineBanner();toast('📡 Sin conexión · Mini‑Enciclopedia y juego siguen funcionando')});
   // URLs ocultas: ?admin=padres → editor de contenido / ?padres=1 → analytics
   // Pensadas para que tú entres directo desde la barra del navegador.
   try{

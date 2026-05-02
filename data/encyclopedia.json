@@ -1,0 +1,374 @@
+[
+  {
+    "id":"sol",
+    "title":{"es":"El Sol","fr":"Le Soleil","en":"The Sun","ca":"El Sol"},
+    "cat":"espacio",
+    "emoji":"☀️",
+    "text":{
+      "es":"El Sol es la estrella en el centro de nuestro sistema solar. Es una bola gigante de gas muy caliente que da luz y calor a la Tierra. Si no tuviéramos Sol, la Tierra estaría muy fría y oscura. El Sol tiene unos 4.600 millones de años y todavía le quedan otros 5.000 millones más.",
+      "fr":"Le Soleil est l'étoile au centre de notre système solaire. C'est une énorme boule de gaz très chaud qui donne lumière et chaleur à la Terre. Sans Soleil, la Terre serait très froide et sombre. Le Soleil a environ 4,6 milliards d'années.",
+      "en":"The Sun is the star at the center of our solar system. It's a giant ball of very hot gas that gives light and heat to the Earth. Without the Sun, Earth would be very cold and dark. The Sun is about 4.6 billion years old.",
+      "ca":"El Sol és l'estrella al centre del nostre sistema solar. És una bola gegant de gas molt calent que dóna llum i calor a la Terra. Sense el Sol, la Terra seria molt freda i fosca. El Sol té uns 4.600 milions d'anys."
+    }
+  },
+  {
+    "id":"luna",
+    "title":{"es":"La Luna","fr":"La Lune","en":"The Moon","ca":"La Lluna"},
+    "cat":"espacio",
+    "emoji":"🌙",
+    "text":{
+      "es":"La Luna es el único satélite natural de la Tierra. Da vueltas a nuestro planeta cada 27 días aproximadamente. La Luna no tiene luz propia: lo que vemos brillar es la luz del Sol reflejada. En 1969, el astronauta Neil Armstrong fue el primer humano en pisar la Luna.",
+      "fr":"La Lune est le seul satellite naturel de la Terre. Elle tourne autour de notre planète tous les 27 jours environ. La Lune n'a pas de lumière propre : ce que nous voyons briller est la lumière du Soleil réfléchie. En 1969, Neil Armstrong fut le premier humain à marcher sur la Lune.",
+      "en":"The Moon is Earth's only natural satellite. It orbits our planet about every 27 days. The Moon has no light of its own: what we see shining is reflected sunlight. In 1969, Neil Armstrong became the first human to walk on the Moon.",
+      "ca":"La Lluna és l'únic satèl·lit natural de la Terra. Gira al voltant del nostre planeta cada 27 dies aproximadament. La Lluna no té llum pròpia: el que veiem brillar és la llum del Sol reflectida. El 1969, Neil Armstrong va ser el primer humà a trepitjar la Lluna."
+    }
+  },
+  {
+    "id":"tierra",
+    "title":{"es":"La Tierra","fr":"La Terre","en":"Earth","ca":"La Terra"},
+    "cat":"espacio",
+    "emoji":"🌍",
+    "text":{
+      "es":"La Tierra es nuestro planeta. Es el tercero más cercano al Sol y el único conocido con vida. Tiene continentes con tierra y océanos con agua. Da una vuelta sobre sí misma cada 24 horas (un día) y una vuelta alrededor del Sol cada 365 días (un año).",
+      "fr":"La Terre est notre planète. C'est la troisième plus proche du Soleil et la seule connue avec de la vie. Elle a des continents avec de la terre et des océans avec de l'eau. Elle tourne sur elle-même toutes les 24 heures (un jour) et autour du Soleil tous les 365 jours (un an).",
+      "en":"Earth is our planet. It's the third closest to the Sun and the only one known with life. It has continents with land and oceans with water. It rotates on itself every 24 hours (one day) and around the Sun every 365 days (one year).",
+      "ca":"La Terra és el nostre planeta. És el tercer més proper al Sol i l'únic conegut amb vida. Té continents amb terra i oceans amb aigua. Gira sobre si mateixa cada 24 hores (un dia) i al voltant del Sol cada 365 dies (un any)."
+    }
+  },
+  {
+    "id":"marte",
+    "title":{"es":"Marte","fr":"Mars","en":"Mars","ca":"Mart"},
+    "cat":"espacio",
+    "emoji":"🔴",
+    "text":{
+      "es":"Marte es el cuarto planeta del Sol y se llama el Planeta Rojo por su color. Tiene la montaña más alta del sistema solar, el Monte Olimpo (¡22 km!). Los científicos quieren llevar humanos a Marte algún día. Allí un día dura 24 horas y 39 minutos, casi como en la Tierra.",
+      "fr":"Mars est la quatrième planète du Soleil et s'appelle la Planète Rouge à cause de sa couleur. Elle a la plus haute montagne du système solaire, le Mont Olympus (22 km !). Les scientifiques veulent y envoyer des humains un jour. Une journée y dure 24 heures et 39 minutes.",
+      "en":"Mars is the fourth planet from the Sun and is called the Red Planet because of its color. It has the highest mountain in the solar system, Olympus Mons (22 km!). Scientists want to send humans to Mars one day. A day there lasts 24 hours and 39 minutes.",
+      "ca":"Mart és el quart planeta del Sol i s'anomena el Planeta Vermell pel seu color. Té la muntanya més alta del sistema solar, el Mont Olimp (22 km!). Els científics volen portar-hi humans algun dia. Allà un dia dura 24 hores i 39 minuts."
+    }
+  },
+  {
+    "id":"jupiter",
+    "title":{"es":"Júpiter","fr":"Jupiter","en":"Jupiter","ca":"Júpiter"},
+    "cat":"espacio",
+    "emoji":"🪐",
+    "text":{
+      "es":"Júpiter es el planeta más grande del sistema solar. Es tan grande que cabrían 1.300 Tierras dentro. Es un gigante de gas, no tiene tierra firme donde caminar. Tiene una gran mancha roja que es una tormenta más grande que la Tierra. Júpiter tiene al menos 95 lunas.",
+      "fr":"Jupiter est la plus grande planète du système solaire. Elle est si grande que 1 300 Terres tiendraient dedans. C'est une géante gazeuse, sans sol pour marcher. Elle a une grande tache rouge qui est une tempête plus grande que la Terre. Jupiter a au moins 95 lunes.",
+      "en":"Jupiter is the largest planet in the solar system. It's so big that 1,300 Earths would fit inside. It's a gas giant, with no solid ground. It has a Great Red Spot that's a storm bigger than Earth. Jupiter has at least 95 moons.",
+      "ca":"Júpiter és el planeta més gran del sistema solar. És tan gran que hi cabrien 1.300 Terres a dins. És un gegant gasós, sense terra ferma per caminar. Té una gran taca vermella que és una tempesta més gran que la Terra. Júpiter té almenys 95 llunes."
+    }
+  },
+  {
+    "id":"saturno",
+    "title":{"es":"Saturno","fr":"Saturne","en":"Saturn","ca":"Saturn"},
+    "cat":"espacio",
+    "emoji":"💫",
+    "text":{
+      "es":"Saturno es el planeta más bonito del sistema solar por sus famosos anillos. Esos anillos están hechos de hielo y rocas. Es el segundo más grande después de Júpiter. Saturno es tan ligero que flotaría en el agua si hubiera un océano gigante.",
+      "fr":"Saturne est la plus belle planète du système solaire grâce à ses célèbres anneaux. Ces anneaux sont faits de glace et de pierres. C'est la deuxième plus grande après Jupiter. Saturne est si légère qu'elle flotterait sur l'eau s'il y avait un océan géant.",
+      "en":"Saturn is the most beautiful planet in the solar system because of its famous rings. Those rings are made of ice and rocks. It's the second largest after Jupiter. Saturn is so light it would float on water if there were a giant ocean.",
+      "ca":"Saturn és el planeta més bonic del sistema solar pels seus famosos anells. Aquests anells són fets de gel i roques. És el segon més gran després de Júpiter. Saturn és tan lleuger que flotaria a l'aigua si hi hagués un oceà gegant."
+    }
+  },
+  {
+    "id":"venus",
+    "title":{"es":"Venus","fr":"Vénus","en":"Venus","ca":"Venus"},
+    "cat":"espacio",
+    "emoji":"🌟",
+    "text":{
+      "es":"Venus es el planeta más caliente del sistema solar, ¡aunque no sea el más cercano al Sol! Tiene una atmósfera de gases tóxicos que atrapan el calor. La temperatura es de 460°C, suficiente para derretir plomo. Venus es el objeto más brillante del cielo después del Sol y la Luna.",
+      "fr":"Vénus est la planète la plus chaude du système solaire, même si elle n'est pas la plus proche du Soleil ! Elle a une atmosphère de gaz toxiques qui piègent la chaleur. La température est de 460°C, assez pour faire fondre le plomb. Vénus est l'objet le plus brillant du ciel après le Soleil et la Lune.",
+      "en":"Venus is the hottest planet in the solar system, even though it's not the closest to the Sun! It has an atmosphere of toxic gases that trap heat. Temperature reaches 460°C, enough to melt lead. Venus is the brightest object in the sky after the Sun and Moon.",
+      "ca":"Venus és el planeta més calent del sistema solar, encara que no sigui el més proper al Sol! Té una atmosfera de gasos tòxics que atrapen la calor. La temperatura és de 460°C, prou per fondre plom. Venus és l'objecte més brillant del cel després del Sol i la Lluna."
+    }
+  },
+  {
+    "id":"sistema_solar",
+    "title":{"es":"Sistema Solar","fr":"Système solaire","en":"Solar System","ca":"Sistema Solar"},
+    "cat":"espacio",
+    "emoji":"🌌",
+    "text":{
+      "es":"El Sistema Solar es nuestra familia espacial. Está formado por el Sol y todo lo que gira a su alrededor: 8 planetas, sus lunas, asteroides, cometas y polvo cósmico. Los planetas son: Mercurio, Venus, Tierra, Marte, Júpiter, Saturno, Urano y Neptuno. Plutón ya no es un planeta, ahora se llama 'planeta enano'.",
+      "fr":"Le Système solaire est notre famille spatiale. Il est composé du Soleil et de tout ce qui tourne autour : 8 planètes, leurs lunes, des astéroïdes, des comètes et de la poussière cosmique. Les planètes sont : Mercure, Vénus, Terre, Mars, Jupiter, Saturne, Uranus et Neptune. Pluton n'est plus une planète.",
+      "en":"The Solar System is our space family. It's made up of the Sun and everything orbiting around it: 8 planets, their moons, asteroids, comets, and cosmic dust. The planets are: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Pluto is no longer a planet.",
+      "ca":"El Sistema Solar és la nostra família espacial. Està format pel Sol i tot el que gira al seu voltant: 8 planetes, les seves llunes, asteroides, cometes i pols còsmica. Els planetes són: Mercuri, Venus, Terra, Mart, Júpiter, Saturn, Urà i Neptú. Plutó ja no és un planeta."
+    }
+  },
+  {
+    "id":"galaxia",
+    "title":{"es":"Galaxia","fr":"Galaxie","en":"Galaxy","ca":"Galàxia"},
+    "cat":"espacio",
+    "emoji":"🌠",
+    "text":{
+      "es":"Una galaxia es un grupo enorme de estrellas, planetas y polvo espacial unidos por la gravedad. Nuestra galaxia se llama Vía Láctea y tiene unas 200.000 millones de estrellas. El universo tiene miles de millones de galaxias. La más cercana a la nuestra es Andrómeda.",
+      "fr":"Une galaxie est un énorme groupe d'étoiles, de planètes et de poussière spatiale liés par la gravité. Notre galaxie s'appelle la Voie lactée et compte environ 200 milliards d'étoiles. L'univers a des milliards de galaxies. La plus proche de la nôtre est Andromède.",
+      "en":"A galaxy is a huge group of stars, planets, and space dust held together by gravity. Our galaxy is called the Milky Way and has about 200 billion stars. The universe has billions of galaxies. The closest to ours is Andromeda.",
+      "ca":"Una galàxia és un enorme grup d'estrelles, planetes i pols espacial units per la gravetat. La nostra galàxia es diu Via Làctia i té uns 200.000 milions d'estrelles. L'univers té milers de milions de galàxies. La més propera a la nostra és Andròmeda."
+    }
+  },
+  {
+    "id":"astronauta",
+    "title":{"es":"Astronauta","fr":"Astronaute","en":"Astronaut","ca":"Astronauta"},
+    "cat":"espacio",
+    "emoji":"👨‍🚀",
+    "text":{
+      "es":"Un astronauta es una persona entrenada para viajar al espacio. Llevan trajes especiales para protegerse de la falta de aire y el frío. Para ser astronauta hay que estudiar mucho (matemáticas, física, idiomas) y entrenar el cuerpo durante años. Yuri Gagarin fue el primer humano en el espacio en 1961.",
+      "fr":"Un astronaute est une personne entraînée pour voyager dans l'espace. Ils portent des combinaisons spéciales pour se protéger du manque d'air et du froid. Pour être astronaute, il faut beaucoup étudier (maths, physique, langues) et entraîner son corps pendant des années. Youri Gagarine fut le premier humain dans l'espace en 1961.",
+      "en":"An astronaut is a person trained to travel to space. They wear special suits to protect themselves from the lack of air and the cold. To be an astronaut you have to study a lot (math, physics, languages) and train your body for years. Yuri Gagarin was the first human in space in 1961.",
+      "ca":"Un astronauta és una persona entrenada per viatjar a l'espai. Porten vestits especials per protegir-se de la falta d'aire i el fred. Per ser astronauta cal estudiar molt (matemàtiques, física, idiomes) i entrenar el cos durant anys. Iuri Gagarin va ser el primer humà a l'espai el 1961."
+    }
+  },
+  {
+    "id":"dinosaurios",
+    "title":{"es":"Dinosaurios","fr":"Dinosaures","en":"Dinosaurs","ca":"Dinosaures"},
+    "cat":"animales",
+    "emoji":"🦖",
+    "text":{
+      "es":"Los dinosaurios fueron animales gigantes que vivieron hace millones de años, mucho antes que los humanos. Algunos eran herbívoros (comían plantas) como el Diplodocus, y otros carnívoros (comían carne) como el Tyrannosaurus rex. Se extinguieron hace 65 millones de años, probablemente por el impacto de un meteorito gigante.",
+      "fr":"Les dinosaures étaient des animaux géants qui vivaient il y a des millions d'années, bien avant les humains. Certains étaient herbivores (mangeaient des plantes) comme le Diplodocus, d'autres carnivores (mangeaient de la viande) comme le Tyrannosaure rex. Ils ont disparu il y a 65 millions d'années, probablement à cause de l'impact d'une météorite géante.",
+      "en":"Dinosaurs were giant animals that lived millions of years ago, long before humans. Some were herbivores (ate plants) like Diplodocus, and others were carnivores (ate meat) like Tyrannosaurus rex. They went extinct 65 million years ago, probably due to a giant meteorite impact.",
+      "ca":"Els dinosaures eren animals gegants que vivien fa milions d'anys, molt abans que els humans. Alguns eren herbívors (menjaven plantes) com el Diplodocus, i altres carnívors (menjaven carn) com el Tiranosaure rex. Es van extingir fa 65 milions d'anys, probablement per l'impacte d'un meteorit gegant."
+    }
+  },
+  {
+    "id":"leon",
+    "title":{"es":"León","fr":"Lion","en":"Lion","ca":"Lleó"},
+    "cat":"animales",
+    "emoji":"🦁",
+    "text":{
+      "es":"El león es un gran felino conocido como 'el rey de la selva'. Vive principalmente en África, en grandes praderas. Los leones machos tienen una melena espesa, las hembras no. Cazan en grupo (las hembras son las cazadoras principales) y pueden comer hasta 30 kg de carne en una comida. Pueden rugir tan fuerte que se oyen a 8 km.",
+      "fr":"Le lion est un grand félin connu comme 'le roi de la jungle'. Il vit principalement en Afrique, dans de grandes prairies. Les lions mâles ont une crinière épaisse, pas les femelles. Ils chassent en groupe (les femelles sont les chasseuses principales) et peuvent manger jusqu'à 30 kg de viande en un repas. Leur rugissement s'entend à 8 km.",
+      "en":"The lion is a big cat known as 'the king of the jungle'. It lives mainly in Africa, in large grasslands. Male lions have a thick mane, females don't. They hunt in groups (females are the main hunters) and can eat up to 30 kg of meat in one meal. They can roar so loud they're heard 8 km away.",
+      "ca":"El lleó és un gran felí conegut com 'el rei de la selva'. Viu principalment a l'Àfrica, en grans praderies. Els lleons mascles tenen una crinera espessa, les femelles no. Cacen en grup (les femelles són les caçadores principals) i poden menjar fins a 30 kg de carn en un àpat. Poden rugir tan fort que se senten a 8 km."
+    }
+  },
+  {
+    "id":"ballena",
+    "title":{"es":"Ballena","fr":"Baleine","en":"Whale","ca":"Balena"},
+    "cat":"animales",
+    "emoji":"🐋",
+    "text":{
+      "es":"Las ballenas son los animales más grandes del planeta. La ballena azul es el animal más grande que ha existido jamás: puede medir 30 metros y pesar 180 toneladas, ¡más que un avión! No son peces, son mamíferos: respiran aire y dan leche a sus crías. Cantan canciones bajo el agua para comunicarse.",
+      "fr":"Les baleines sont les plus grands animaux de la planète. La baleine bleue est le plus grand animal ayant jamais existé : elle peut mesurer 30 mètres et peser 180 tonnes, plus qu'un avion ! Ce ne sont pas des poissons, ce sont des mammifères : elles respirent de l'air et allaitent leurs petits. Elles chantent des chansons sous l'eau pour communiquer.",
+      "en":"Whales are the largest animals on the planet. The blue whale is the largest animal that has ever existed: it can measure 30 meters and weigh 180 tons, more than an airplane! They are not fish, they are mammals: they breathe air and feed milk to their babies. They sing songs underwater to communicate.",
+      "ca":"Les balenes són els animals més grans del planeta. La balena blava és l'animal més gran que mai ha existit: pot mesurar 30 metres i pesar 180 tones, més que un avió! No són peixos, són mamífers: respiren aire i donen llet a les seves cries. Canten cançons sota l'aigua per comunicar-se."
+    }
+  },
+  {
+    "id":"elefante",
+    "title":{"es":"Elefante","fr":"Éléphant","en":"Elephant","ca":"Elefant"},
+    "cat":"animales",
+    "emoji":"🐘",
+    "text":{
+      "es":"El elefante es el animal terrestre más grande del mundo. Hay dos tipos: el elefante africano (más grande) y el asiático. Su trompa tiene 40.000 músculos y la usan para beber, comer, oler y abrazar. Son muy inteligentes: reconocen a sus familiares incluso después de muchos años. Pueden vivir hasta 70 años.",
+      "fr":"L'éléphant est le plus grand animal terrestre du monde. Il y a deux types : l'éléphant d'Afrique (plus grand) et celui d'Asie. Sa trompe a 40 000 muscles et il l'utilise pour boire, manger, sentir et caresser. Ils sont très intelligents : ils reconnaissent leur famille même après de nombreuses années. Ils peuvent vivre jusqu'à 70 ans.",
+      "en":"The elephant is the largest land animal in the world. There are two types: the African elephant (larger) and the Asian. Its trunk has 40,000 muscles and is used to drink, eat, smell and hug. They are very intelligent: they recognize their relatives even after many years. They can live up to 70 years.",
+      "ca":"L'elefant és l'animal terrestre més gran del món. N'hi ha dos tipus: l'elefant africà (més gran) i l'asiàtic. La seva trompa té 40.000 músculs i la fan servir per beure, menjar, ensumar i abraçar. Són molt intel·ligents: reconeixen els seus familiars fins i tot després de molts anys. Poden viure fins a 70 anys."
+    }
+  },
+  {
+    "id":"pulpo",
+    "title":{"es":"Pulpo","fr":"Pieuvre","en":"Octopus","ca":"Pop"},
+    "cat":"animales",
+    "emoji":"🐙",
+    "text":{
+      "es":"El pulpo es uno de los animales más inteligentes del mar. Tiene 8 brazos llenos de ventosas y 3 corazones. Puede cambiar de color para esconderse de los enemigos. Si le cortan un brazo, le crece otro nuevo. Algunos pulpos pueden abrir frascos para coger comida, ¡como las personas!",
+      "fr":"La pieuvre est l'un des animaux les plus intelligents de la mer. Elle a 8 bras pleins de ventouses et 3 cœurs. Elle peut changer de couleur pour se cacher des ennemis. Si on lui coupe un bras, il en repousse un nouveau. Certaines pieuvres peuvent ouvrir des bocaux pour attraper la nourriture, comme les humains !",
+      "en":"The octopus is one of the smartest sea animals. It has 8 arms full of suction cups and 3 hearts. It can change color to hide from enemies. If an arm is cut off, a new one grows back. Some octopuses can open jars to get food, just like humans!",
+      "ca":"El pop és un dels animals més intel·ligents del mar. Té 8 braços plens de ventoses i 3 cors. Pot canviar de color per amagar-se dels enemics. Si li tallen un braç, n'hi creix un de nou. Alguns pops poden obrir pots per agafar menjar, com les persones!"
+    }
+  },
+  {
+    "id":"aguila",
+    "title":{"es":"Águila","fr":"Aigle","en":"Eagle","ca":"Àguila"},
+    "cat":"animales",
+    "emoji":"🦅",
+    "text":{
+      "es":"El águila es una de las aves más poderosas del cielo. Tiene una vista 8 veces mejor que la nuestra: puede ver un conejo desde 3 km de altura. Sus garras son tan fuertes que pueden levantar presas más pesadas que ellas. Hay águilas en casi todos los continentes excepto la Antártida.",
+      "fr":"L'aigle est l'un des oiseaux les plus puissants du ciel. Il a une vue 8 fois meilleure que la nôtre : il peut voir un lapin depuis 3 km d'altitude. Ses serres sont si fortes qu'elles peuvent soulever des proies plus lourdes qu'elles. Il y a des aigles sur presque tous les continents sauf l'Antarctique.",
+      "en":"The eagle is one of the most powerful birds in the sky. It has eyesight 8 times better than ours: it can see a rabbit from 3 km up. Its talons are so strong they can lift prey heavier than itself. There are eagles on almost every continent except Antarctica.",
+      "ca":"L'àguila és una de les aus més poderoses del cel. Té una vista 8 vegades millor que la nostra: pot veure un conill des de 3 km d'alçada. Les seves urpes són tan fortes que poden aixecar preses més pesades que elles. Hi ha àguiles a gairebé tots els continents excepte l'Antàrtida."
+    }
+  },
+  {
+    "id":"abeja",
+    "title":{"es":"Abeja","fr":"Abeille","en":"Bee","ca":"Abella"},
+    "cat":"animales",
+    "emoji":"🐝",
+    "text":{
+      "es":"Las abejas son insectos muy importantes para la naturaleza porque polinizan las flores. Sin abejas no tendríamos muchas frutas y verduras. Viven en colmenas con una reina, miles de obreras y zánganos. Una abeja puede visitar 5.000 flores en un día. Producen miel a partir del néctar de las flores.",
+      "fr":"Les abeilles sont des insectes très importants pour la nature car elles pollinisent les fleurs. Sans abeilles, nous n'aurions pas beaucoup de fruits et légumes. Elles vivent dans des ruches avec une reine, des milliers d'ouvrières et des faux-bourdons. Une abeille peut visiter 5 000 fleurs par jour. Elles produisent du miel à partir du nectar.",
+      "en":"Bees are very important insects for nature because they pollinate flowers. Without bees we wouldn't have many fruits and vegetables. They live in hives with a queen, thousands of workers and drones. A bee can visit 5,000 flowers a day. They make honey from flower nectar.",
+      "ca":"Les abelles són insectes molt importants per a la natura perquè pol·linitzen les flors. Sense abelles no tindríem moltes fruites i verdures. Viuen en ruscos amb una reina, milers d'obreres i abegots. Una abella pot visitar 5.000 flors en un dia. Produeixen mel a partir del nèctar."
+    }
+  },
+  {
+    "id":"andorra_pais",
+    "title":{"es":"Andorra","fr":"Andorre","en":"Andorra","ca":"Andorra"},
+    "cat":"geografia",
+    "emoji":"🇦🇩",
+    "text":{
+      "es":"Andorra es un pequeño país en los Pirineos, entre España y Francia. Es uno de los países más pequeños del mundo: solo 468 km². Su capital es Andorra la Vella, la capital más alta de Europa. Está dividida en 7 parròquies. Su idioma oficial es el catalán. Es famosa por el esquí y el comercio. La gobiernan dos coprínceps: el obispo de la Seu d'Urgell y el presidente de Francia.",
+      "fr":"L'Andorre est un petit pays des Pyrénées, entre l'Espagne et la France. C'est l'un des plus petits pays du monde : seulement 468 km². Sa capitale est Andorre-la-Vieille, la capitale la plus haute d'Europe. Elle est divisée en 7 paroisses. Sa langue officielle est le catalan. Elle est célèbre pour le ski et le commerce. Elle est gouvernée par deux coprinces : l'évêque de la Seu d'Urgell et le président de France.",
+      "en":"Andorra is a small country in the Pyrenees, between Spain and France. It's one of the smallest countries in the world: only 468 km². Its capital is Andorra la Vella, the highest capital in Europe. It's divided into 7 parishes. Its official language is Catalan. It's famous for skiing and shopping. It's governed by two co-princes: the bishop of La Seu d'Urgell and the president of France.",
+      "ca":"Andorra és un petit país als Pirineus, entre Espanya i França. És un dels països més petits del món: només 468 km². La seva capital és Andorra la Vella, la capital més alta d'Europa. Està dividida en 7 parròquies. La seva llengua oficial és el català. És famosa per l'esquí i el comerç. La governen dos coprínceps: el bisbe de la Seu d'Urgell i el president de França."
+    }
+  },
+  {
+    "id":"francia",
+    "title":{"es":"Francia","fr":"France","en":"France","ca":"França"},
+    "cat":"geografia",
+    "emoji":"🇫🇷",
+    "text":{
+      "es":"Francia es un país de Europa Occidental. Su capital es París, famosa por la Torre Eiffel. Es el país más visitado del mundo. Su idioma oficial es el francés y su moneda el euro. Es famosa por su gastronomía (croissants, queso, vino), su arte y su moda. Hace frontera con Andorra, España, Bélgica, Italia y otros países.",
+      "fr":"La France est un pays d'Europe occidentale. Sa capitale est Paris, célèbre pour la Tour Eiffel. C'est le pays le plus visité au monde. Sa langue officielle est le français et sa monnaie l'euro. Elle est célèbre pour sa gastronomie (croissants, fromage, vin), son art et sa mode. Elle borde l'Andorre, l'Espagne, la Belgique, l'Italie et d'autres pays.",
+      "en":"France is a country in Western Europe. Its capital is Paris, famous for the Eiffel Tower. It's the most visited country in the world. Its official language is French and its currency the euro. It's famous for its cuisine (croissants, cheese, wine), art and fashion. It borders Andorra, Spain, Belgium, Italy and other countries.",
+      "ca":"França és un país d'Europa occidental. La seva capital és París, famosa per la Torre Eiffel. És el país més visitat del món. La seva llengua oficial és el francès i la seva moneda l'euro. És famosa per la seva gastronomia (croissants, formatge, vi), el seu art i la seva moda. Té frontera amb Andorra, Espanya, Bèlgica, Itàlia i altres països."
+    }
+  },
+  {
+    "id":"espana",
+    "title":{"es":"España","fr":"Espagne","en":"Spain","ca":"Espanya"},
+    "cat":"geografia",
+    "emoji":"🇪🇸",
+    "text":{
+      "es":"España es un país del sur de Europa, en la Península Ibérica. Su capital es Madrid. El idioma oficial es el español, pero también se hablan catalán, euskera y gallego en algunas regiones. Es famosa por la paella, el flamenco, el fútbol y sus playas. Tiene frontera con Portugal, Francia y Andorra.",
+      "fr":"L'Espagne est un pays du sud de l'Europe, sur la péninsule ibérique. Sa capitale est Madrid. La langue officielle est l'espagnol, mais on parle aussi catalan, basque et galicien dans certaines régions. Elle est célèbre pour la paella, le flamenco, le football et ses plages. Elle borde le Portugal, la France et l'Andorre.",
+      "en":"Spain is a country in southern Europe, on the Iberian Peninsula. Its capital is Madrid. The official language is Spanish, but Catalan, Basque and Galician are also spoken in some regions. It's famous for paella, flamenco, soccer and its beaches. It borders Portugal, France and Andorra.",
+      "ca":"Espanya és un país del sud d'Europa, a la Península Ibèrica. La seva capital és Madrid. La llengua oficial és l'espanyol, però també es parla català, basc i gallec en algunes regions. És famosa per la paella, el flamenc, el futbol i les seves platges. Té frontera amb Portugal, França i Andorra."
+    }
+  },
+  {
+    "id":"egipto",
+    "title":{"es":"Egipto","fr":"Égypte","en":"Egypt","ca":"Egipte"},
+    "cat":"geografia",
+    "emoji":"🇪🇬",
+    "text":{
+      "es":"Egipto es un país en el norte de África. Su capital es El Cairo. Es famoso por las pirámides, construidas hace más de 4.500 años por los antiguos egipcios. La pirámide de Giza es una de las 7 maravillas del mundo. El río Nilo cruza el país. Los faraones eran los reyes del antiguo Egipto y se enterraban en las pirámides.",
+      "fr":"L'Égypte est un pays du nord de l'Afrique. Sa capitale est Le Caire. Elle est célèbre pour les pyramides, construites il y a plus de 4 500 ans par les anciens Égyptiens. La pyramide de Gizeh est l'une des 7 merveilles du monde. Le Nil traverse le pays. Les pharaons étaient les rois de l'ancienne Égypte.",
+      "en":"Egypt is a country in northern Africa. Its capital is Cairo. It's famous for the pyramids, built over 4,500 years ago by the ancient Egyptians. The Pyramid of Giza is one of the 7 wonders of the world. The Nile river crosses the country. Pharaohs were the kings of ancient Egypt.",
+      "ca":"Egipte és un país al nord d'Àfrica. La seva capital és el Caire. És famós per les piràmides, construïdes fa més de 4.500 anys pels antics egipcis. La piràmide de Gizeh és una de les 7 meravelles del món. El riu Nil travessa el país. Els faraons eren els reis de l'antic Egipte."
+    }
+  },
+  {
+    "id":"venezuela",
+    "title":{"es":"Venezuela","fr":"Venezuela","en":"Venezuela","ca":"Veneçuela"},
+    "cat":"geografia",
+    "emoji":"🇻🇪",
+    "text":{
+      "es":"Venezuela es un país de Sudamérica. Su capital es Caracas. Tiene la cascada más alta del mundo, el Salto Ángel, que mide casi 1.000 metros. Es famosa por sus playas en el Caribe, el lago de Maracaibo y el río Orinoco. Su idioma oficial es el español. Es uno de los países con más reservas de petróleo del mundo.",
+      "fr":"Le Venezuela est un pays d'Amérique du Sud. Sa capitale est Caracas. Il a la plus haute cascade du monde, le Salto Ángel, qui mesure près de 1 000 mètres. Il est célèbre pour ses plages des Caraïbes, le lac Maracaibo et le fleuve Orénoque. Sa langue officielle est l'espagnol.",
+      "en":"Venezuela is a country in South America. Its capital is Caracas. It has the highest waterfall in the world, Angel Falls, almost 1,000 meters tall. It's famous for its Caribbean beaches, Lake Maracaibo and the Orinoco River. Its official language is Spanish.",
+      "ca":"Veneçuela és un país de Sud-amèrica. La seva capital és Caracas. Té la cascada més alta del món, el Salt Àngel, que mesura gairebé 1.000 metres. És famosa per les seves platges del Carib, el llac de Maracaibo i el riu Orinoco. La seva llengua oficial és l'espanyol."
+    }
+  },
+  {
+    "id":"colombia",
+    "title":{"es":"Colombia","fr":"Colombie","en":"Colombia","ca":"Colòmbia"},
+    "cat":"geografia",
+    "emoji":"🇨🇴",
+    "text":{
+      "es":"Colombia es un país de Sudamérica. Su capital es Bogotá. Es famosa por su café (uno de los mejores del mundo), su música (cumbia, vallenato), y sus playas en el Caribe. Es el único país sudamericano con costas en dos océanos: Atlántico y Pacífico. Hay selvas, montañas y desiertos en su territorio.",
+      "fr":"La Colombie est un pays d'Amérique du Sud. Sa capitale est Bogotá. Elle est célèbre pour son café (l'un des meilleurs du monde), sa musique (cumbia, vallenato) et ses plages des Caraïbes. C'est le seul pays sud-américain avec des côtes sur deux océans : Atlantique et Pacifique.",
+      "en":"Colombia is a country in South America. Its capital is Bogotá. It's famous for its coffee (one of the best in the world), its music (cumbia, vallenato), and its Caribbean beaches. It's the only South American country with coasts on two oceans: Atlantic and Pacific.",
+      "ca":"Colòmbia és un país de Sud-amèrica. La seva capital és Bogotà. És famosa pel seu cafè (un dels millors del món), la seva música (cúmbia, vallenato) i les seves platges al Carib. És l'únic país sud-americà amb costes a dos oceans: Atlàntic i Pacífic."
+    }
+  },
+  {
+    "id":"pirineos",
+    "title":{"es":"Pirineos","fr":"Pyrénées","en":"Pyrenees","ca":"Pirineus"},
+    "cat":"geografia",
+    "emoji":"⛰️",
+    "text":{
+      "es":"Los Pirineos son una cordillera de montañas que separa Francia de España. Andorra está justo en medio. Su pico más alto es el Aneto, con 3.404 metros. En invierno se llenan de nieve y son perfectos para esquiar. En primavera y verano, los Pirineos están llenos de flores, lagos y senderos para hacer excursiones.",
+      "fr":"Les Pyrénées sont une chaîne de montagnes qui sépare la France de l'Espagne. L'Andorre se trouve juste au milieu. Son plus haut sommet est l'Aneto, avec 3 404 mètres. En hiver, elles se couvrent de neige et sont parfaites pour skier. Au printemps et en été, les Pyrénées sont pleines de fleurs, de lacs et de sentiers de randonnée.",
+      "en":"The Pyrenees are a mountain range that separates France from Spain. Andorra is right in the middle. Its highest peak is Aneto, at 3,404 meters. In winter they fill with snow and are perfect for skiing. In spring and summer, the Pyrenees are full of flowers, lakes and hiking trails.",
+      "ca":"Els Pirineus són una serralada de muntanyes que separa França d'Espanya. Andorra està just al mig. El seu cim més alt és l'Aneto, amb 3.404 metres. A l'hivern s'omplen de neu i són perfectes per esquiar. A la primavera i l'estiu, els Pirineus són plens de flors, llacs i camins per fer excursions."
+    }
+  },
+  {
+    "id":"agua",
+    "title":{"es":"El agua","fr":"L'eau","en":"Water","ca":"L'aigua"},
+    "cat":"ciencia",
+    "emoji":"💧",
+    "text":{
+      "es":"El agua es esencial para la vida. Sin ella no podríamos sobrevivir. La fórmula química es H2O: dos átomos de hidrógeno y uno de oxígeno. Puede estar en tres estados: líquido (océanos, ríos), sólido (hielo, nieve) y gaseoso (vapor). El 70% de la Tierra está cubierta de agua. Tu cuerpo también es 60% agua.",
+      "fr":"L'eau est essentielle à la vie. Sans elle, nous ne pourrions pas survivre. La formule chimique est H2O : deux atomes d'hydrogène et un d'oxygène. Elle peut être dans trois états : liquide (océans, rivières), solide (glace, neige) et gazeux (vapeur). 70% de la Terre est couverte d'eau. Ton corps est aussi 60% eau.",
+      "en":"Water is essential for life. Without it we couldn't survive. The chemical formula is H2O: two hydrogen atoms and one oxygen. It can be in three states: liquid (oceans, rivers), solid (ice, snow) and gas (steam). 70% of Earth is covered in water. Your body is also 60% water.",
+      "ca":"L'aigua és essencial per a la vida. Sense ella no podríem sobreviure. La fórmula química és H2O: dos àtoms d'hidrogen i un d'oxigen. Pot estar en tres estats: líquid (oceans, rius), sòlid (gel, neu) i gasós (vapor). El 70% de la Terra està coberta d'aigua. El teu cos també és 60% aigua."
+    }
+  },
+  {
+    "id":"electricidad",
+    "title":{"es":"La electricidad","fr":"L'électricité","en":"Electricity","ca":"L'electricitat"},
+    "cat":"ciencia",
+    "emoji":"⚡",
+    "text":{
+      "es":"La electricidad es energía que mueve las cosas eléctricas: luces, televisores, ordenadores, móviles. Llega a tu casa por cables. Se produce de muchas formas: con el viento (eólica), con el sol (solar), con el agua (hidráulica) o con materiales fósiles. Benjamin Franklin demostró que los rayos son electricidad volando una cometa en una tormenta.",
+      "fr":"L'électricité est l'énergie qui fait fonctionner les choses électriques : lumières, télévisions, ordinateurs, téléphones. Elle arrive chez toi par des câbles. Elle est produite de nombreuses façons : avec le vent (éolienne), avec le soleil (solaire), avec l'eau (hydraulique) ou avec des combustibles fossiles. Benjamin Franklin a prouvé que la foudre est de l'électricité.",
+      "en":"Electricity is energy that powers electrical things: lights, TVs, computers, phones. It reaches your home through wires. It's produced in many ways: with wind (eolic), with sun (solar), with water (hydraulic) or with fossil fuels. Benjamin Franklin proved that lightning is electricity.",
+      "ca":"L'electricitat és energia que mou les coses elèctriques: llums, televisors, ordinadors, mòbils. Arriba a casa per cables. Es produeix de moltes maneres: amb el vent (eòlica), amb el sol (solar), amb l'aigua (hidràulica) o amb materials fòssils. Benjamin Franklin va demostrar que els llamps són electricitat."
+    }
+  },
+  {
+    "id":"corazon",
+    "title":{"es":"El corazón","fr":"Le cœur","en":"The heart","ca":"El cor"},
+    "cat":"ciencia",
+    "emoji":"❤️",
+    "text":{
+      "es":"El corazón es un músculo del tamaño de tu puño que está en tu pecho. Late unas 100.000 veces cada día y bombea sangre por todo tu cuerpo a través de las venas y arterias. Cuando haces deporte late más rápido para llevar más oxígeno a los músculos. Cuando duermes, late más despacio. Si te emocionas, lo notas latir fuerte.",
+      "fr":"Le cœur est un muscle de la taille de ton poing qui se trouve dans ta poitrine. Il bat environ 100 000 fois par jour et pompe le sang dans tout ton corps à travers les veines et artères. Quand tu fais du sport il bat plus vite pour apporter plus d'oxygène aux muscles. Quand tu dors, il bat plus lentement.",
+      "en":"The heart is a muscle the size of your fist located in your chest. It beats about 100,000 times each day and pumps blood throughout your body through veins and arteries. When you exercise it beats faster to bring more oxygen to your muscles. When you sleep, it beats slower.",
+      "ca":"El cor és un múscul de la mida del teu puny que es troba al teu pit. Batega unes 100.000 vegades cada dia i bomba sang per tot el teu cos a través de les venes i artèries. Quan fas esport batega més ràpid per portar més oxigen als músculs. Quan dorms, batega més lentament."
+    }
+  },
+  {
+    "id":"volcan",
+    "title":{"es":"Volcán","fr":"Volcan","en":"Volcano","ca":"Volcà"},
+    "cat":"ciencia",
+    "emoji":"🌋",
+    "text":{
+      "es":"Un volcán es una montaña por donde sale lava (roca derretida muy caliente) cuando entra en erupción. Hay más de 1.500 volcanes activos en el mundo. La lava puede estar a 1.200°C, ¡muy peligrosa! Algunos volcanes famosos son el Vesubio en Italia (que destruyó Pompeya), el Etna en Italia y el Kilauea en Hawai.",
+      "fr":"Un volcan est une montagne par où sort de la lave (roche fondue très chaude) lors d'une éruption. Il y a plus de 1 500 volcans actifs dans le monde. La lave peut être à 1 200°C, très dangereuse ! Quelques volcans célèbres sont le Vésuve en Italie (qui a détruit Pompéi), l'Etna en Italie et le Kilauea à Hawaï.",
+      "en":"A volcano is a mountain where lava (very hot melted rock) comes out when it erupts. There are over 1,500 active volcanoes in the world. Lava can reach 1,200°C, very dangerous! Some famous volcanoes are Vesuvius in Italy (which destroyed Pompeii), Etna in Italy and Kilauea in Hawaii.",
+      "ca":"Un volcà és una muntanya per on surt lava (roca fosa molt calenta) quan entra en erupció. Hi ha més de 1.500 volcans actius al món. La lava pot estar a 1.200°C, molt perillosa! Alguns volcans famosos són el Vesuvi a Itàlia (que va destruir Pompeia), l'Etna a Itàlia i el Kilauea a Hawaii."
+    }
+  },
+  {
+    "id":"einstein",
+    "title":{"es":"Albert Einstein","fr":"Albert Einstein","en":"Albert Einstein","ca":"Albert Einstein"},
+    "cat":"historia",
+    "emoji":"🧠",
+    "text":{
+      "es":"Albert Einstein (1879-1955) fue un físico alemán considerado uno de los científicos más importantes de la historia. Su famosa fórmula E=mc² explica la relación entre energía y masa. Ganó el Premio Nobel de Física en 1921. Cuando era niño, no era especialmente buen estudiante, pero soñaba mucho y se hacía muchas preguntas sobre el universo.",
+      "fr":"Albert Einstein (1879-1955) était un physicien allemand considéré comme l'un des scientifiques les plus importants de l'histoire. Sa célèbre formule E=mc² explique la relation entre énergie et masse. Il a gagné le prix Nobel de physique en 1921. Quand il était enfant, il n'était pas particulièrement bon élève, mais il rêvait beaucoup et se posait beaucoup de questions sur l'univers.",
+      "en":"Albert Einstein (1879-1955) was a German physicist considered one of the most important scientists in history. His famous formula E=mc² explains the relationship between energy and mass. He won the Nobel Prize in Physics in 1921. As a child, he wasn't especially good at school, but he dreamed a lot and asked many questions about the universe.",
+      "ca":"Albert Einstein (1879-1955) va ser un físic alemany considerat un dels científics més importants de la història. La seva famosa fórmula E=mc² explica la relació entre energia i massa. Va guanyar el Premi Nobel de Física el 1921. Quan era nen, no era especialment bon estudiant, però somiava molt i es feia moltes preguntes sobre l'univers."
+    }
+  },
+  {
+    "id":"colon",
+    "title":{"es":"Cristóbal Colón","fr":"Christophe Colomb","en":"Christopher Columbus","ca":"Cristòfor Colom"},
+    "cat":"historia",
+    "emoji":"⛵",
+    "text":{
+      "es":"Cristóbal Colón fue un navegante que en 1492 cruzó el océano Atlántico con tres barcos (la Pinta, la Niña y la Santa María) y llegó a América. Él pensaba que iba a las Indias, pero descubrió un continente nuevo para los europeos. Este viaje cambió el mundo: por eso hay países que hablan español en América Latina.",
+      "fr":"Christophe Colomb était un navigateur qui en 1492 a traversé l'océan Atlantique avec trois navires (la Pinta, la Niña et la Santa María) et est arrivé en Amérique. Il pensait aller aux Indes, mais il a découvert un nouveau continent pour les Européens. Ce voyage a changé le monde.",
+      "en":"Christopher Columbus was a navigator who in 1492 crossed the Atlantic Ocean with three ships (the Pinta, the Niña and the Santa María) and arrived in America. He thought he was going to the Indies, but he discovered a new continent for Europeans. This voyage changed the world.",
+      "ca":"Cristòfor Colom va ser un navegant que el 1492 va creuar l'oceà Atlàntic amb tres vaixells (la Pinta, la Niña i la Santa María) i va arribar a Amèrica. Ell pensava que anava a les Índies, però va descobrir un continent nou per als europeus. Aquest viatge va canviar el món."
+    }
+  },
+  {
+    "id":"piramides",
+    "title":{"es":"Las pirámides","fr":"Les pyramides","en":"The pyramids","ca":"Les piràmides"},
+    "cat":"historia",
+    "emoji":"🔺",
+    "text":{
+      "es":"Las pirámides de Egipto son tumbas gigantes construidas para los faraones (los reyes egipcios) hace más de 4.500 años. La más famosa es la pirámide de Giza, de 147 metros de altura. Para construirlas, miles de obreros movieron bloques de piedra de varias toneladas. Todavía no sabemos exactamente cómo lo hicieron sin máquinas modernas.",
+      "fr":"Les pyramides d'Égypte sont des tombes géantes construites pour les pharaons (les rois égyptiens) il y a plus de 4 500 ans. La plus célèbre est la pyramide de Gizeh, de 147 mètres de haut. Pour les construire, des milliers d'ouvriers ont déplacé des blocs de pierre de plusieurs tonnes. On ne sait toujours pas exactement comment ils ont fait sans machines modernes.",
+      "en":"The pyramids of Egypt are giant tombs built for the pharaohs (Egyptian kings) over 4,500 years ago. The most famous is the Pyramid of Giza, 147 meters tall. To build them, thousands of workers moved stone blocks weighing several tons. We still don't know exactly how they did it without modern machinery.",
+      "ca":"Les piràmides d'Egipte són tombes gegants construïdes per als faraons (els reis egipcis) fa més de 4.500 anys. La més famosa és la piràmide de Gizeh, de 147 metres d'alçada. Per construir-les, milers d'obrers van moure blocs de pedra de diverses tones. Encara no sabem exactament com ho van fer sense màquines modernes."
+    }
+  }
+]

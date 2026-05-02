@@ -1,8 +1,8 @@
 // Service Worker - Permite que el juego funcione sin internet (offline)
 // Estrategia: network-first para HTML (siempre busca actualizaciones), cache-first para el resto.
-// 20260502-120748 se reemplaza automáticamente en cada push con el timestamp UTC actual.
+// 20260502-123253 se reemplaza automáticamente en cada push con el timestamp UTC actual.
 // Esto significa: NO HAY QUE BUMPEAR LA VERSIÓN MANUALMENTE NUNCA MÁS.
-const BUILD_TIME = '20260502-120748'; // sustituido por sed en el push script
+const BUILD_TIME = '20260502-123253'; // sustituido por sed en el push script
 const CACHE_NAME = 'aventura-espacial-' + BUILD_TIME;
 const urlsToCache = [
   './',
@@ -12,7 +12,9 @@ const urlsToCache = [
   './icon-512.png',
   './avatar-emmanuel.jpg',
   './avatar-emiliano.jpg',
-  './foto-hermanos.jpg'
+  './foto-hermanos.jpg',
+  './data/dictionary-extra.json',
+  './data/encyclopedia.json'
 ];
 
 self.addEventListener('install', event => {
