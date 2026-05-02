@@ -172,7 +172,9 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 @keyframes c4Win{0%,100%{transform:scale(1)}50%{transform:scale(1.15);outline-color:#ffd700}}
 /* 2048 */
 .g2048-board{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:#3a2860;padding:10px;border-radius:14px;margin:14px auto;width:min(90vw,400px);aspect-ratio:1;box-shadow:0 0 20px rgba(156,39,176,.4)}
-.g2048-cell{background:rgba(255,255,255,.08);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:clamp(18px,5vw,32px);font-weight:bold;color:#fff;transition:all .15s}
+.g2048-cell{background:rgba(255,255,255,.08);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:clamp(18px,5vw,32px);font-weight:bold;color:#fff;transition:background .2s,color .2s,font-size .2s,box-shadow .2s,transform .15s cubic-bezier(.34,1.56,.64,1)}
+.g2048-cell.merged{animation:g2048Merge .25s ease-out}
+@keyframes g2048Merge{0%{transform:scale(1)}50%{transform:scale(1.18);box-shadow:0 0 20px currentColor}100%{transform:scale(1)}}
 .g2048-cell[data-v="2"]{background:#eee4da;color:#776e65}
 .g2048-cell[data-v="4"]{background:#ede0c8;color:#776e65}
 .g2048-cell[data-v="8"]{background:#f2b179;color:#fff}
@@ -2905,11 +2907,11 @@ function c4Drop(col){
 }
 function c4PCMove(){
   if(c4Done)return;
-  // Heurística: 1) ganar si puedo, 2) bloquear si humano gana, 3) preferir centro
+  // IA con minimax + alpha-beta pruning (depth 5). Mucho más fuerte que heurística simple.
   let move=c4FindWinMove(c4Board,'y');
   if(move<0)move=c4FindWinMove(c4Board,'r');
+  if(move<0)move=c4Minimax(c4Board,5);
   if(move<0){
-    // Prefiere columnas centrales
     const order=[3,2,4,1,5,0,6];
     for(const c of order){if(c4LowestEmpty(c4Board,c)>=0){move=c;break}}
   }
@@ -2922,6 +2924,67 @@ function c4PCMove(){
   if(c4Full(c4Board)){c4End('draw');return}
   c4Turn='r';
   document.getElementById('c4Status').textContent='Tu turno 🔴';
+}
+// Evalúa una posición. Positivo = bueno para PC (y), negativo = bueno para humano (r).
+function c4Score(b){
+  let score=0;
+  // Cada ventana de 4 casillas en cualquier dirección
+  for(let r=0;r<C4_R;r++)for(let c=0;c<C4_C;c++){
+    [[0,1],[1,0],[1,1],[1,-1]].forEach(([dr,dc])=>{
+      let y=0,red=0,empty=0;
+      for(let k=0;k<4;k++){
+        const nr=r+dr*k,nc=c+dc*k;
+        if(nr<0||nr>=C4_R||nc<0||nc>=C4_C)return;
+        if(b[nr][nc]==='y')y++;
+        else if(b[nr][nc]==='r')red++;
+        else empty++;
+      }
+      // Solo cuenta si solo hay un tipo de pieza en la ventana (la otra puede llenarla)
+      if(y===4)score+=10000;
+      else if(red===4)score-=10000;
+      else if(y===3&&empty===1)score+=50;
+      else if(y===2&&empty===2)score+=10;
+      else if(red===3&&empty===1)score-=80; // bloqueamos más agresivo
+      else if(red===2&&empty===2)score-=10;
+    });
+  }
+  // Bonificación por casillas centrales
+  for(let r=0;r<C4_R;r++)if(b[r][3]==='y')score+=4;else if(b[r][3]==='r')score-=4;
+  return score;
+}
+function c4Minimax(b,depth,alpha=-Infinity,beta=Infinity,maximizing=true){
+  // Si la profundidad es 0 o el tablero está lleno, evaluamos
+  if(depth===0||c4Full(b))return depth===5?-1:c4Score(b);
+  const order=[3,2,4,1,5,0,6];
+  let bestMove=-1;
+  if(maximizing){
+    let maxVal=-Infinity;
+    for(const c of order){
+      const r=c4LowestEmpty(b,c);if(r<0)continue;
+      b[r][c]='y';
+      // Si esta jugada gana, no hace falta seguir explorando
+      if(c4CheckWin(b,r,c,'y',false)){b[r][c]=0;return depth===5?c:100000+depth}
+      const val=c4Minimax(b,depth-1,alpha,beta,false);
+      b[r][c]=0;
+      if(val>maxVal){maxVal=val;bestMove=c}
+      alpha=Math.max(alpha,val);
+      if(beta<=alpha)break;
+    }
+    return depth===5?bestMove:maxVal;
+  }else{
+    let minVal=Infinity;
+    for(const c of order){
+      const r=c4LowestEmpty(b,c);if(r<0)continue;
+      b[r][c]='r';
+      if(c4CheckWin(b,r,c,'r',false)){b[r][c]=0;return -100000-depth}
+      const val=c4Minimax(b,depth-1,alpha,beta,true);
+      b[r][c]=0;
+      if(val<minVal){minVal=val;bestMove=c}
+      beta=Math.min(beta,val);
+      if(beta<=alpha)break;
+    }
+    return minVal;
+  }
 }
 function c4LowestEmpty(b,col){for(let r=C4_R-1;r>=0;r--)if(b[r][col]===0)return r;return -1}
 function c4Full(b){for(let c=0;c<C4_C;c++)if(c4LowestEmpty(b,c)>=0)return false;return true}
@@ -3334,21 +3397,109 @@ function chessMove(sr,sc,r,c){
     }
   }
 }
-function chessAI(){
-  if(chessDone||game.screen!=='chess')return;
-  const moves=[];
+// Valor de cada pieza para minimax (mayúsculas = blancas, minúsculas = negras)
+const CHESS_VAL={p:1,n:3,b:3,r:5,q:9,k:1000,P:1,N:3,B:3,R:5,Q:9,K:1000};
+function chessEval(b){
+  // Score positivo = mejor para negras (PC), negativo = mejor para blancas (humano)
+  let score=0;
   for(let r=0;r<8;r++)for(let c=0;c<8;c++){
-    if(!chessIsBlack(chessBoard[r][c]))continue;
-    for(let dr=0;dr<8;dr++)for(let dc=0;dc<8;dc++){
-      if(chessValidMove(r,c,dr,dc))moves.push([r,c,dr,dc]);
+    const p=b[r][c];if(p===' ')continue;
+    const v=CHESS_VAL[p]||0;
+    if(p>='a'&&p<='z')score+=v; // negras = PC
+    else score-=v;
+    // Bonus por desarrollar piezas hacia el centro
+    if(p.toLowerCase()!=='k'&&p.toLowerCase()!=='p'){
+      const center=Math.abs(r-3.5)+Math.abs(c-3.5);
+      if(p>='a'&&p<='z')score+=0.1*(7-center);
+      else score-=0.1*(7-center);
     }
   }
-  if(!moves.length){chessDone=true;document.getElementById('chess-turn').textContent='🤝 Empate (PC sin movimientos)';return}
-  let pick=moves.find(m=>chessBoard[m[2]][m[3]].toLowerCase()==='k');
-  if(!pick){
-    const captures=moves.filter(m=>chessBoard[m[2]][m[3]]!==' ');
-    pick=captures.length?captures[Math.floor(Math.random()*captures.length)]:moves[Math.floor(Math.random()*moves.length)];
+  return score;
+}
+function chessAllMoves(b,forBlack){
+  const moves=[];
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const p=b[r][c];if(p===' ')continue;
+    if(forBlack&&!(p>='a'&&p<='z'))continue;
+    if(!forBlack&&!(p>='A'&&p<='Z'))continue;
+    for(let dr=0;dr<8;dr++)for(let dc=0;dc<8;dc++){
+      if(chessValidMoveOn(b,r,c,dr,dc))moves.push([r,c,dr,dc]);
+    }
   }
+  return moves;
+}
+function chessValidMoveOn(b,sr,sc,r,c){
+  // Versión de chessValidMove que opera sobre un tablero arbitrario b
+  const orig=chessBoard;chessBoard=b;
+  const result=chessValidMove(sr,sc,r,c);
+  chessBoard=orig;
+  return result;
+}
+function chessMinimax(b,depth,alpha,beta,maximizing){
+  if(depth===0)return chessEval(b);
+  const moves=chessAllMoves(b,maximizing);
+  if(!moves.length)return chessEval(b);
+  // Ordena: primero capturas (alpha-beta funciona mejor)
+  moves.sort((a,bb)=>{
+    const ca=b[a[2]][a[3]]!==' '?1:0;
+    const cb=b[bb[2]][bb[3]]!==' '?1:0;
+    return cb-ca;
+  });
+  if(maximizing){
+    let maxEval=-Infinity;
+    for(const[sr,sc,tr,tc] of moves){
+      const captured=b[tr][tc];
+      const piece=b[sr][sc];
+      // Si capturas el rey, gana inmediato
+      if(captured.toLowerCase()==='k')return 100000-depth;
+      b[tr][tc]=piece;b[sr][sc]=' ';
+      const evalScore=chessMinimax(b,depth-1,alpha,beta,false);
+      b[sr][sc]=piece;b[tr][tc]=captured;
+      maxEval=Math.max(maxEval,evalScore);
+      alpha=Math.max(alpha,evalScore);
+      if(beta<=alpha)break;
+    }
+    return maxEval;
+  }else{
+    let minEval=Infinity;
+    for(const[sr,sc,tr,tc] of moves){
+      const captured=b[tr][tc];
+      const piece=b[sr][sc];
+      if(captured.toLowerCase()==='k')return -100000+depth;
+      b[tr][tc]=piece;b[sr][sc]=' ';
+      const evalScore=chessMinimax(b,depth-1,alpha,beta,true);
+      b[sr][sc]=piece;b[tr][tc]=captured;
+      minEval=Math.min(minEval,evalScore);
+      beta=Math.min(beta,evalScore);
+      if(beta<=alpha)break;
+    }
+    return minEval;
+  }
+}
+function chessAI(){
+  if(chessDone||game.screen!=='chess')return;
+  const moves=chessAllMoves(chessBoard,true);
+  if(!moves.length){chessDone=true;document.getElementById('chess-turn').textContent='🤝 Empate (PC sin movimientos)';return}
+  // 1) Si puedes capturar al rey, hazlo
+  const winMove=moves.find(m=>chessBoard[m[2]][m[3]].toLowerCase()==='k');
+  if(winMove){
+    chessMove(winMove[0],winMove[1],winMove[2],winMove[3]);
+    if(!chessDone)chessTurn='w';
+    chessRender();return;
+  }
+  // 2) Minimax con depth 2 (la PC piensa: mi jugada → tu respuesta → mi mejor jugada)
+  let bestVal=-Infinity,bestMoves=[];
+  for(const[sr,sc,tr,tc] of moves){
+    const captured=chessBoard[tr][tc];
+    const piece=chessBoard[sr][sc];
+    chessBoard[tr][tc]=piece;chessBoard[sr][sc]=' ';
+    const val=chessMinimax(chessBoard,2,-Infinity,Infinity,false);
+    chessBoard[sr][sc]=piece;chessBoard[tr][tc]=captured;
+    if(val>bestVal){bestVal=val;bestMoves=[[sr,sc,tr,tc]]}
+    else if(val===bestVal)bestMoves.push([sr,sc,tr,tc]);
+  }
+  // Aleatorizamos entre las mejores para variedad
+  const pick=bestMoves[Math.floor(Math.random()*bestMoves.length)];
   chessMove(pick[0],pick[1],pick[2],pick[3]);
   if(!chessDone)chessTurn='w';
   chessRender();
@@ -3516,7 +3667,7 @@ function marioStart(){
 function marioLoadLevel(){
   const L=MARIO_LEVELS[marioLevel];
   marioWorld=L;
-  marioPlayer={x:30,y:MARIO_GROUND_Y-30,vx:0,vy:0,onGround:false,facing:1,invincible:0};
+  marioPlayer={x:30,y:MARIO_GROUND_Y-30,vx:0,vy:0,onGround:false,facing:1,invincible:0,doubleJumpAvail:false,doubleJumpUsed:false};
   marioCam={x:0};
   marioEnemies=L.enemies.map(e=>({...e,vx:.8,alive:true}));
   marioPickups=[];
@@ -3542,7 +3693,13 @@ function marioStep(){
   else p.vx*=0.82;
   if(Math.abs(p.vx)<.1)p.vx=0;
   // Salto con edge detection y altura variable
-  if(marioKeys.jumpEdge&&p.onGround){p.vy=-9.5;p.onGround=false;sndCoin()}
+  if(marioKeys.jumpEdge){
+    if(p.onGround){p.vy=-9.5;p.onGround=false;p.doubleJumpUsed=false;sndCoin()}
+    else if(p.doubleJumpAvail&&!p.doubleJumpUsed){
+      // Doble salto en el aire
+      p.vy=-8.5;p.doubleJumpUsed=true;sndCoin();
+    }
+  }
   if(!p.onGround&&p.vy<-3&&!marioKeys.jump)p.vy*=0.85;
   marioKeys.jumpEdge=0;
   // Gravedad
@@ -3593,7 +3750,13 @@ function marioStep(){
     if(Math.abs(p.x+12-pk.x)<14&&Math.abs(p.y+15-pk.y)<14){
       pk.taken=true;
       if(pk.kind==='coin'){marioScore+=10;sndCoin()}
-      else if(pk.kind==='star'){marioLives++;marioScore+=50;sndWin();toast('🌟 +1 vida!');confetti(20)}
+      else if(pk.kind==='star'){
+        marioLives++;marioScore+=50;sndWin();confetti(20);
+        // La estrella ahora también activa el doble salto durante 15 segundos
+        marioPlayer.doubleJumpAvail=true;
+        toast('🌟 +1 vida · Doble salto activado!');
+        setTimeout(()=>{if(marioPlayer)marioPlayer.doubleJumpAvail=false},15000);
+      }
       document.getElementById('marioScore').textContent=marioScore;
       document.getElementById('marioLives').textContent=marioLives;
     }
@@ -3864,13 +4027,13 @@ function marioDrawAstronaut(ctx,p){
   ctx.restore();
 }
 
-// ========== DINO RUNNER (paisaje atardecer + T-Rex verde grande) ==========
+// ========== DINO RUNNER (paisaje atardecer/noche + T-Rex con power-ups) ==========
 const DINO_W=900,DINO_H=320,DINO_GROUND=260;
-let dinoPlayer,dinoSpeed,dinoScore,dinoBest=0,dinoLoop=null,dinoObstacles=[],dinoSpawnT=0,dinoDone=false,dinoClouds=[],dinoGroundOffset=0,dinoMountains=[],dinoStars=[];
+let dinoPlayer,dinoSpeed,dinoScore,dinoBest=0,dinoLoop=null,dinoObstacles=[],dinoSpawnT=0,dinoDone=false,dinoClouds=[],dinoGroundOffset=0,dinoMountains=[],dinoStars=[],dinoPowerups=[],dinoPowerupSpawn=0;
 function dinoStart(){
   dinoBest=parseInt(localStorage.getItem('dino_best')||'0',10);
-  dinoPlayer={x:80,y:DINO_GROUND-66,vy:0,onGround:true,crouch:false};
-  dinoSpeed=5;dinoScore=0;dinoObstacles=[];dinoSpawnT=90;dinoDone=false;dinoGroundOffset=0;
+  dinoPlayer={x:80,y:DINO_GROUND-66,vy:0,onGround:true,crouch:false,shield:0};
+  dinoSpeed=5;dinoScore=0;dinoObstacles=[];dinoPowerups=[];dinoSpawnT=90;dinoPowerupSpawn=400;dinoDone=false;dinoGroundOffset=0;
   dinoClouds=[];
   for(let i=0;i<5;i++)dinoClouds.push({x:Math.random()*DINO_W,y:Math.random()*80+25,size:Math.random()*0.6+0.7});
   dinoMountains=[];
@@ -3926,13 +4089,12 @@ function dinoStep(){
     }
     dinoSpawnT=Math.max(36,Math.floor(95+Math.random()*70-dinoSpeed*3.5));
   }
-  // Mover y colisionar
+  // Mover y colisionar obstáculos
   for(let i=dinoObstacles.length-1;i>=0;i--){
     const o=dinoObstacles[i];
     o.x-=dinoSpeed;
     if(o.type==='bird'){o.frame=(o.frame+1)%30}
     if(o.x<-80){dinoObstacles.splice(i,1);continue}
-    // Hitbox del dino (más estrecha para fairness)
     const pw=p.crouch?56:38,ph=p.crouch?38:62;
     const px=p.x+6,py=p.y+4;
     let ow,oh,ox,oy;
@@ -3940,8 +4102,33 @@ function dinoStep(){
     else if(o.sz==='lg'){ow=32;oh=56;ox=o.x+2;oy=o.y+4}
     else if(o.sz==='group'){ow=52;oh=38;ox=o.x;oy=o.y+4}
     else{ow=20;oh=38;ox=o.x+2;oy=o.y+4}
-    if(px+pw>ox&&px<ox+ow&&py+ph>oy&&py<oy+oh){dinoFail();return}
+    if(px+pw>ox&&px<ox+ow&&py+ph>oy&&py<oy+oh){
+      // Si tiene escudo, lo consume y elimina obstáculo
+      if(p.shield>0){p.shield=0;dinoObstacles.splice(i,1);sndWin();confetti(15);continue}
+      dinoFail();return;
+    }
   }
+  // Spawn power-ups (escudo) cada cierto tiempo
+  if(--dinoPowerupSpawn<=0){
+    dinoPowerups.push({x:DINO_W,y:DINO_GROUND-100-Math.random()*40,frame:0});
+    dinoPowerupSpawn=600+Math.floor(Math.random()*400);
+  }
+  // Mover power-ups y detectar recogida
+  for(let i=dinoPowerups.length-1;i>=0;i--){
+    const pu=dinoPowerups[i];
+    pu.x-=dinoSpeed;pu.frame++;
+    if(pu.x<-30){dinoPowerups.splice(i,1);continue}
+    // Colisión con jugador
+    const dx=Math.abs((p.x+22)-(pu.x+12));
+    const dy=Math.abs((p.y+30)-(pu.y+12));
+    if(dx<25&&dy<25){
+      p.shield=600; // ~10 segundos a 60fps
+      dinoPowerups.splice(i,1);
+      sndWin();confetti(20);
+    }
+  }
+  // Decrementa escudo
+  if(p.shield>0)p.shield--;
   // Score y velocidad
   dinoScore++;
   if(dinoScore%180===0&&dinoSpeed<16){dinoSpeed+=0.5}
@@ -3977,12 +4164,23 @@ function dinoFail(){
 function dinoRender(){
   const c=document.getElementById('dino-canvas');if(!c)return;
   const ctx=c.getContext('2d');
-  // Cielo atardecer (degradado naranja-amarillo)
+  // Día / noche según puntuación: cada 200 puntos cambia
+  const finalScore=Math.floor(dinoScore/3);
+  const phase=Math.floor(finalScore/200)%4; // 0=día, 1=atardecer, 2=noche, 3=amanecer
   const sky=ctx.createLinearGradient(0,0,0,DINO_GROUND);
-  sky.addColorStop(0,'#ff7e5f');
-  sky.addColorStop(.4,'#feb47b');
-  sky.addColorStop(.75,'#ffcb6b');
-  sky.addColorStop(1,'#ffd194');
+  if(phase===0){
+    // Día: cielo azul
+    sky.addColorStop(0,'#64b5f6');sky.addColorStop(.5,'#90caf9');sky.addColorStop(1,'#ffd194');
+  }else if(phase===1){
+    // Atardecer (original)
+    sky.addColorStop(0,'#ff7e5f');sky.addColorStop(.4,'#feb47b');sky.addColorStop(.75,'#ffcb6b');sky.addColorStop(1,'#ffd194');
+  }else if(phase===2){
+    // Noche: cielo morado oscuro con estrellas
+    sky.addColorStop(0,'#0a0033');sky.addColorStop(.5,'#1a0066');sky.addColorStop(1,'#3a1f5e');
+  }else{
+    // Amanecer rosa
+    sky.addColorStop(0,'#ff9a8b');sky.addColorStop(.5,'#ffd6a5');sky.addColorStop(1,'#fff5cc');
+  }
   ctx.fillStyle=sky;ctx.fillRect(0,0,DINO_W,DINO_GROUND);
   // Sol con halo
   const sunX=DINO_W*0.78,sunY=80;
@@ -4043,12 +4241,41 @@ function dinoRender(){
     const x=((i*120-dinoGroundOffset*.7)%DINO_W+DINO_W)%DINO_W;
     ctx.beginPath();ctx.arc(x,DINO_GROUND+26+(i%2)*8,2.5,0,Math.PI*2);ctx.fill();
   }
-  // Dino
+  // Power-ups (escudo flotante con animación)
+  for(const pu of dinoPowerups){
+    const float=Math.sin(performance.now()/200+pu.x*0.05)*4;
+    const ry=pu.y+float;
+    // Halo
+    ctx.shadowColor='#00d4ff';ctx.shadowBlur=18;
+    ctx.fillStyle='rgba(0,212,255,.85)';
+    ctx.beginPath();ctx.arc(pu.x+12,ry+12,14,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+    // Símbolo escudo
+    ctx.fillStyle='#fff';ctx.font='bold 22px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('🛡️',pu.x+12,ry+13);
+    ctx.textAlign='left';ctx.textBaseline='alphabetic';
+  }
+  // Dino con halo si tiene escudo
+  if(dinoPlayer&&dinoPlayer.shield>0){
+    const haloPulse=1+Math.sin(performance.now()/200)*0.15;
+    ctx.shadowColor='#00d4ff';ctx.shadowBlur=30*haloPulse;
+    ctx.strokeStyle='rgba(0,212,255,.7)';ctx.lineWidth=3;
+    ctx.beginPath();ctx.ellipse(dinoPlayer.x+22,dinoPlayer.y+30,38,42,0,0,Math.PI*2);ctx.stroke();
+    ctx.shadowBlur=0;ctx.lineWidth=1;
+  }
   drawDino(ctx,dinoPlayer);
   // Obstáculos
   for(const o of dinoObstacles){
     if(o.type==='cactus')drawCactus(ctx,o);
     else drawBird(ctx,o);
+  }
+  // Indicador de escudo activo arriba a la izquierda
+  if(dinoPlayer&&dinoPlayer.shield>0){
+    const seconds=Math.ceil(dinoPlayer.shield/60);
+    ctx.fillStyle='rgba(0,212,255,.85)';
+    ctx.fillRect(15,15,80,28);
+    ctx.fillStyle='#fff';ctx.font='bold 15px sans-serif';
+    ctx.fillText('🛡️ '+seconds+'s',22,34);
   }
   // Score
   ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(DINO_W-220,12,200,32);
