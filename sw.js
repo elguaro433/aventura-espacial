@@ -1,6 +1,6 @@
 // Service Worker - Permite que el juego funcione sin internet (offline)
 // Estrategia: network-first para HTML (siempre busca actualizaciones), cache-first para el resto.
-const CACHE_NAME = 'aventura-espacial-v6';
+const CACHE_NAME = 'aventura-espacial-v7';
 const urlsToCache = [
   './',
   './index.html',

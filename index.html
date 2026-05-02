@@ -211,7 +211,7 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .chess-cell.move-hint{position:relative}
 .chess-cell.move-hint::after{content:'';position:absolute;width:30%;height:30%;background:rgba(76,175,80,.6);border-radius:50%}
 /* MARIO */
-#mario-canvas{display:block;margin:10px auto;background:linear-gradient(180deg,#1a0033 0%,#0a0020 100%);border:3px solid #ffd700;border-radius:8px;box-shadow:0 0 18px rgba(255,215,0,.4);max-width:95vw;height:auto;image-rendering:pixelated}
+#mario-canvas{display:block;margin:10px auto;background:radial-gradient(ellipse at 30% 30%,#3a1f5e,#1a0033 60%,#0a0020 100%);border:3px solid #ffd700;border-radius:8px;box-shadow:0 0 18px rgba(255,215,0,.4);max-width:95vw;height:auto}
 @media (max-width:480px){.galaxy-grid{grid-template-columns:repeat(2,1fr)}.player-card{width:45vw}.btn{padding:12px 18px;font-size:14px}.hud{font-size:12px}.tabs{font-size:11px}.tab{padding:8px 12px}}
 </style>
 </head>
@@ -2521,31 +2521,177 @@ function marioStep(){
   marioRender();
   marioLoop=requestAnimationFrame(marioStep);
 }
+function marioDrawAstronaut(ctx,x,y,facing,jumping,running){
+  const cx=x+12,cy=y+12;
+  ctx.save();
+  if(facing<0){ctx.translate(cx,0);ctx.scale(-1,1);ctx.translate(-cx,0)}
+  // mochila propulsora con llama si salta
+  if(jumping){
+    const flame=ctx.createLinearGradient(0,y+30,0,y+44);
+    flame.addColorStop(0,'#ff6b00');flame.addColorStop(.5,'#ffd700');flame.addColorStop(1,'rgba(255,215,0,0)');
+    ctx.fillStyle=flame;
+    ctx.beginPath();
+    ctx.moveTo(x+8,y+30);ctx.lineTo(x+12,y+44);ctx.lineTo(x+16,y+30);ctx.closePath();
+    ctx.fill();
+  }
+  // sombra inferior
+  if(!jumping){
+    ctx.fillStyle='rgba(0,0,0,.35)';
+    ctx.beginPath();ctx.ellipse(cx,y+34,9,2,0,0,Math.PI*2);ctx.fill();
+  }
+  // botas
+  ctx.fillStyle='#37474f';
+  ctx.fillRect(x+6,y+28,5,5);
+  ctx.fillRect(x+13,y+28,5,5);
+  // piernas
+  ctx.fillStyle='#eceff1';
+  ctx.fillRect(x+7,y+22,4,7);
+  ctx.fillRect(x+13,y+22,4,7);
+  // cuerpo (traje espacial)
+  const bodyGrad=ctx.createLinearGradient(x,y+12,x,y+24);
+  bodyGrad.addColorStop(0,'#ffffff');bodyGrad.addColorStop(1,'#cfd8dc');
+  ctx.fillStyle=bodyGrad;
+  ctx.fillRect(x+5,y+12,14,12);
+  // cinturón
+  ctx.fillStyle='#9e9e9e';
+  ctx.fillRect(x+5,y+19,14,2);
+  // logo del traje
+  ctx.fillStyle='#ff6b9d';
+  ctx.fillRect(x+10,y+15,4,3);
+  // brazos
+  ctx.fillStyle='#eceff1';
+  ctx.fillRect(x+1,y+13,4,8);
+  ctx.fillRect(x+19,y+13,4,8);
+  if(running){
+    // animación brazos
+    const swing=Math.sin(performance.now()/80)*2;
+    ctx.fillRect(x+19,y+13+swing,4,8);
+  }
+  // guantes
+  ctx.fillStyle='#1976d2';
+  ctx.fillRect(x+1,y+19,4,3);
+  ctx.fillRect(x+19,y+19,4,3);
+  // casco (esfera)
+  ctx.fillStyle='#f5f5f5';
+  ctx.beginPath();ctx.arc(cx,y+8,9,0,Math.PI*2);ctx.fill();
+  // visor del casco
+  const visor=ctx.createRadialGradient(cx-2,y+5,1,cx,y+8,7);
+  visor.addColorStop(0,'#80deea');visor.addColorStop(.7,'#0288d1');visor.addColorStop(1,'#01579b');
+  ctx.fillStyle=visor;
+  ctx.beginPath();ctx.arc(cx,y+8,6,0,Math.PI*2);ctx.fill();
+  // brillo del visor
+  ctx.fillStyle='rgba(255,255,255,.7)';
+  ctx.beginPath();ctx.arc(cx-2,y+5,1.8,0,Math.PI*2);ctx.fill();
+  // antena
+  ctx.fillStyle='#9e9e9e';
+  ctx.fillRect(x+18,y-2,1,4);
+  ctx.fillStyle='#f44336';
+  ctx.beginPath();ctx.arc(x+18.5,y-3,1.5,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+function marioDrawStar(ctx,cx,cy,size,phase){
+  const pulse=1+Math.sin(performance.now()/300+phase)*.08;
+  size*=pulse;
+  ctx.save();
+  ctx.shadowColor='#ffd700';ctx.shadowBlur=12;
+  ctx.fillStyle='#ffd700';
+  ctx.beginPath();
+  for(let i=0;i<5;i++){
+    const a1=-Math.PI/2+i*Math.PI*2/5;
+    const a2=a1+Math.PI/5;
+    const x1=cx+Math.cos(a1)*size,y1=cy+Math.sin(a1)*size;
+    const x2=cx+Math.cos(a2)*size*.45,y2=cy+Math.sin(a2)*size*.45;
+    if(i===0)ctx.moveTo(x1,y1);else ctx.lineTo(x1,y1);
+    ctx.lineTo(x2,y2);
+  }
+  ctx.closePath();ctx.fill();
+  ctx.shadowBlur=0;
+  // brillo central
+  ctx.fillStyle='rgba(255,255,255,.7)';
+  ctx.beginPath();ctx.arc(cx-size*.2,cy-size*.2,size*.18,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+function marioDrawFlag(ctx,x,y){
+  // base
+  ctx.fillStyle='#5d4037';
+  ctx.fillRect(x-4,y+30,12,4);
+  // asta
+  const poleGrad=ctx.createLinearGradient(x,y,x+2,y);
+  poleGrad.addColorStop(0,'#bdbdbd');poleGrad.addColorStop(.5,'#fff');poleGrad.addColorStop(1,'#9e9e9e');
+  ctx.fillStyle=poleGrad;
+  ctx.fillRect(x,y-4,2,38);
+  // pomo
+  ctx.fillStyle='#ffd700';
+  ctx.beginPath();ctx.arc(x+1,y-5,2.5,0,Math.PI*2);ctx.fill();
+  // tela ondeada
+  const wave=Math.sin(performance.now()/200)*2;
+  ctx.fillStyle='#f44336';
+  ctx.beginPath();
+  ctx.moveTo(x+2,y);
+  ctx.lineTo(x+24+wave,y+3);
+  ctx.lineTo(x+22,y+8);
+  ctx.lineTo(x+24+wave,y+13);
+  ctx.lineTo(x+2,y+12);
+  ctx.closePath();ctx.fill();
+  // detalle
+  ctx.fillStyle='#fff';
+  ctx.font='bold 8px sans-serif';
+  ctx.fillText('★',x+8,y+9);
+}
+function marioDrawPlatform(ctx,p){
+  const grad=ctx.createLinearGradient(p.x,p.y,p.x,p.y+p.h);
+  grad.addColorStop(0,'#ce93d8');
+  grad.addColorStop(.25,'#ab47bc');
+  grad.addColorStop(.7,'#7b1fa2');
+  grad.addColorStop(1,'#4a148c');
+  ctx.fillStyle=grad;
+  ctx.fillRect(p.x,p.y,p.w,p.h);
+  // brillo dorado superior
+  const top=ctx.createLinearGradient(0,p.y,0,p.y+5);
+  top.addColorStop(0,'#ffea00');top.addColorStop(1,'rgba(255,215,0,.4)');
+  ctx.fillStyle=top;
+  ctx.fillRect(p.x,p.y,p.w,4);
+  // sombra inferior
+  ctx.fillStyle='rgba(0,0,0,.4)';
+  ctx.fillRect(p.x,p.y+p.h-3,p.w,3);
+  // remaches a los lados
+  ctx.fillStyle='rgba(255,215,0,.6)';
+  for(let i=8;i<p.w-4;i+=18){
+    ctx.beginPath();ctx.arc(p.x+i,p.y+p.h/2,1.5,0,Math.PI*2);ctx.fill();
+  }
+}
 function marioRender(){
   const c=document.getElementById('mario-canvas');if(!c)return;
   const ctx=c.getContext('2d');
-  ctx.fillStyle='#0a0020';ctx.fillRect(0,0,MARIO_W,MARIO_H);
-  // stars background
-  ctx.fillStyle='#fff';
-  for(const s of marioStars){ctx.fillRect(s.x,s.y,s.s,s.s)}
+  // bg con nebulosa
+  const bg=ctx.createRadialGradient(MARIO_W*.3,MARIO_H*.3,30,MARIO_W*.5,MARIO_H*.5,MARIO_W);
+  bg.addColorStop(0,'#3a1f5e');bg.addColorStop(.5,'#1a0033');bg.addColorStop(1,'#0a0020');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,MARIO_W,MARIO_H);
+  // estrellas titilantes
+  for(const s of marioStars){
+    const tw=.5+Math.sin(performance.now()/500+s.x)*.5;
+    ctx.fillStyle=`rgba(255,255,255,${tw})`;
+    ctx.fillRect(s.x,s.y,s.s,s.s);
+  }
+  // planeta decorativo lejano
+  const px=MARIO_W*.85,py=MARIO_H*.18;
+  const pgrad=ctx.createRadialGradient(px-6,py-6,2,px,py,18);
+  pgrad.addColorStop(0,'#ff8a65');pgrad.addColorStop(1,'#bf360c');
+  ctx.fillStyle=pgrad;
+  ctx.beginPath();ctx.arc(px,py,16,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(255,165,0,.3)';
+  ctx.beginPath();ctx.ellipse(px,py,28,5,-.3,0,Math.PI*2);ctx.fill();
   // platforms
   const L=MARIO_LEVELS[marioLevel];
-  for(const p of L.platforms){
-    ctx.fillStyle='#9c27b0';ctx.fillRect(p.x,p.y,p.w,p.h);
-    ctx.fillStyle='#ffd700';ctx.fillRect(p.x,p.y,p.w,3);
-  }
-  // coins
-  ctx.font='18px sans-serif';ctx.textBaseline='middle';
-  L.coins.forEach((co,i)=>{if(!marioCoinsGot[i])ctx.fillText('⭐',co.x-9,co.y)});
+  for(const p of L.platforms)marioDrawPlatform(ctx,p);
+  // coins (estrellas)
+  L.coins.forEach((co,i)=>{if(!marioCoinsGot[i])marioDrawStar(ctx,co.x,co.y,9,i)});
   // goal
-  ctx.font='24px sans-serif';ctx.fillText('🏁',L.goal.x-12,L.goal.y);
+  marioDrawFlag(ctx,L.goal.x,L.goal.y);
   // player
-  ctx.font='22px sans-serif';
-  const emoji=marioPlayer.vy<-2?'🚀':(marioPlayer.onGround?'🧑‍🚀':'🧑‍🚀');
-  ctx.save();
-  if(marioPlayer.facing<0){ctx.translate(marioPlayer.x+11,marioPlayer.y+12);ctx.scale(-1,1);ctx.fillText(emoji,-11,0)}
-  else{ctx.fillText(emoji,marioPlayer.x-1,marioPlayer.y+12)}
-  ctx.restore();
+  const running=Math.abs(marioPlayer.vx)>1&&marioPlayer.onGround;
+  const jumping=!marioPlayer.onGround&&marioPlayer.vy<0;
+  marioDrawAstronaut(ctx,marioPlayer.x,marioPlayer.y,marioPlayer.facing,jumping,running);
 }
 function marioNextLevel(){
   sndWin();confetti(30);
