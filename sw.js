@@ -1,12 +1,15 @@
 // Service Worker - Permite que el juego funcione sin internet (offline)
 // Estrategia: network-first para HTML (siempre busca actualizaciones), cache-first para el resto.
-const CACHE_NAME = 'aventura-espacial-v3';
+const CACHE_NAME = 'aventura-espacial-v4';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  './avatar-emmanuel.jpg',
+  './avatar-emiliano.jpg',
+  './foto-hermanos.jpg'
 ];
 
 self.addEventListener('install', event => {
