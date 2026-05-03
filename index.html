@@ -1575,10 +1575,63 @@ const MATH_EXPLANATIONS = {
   'Un rectángulo mide 8 × 5 cm. ¿Área?':'Área de rectángulo = base × altura. 8×5 = 40 cm². Las unidades son cm² porque medimos superficie.',
   '¿Cuánto es 25% de 80?':'25% es lo mismo que 1/4. 80÷4 = 20. ¡El 25% siempre es la cuarta parte!'
 };
-// Asigna q.explanation desde el diccionario si la pregunta no la trae ya inline
+// Explicaciones adicionales (idiomas + lógica) — generadas con auditoría pedagógica
+const EXTRA_EXPLANATIONS = {
+  '¿Cómo se dice ROJO en francés?':'"Rouge" suena como "ruge" el león rojo de furia.',
+  '¿Cómo se dice NEGRO en francés?':'"Noir" se parece a "noche", y la noche es negra.',
+  '¿"Chat" significa?':'"Chat" (se pronuncia "sha") = gato. El gato dice "shhh" cuando caza.',
+  '¿"Chien" significa?':'"Chien" (se pronuncia "shien") = perro. Suena parecido a "can" en español antiguo.',
+  '¿"Bonjour" significa?':'Truco: "Bon" = bueno y "jour" = día. ¡Buen día = Hola!',
+  '¿"Merci" significa?':'"Merci" = Gracias. Suena como "merece", y las gracias se las merece quien ayuda.',
+  '¿"Au revoir" significa?':'"Au revoir" = Adiós (literalmente "hasta volver a ver"). "voir" = ver.',
+  'Femenino de "petit":':'Regla: el femenino añade -E al masculino. petit → petite.',
+  'Plural de "le chat":':'En francés, plural de "le" es "les" y se añade -S: les chats. La -S no se pronuncia.',
+  '¿Quién escribió "Le Petit Prince"?':'Antoine de Saint-Exupéry, piloto y escritor francés.',
+  '¿Cuál se escribe con H al inicio?':'"Hiena" lleva H muda. Truco: muchas palabras con "hie-" llevan H (hierba, hielo).',
+  '"Mañana vamos a esquiar a Pal-Arinsal." ¿Qué tiempo es "vamos a esquiar"?':'"Ir a + infinitivo" = futuro próximo. "Vamos a esquiar" = esquiaremos.',
+  '"Mi casa ___ en La Massana, en Andorra."':'Verbo ESTAR para LUGAR. Dónde estás → estar.',
+  '"Los Pirineos ___ montañas muy altas."':'Verbo SER para identificar QUÉ es algo. "Son montañas".',
+  '"Cuando ___ pequeño, jugaba en la nieve."':'Imperfecto: acción habitual del pasado. Yo era, tú eras, él era.',
+  'Plural correcto de "el esquí":':'Palabras agudas con tilde mantienen tilde en plural: esquí → esquíes.',
+  '"Los niños ___ a casa después de esquiar."':'Verbo VOLVER en presente: yo vuelvo, tú vuelves, ellos VUELVEN.',
+  '¿"Red" significa?':'Red = Rojo. Color de la sangre y los tomates.',
+  '¿"Mouse" significa?':'Mouse = ratón. Plural irregular: mice (no mouses).',
+  '¿"Sheep" significa?':'Sheep = oveja. Plural irregular igual en singular y plural.',
+  '¿Pasado de "go"?':'Verbo irregular: go → went → gone. NO se dice "goed".',
+  '¿Pasado de "eat"?':'Verbo irregular: eat → ate → eaten. "I ate pizza yesterday".',
+  'Comparativo de "big":':'Adjetivos cortos: doblan consonante + "er". Big → bigger.',
+  'Superlativo de "good":':'Irregular: Good → better → best.',
+  'Plural de "child":':'Plural irregular: child → children (no "childs").',
+  '¿Cuál es el participio pasado de "see"?':'See → saw → seen.',
+  'How do you say "Vivo en Andorra" in English?':'Present simple: I LIVE (sin -s para "I"). Solo se añade -s con he/she/it.',
+  'Complete: "Andorra is ___ France and Spain."':'"Between" = entre DOS cosas. "Among" = entre MUCHAS.',
+  'Which is the British spelling?':'Inglés británico: COLOUR (con U). Americano: COLOR (sin U).',
+  'How do you say "cohete" in English?':'Rocket = cohete. No confundir con "racket" (raqueta).',
+  'Complete: "I ___ never been to the Moon."':'Present perfect: HAVE + participio (been).',
+  '¿"Vermell" en català significa?':'Vermell = rojo. Parece a "bermellón", un tipo de rojo intenso.',
+  '¿"Bon dia" en català significa?':'Bon dia = Buenos días. (bon = bueno, dia = día).',
+  '¿Cuál es correcta? (enviar)':'Regla catalana especial: N antes de V (no M como en castellano). "eNviar".',
+  '¿Cuál es correcta? (cambiar al català)':'En catalán "cambiar" se dice "canviar" con N. Regla: N antes de V en catalán.',
+  '¿Cómo se escribe "carro" (vehículo) en català?':'RR entre vocales suena fuerte: "carro". Una R sola entre vocales suena suave.',
+  '¿Cuál es correcta? (mare = madre, en català)':'"Mare" = madre. Una sola R porque suena suave entre vocales.',
+  'Com s\'apostrofa correctament davant "escola"?':'Davant vocal o H, "la" → "l\'": l\'escola, l\'hora.',
+  'Quantes parròquies té Andorra?':'Andorra té 7 parròquies: Canillo, Encamp, Ordino, La Massana, Andorra la Vella, Sant Julià, Escaldes-Engordany.',
+  'El trinxat és un plat típic fet principalment amb...':'Trinxat = plat de muntanya amb COL i PATATA aixafades, sovint amb cansalada.',
+  'Quin riu travessa bona part d\'Andorra?':'La Valira és el riu principal d\'Andorra.',
+  'En quina parròquia està Caldea (aigües termals)?':'Caldea està a Escaldes-Engordany. "Escaldes" ja indica aigües calentes!',
+  // Lógica
+  'Tres pájaros en un cable. Un cazador dispara y mata uno. ¿Cuántos quedan?':'Truco: al disparar, los otros 2 vuelan asustados. Quedan 0 pájaros (solo el muerto).',
+  '¿Cuántos meses tienen 28 días?':'TODOS los meses tienen al menos 28 días. Algunos tienen más, pero los 12 tienen 28 mínimo.',
+  '¿Qué pesa más: 1 kg de plumas o 1 kg de hierro?':'Pesan IGUAL. 1 kg = 1 kg, no importa qué material. La trampa es pensar en densidad.',
+  'Si en una caja hay 6 manzanas y sacas 4, ¿cuántas tienes tú?':'Tienes 4 (las que sacaste). En la caja quedan 2.',
+  'Vas al norte, giras a la derecha, luego al sur, luego a la derecha. ¿Hacia dónde miras?':'Norte→derecha=Este. Sur→derecha=Oeste. Final: miras al Oeste.'
+};
+
+// Asigna q.explanation desde los diccionarios si la pregunta no la trae ya inline
 function attachExplanation(q){
   if(!q||q.explanation)return q;
   if(MATH_EXPLANATIONS[q.q])q.explanation=MATH_EXPLANATIONS[q.q];
+  else if(EXTRA_EXPLANATIONS[q.q])q.explanation=EXTRA_EXPLANATIONS[q.q];
   return q;
 }
 
@@ -2497,21 +2550,26 @@ const ACHIEVEMENTS=[
 ];
 
 // Shop
+// Items con `effect` activan habilidades en gameplay (consumibles o permanentes).
+// effect: 'extraLife' | 'shield' | 'doubleXP' | 'freeHint' | 'megaCoin' | null (cosmético)
 const SHOP=[
-{id:'helmet1',emoji:'⛑️',name:'Casco básico',price:50},
-{id:'helmet2',emoji:'🪖',name:'Casco avanzado',price:120},
-{id:'ship1',emoji:'🚀',name:'Nave estándar',price:100},
-{id:'ship2',emoji:'🛸',name:'Nave alien',price:200},
-{id:'pet1',emoji:'👽',name:'Mascota alien',price:80},
-{id:'pet2',emoji:'🐉',name:'Dragón cósmico',price:250},
-{id:'shield',emoji:'🛡️',name:'Escudo galáctico',price:150},
-{id:'cape',emoji:'🦸',name:'Capa de héroe',price:130},
-{id:'medal',emoji:'🏅',name:'Medalla de oro',price:300},
-{id:'crown',emoji:'👑',name:'Corona estelar',price:400},
-{id:'dragon',emoji:'🟠',name:'Bola de Dragón',price:175},
-{id:'pickaxe',emoji:'⛏️',name:'Pico de Diamante',price:175},
-{id:'mushroom',emoji:'🍄',name:'Champiñón Mario',price:125},
-{id:'fireball',emoji:'🔥',name:'Bola de Fuego',price:140}
+// === COSMÉTICOS (aparecen como medallas en perfil) ===
+{id:'helmet1',emoji:'⛑️',name:'Casco básico',price:50,desc:'Cosmético'},
+{id:'helmet2',emoji:'🪖',name:'Casco avanzado',price:120,desc:'Cosmético'},
+{id:'ship1',emoji:'🚀',name:'Nave estándar',price:100,desc:'Cosmético'},
+{id:'ship2',emoji:'🛸',name:'Nave alien',price:200,desc:'Cosmético'},
+{id:'pet1',emoji:'👽',name:'Mascota alien',price:80,desc:'Cosmético'},
+{id:'pet2',emoji:'🐉',name:'Dragón cósmico',price:250,desc:'Cosmético'},
+{id:'cape',emoji:'🦸',name:'Capa de héroe',price:130,desc:'Cosmético'},
+{id:'medal',emoji:'🏅',name:'Medalla de oro',price:300,desc:'Cosmético · prestigio'},
+{id:'crown',emoji:'👑',name:'Corona estelar',price:400,desc:'Cosmético · prestigio'},
+// === ITEMS CON EFECTO EN GAMEPLAY (consumibles o permanentes) ===
+{id:'shield',emoji:'🛡️',name:'Escudo galáctico',price:150,effect:'extraLife',desc:'+1 vida extra al iniciar cada planeta (permanente)'},
+{id:'dragon',emoji:'🟠',name:'Bola de Dragón',price:175,effect:'reviveOnce',desc:'Te salva del PRIMER fallo en cada planeta (permanente)'},
+{id:'mushroom',emoji:'🍄',name:'Champiñón Mario',price:125,effect:'doubleXP',desc:'Doble XP durante 24h tras comprarlo (consumible)'},
+{id:'fireball',emoji:'🔥',name:'Bola de Fuego',price:100,effect:'freeHint',desc:'Próximas 3 pistas son GRATIS (consumible)'},
+{id:'pickaxe',emoji:'⛏️',name:'Pico de Diamante',price:175,effect:'megaCoin',desc:'Doble monedas en planetas durante 24h (consumible)'},
+{id:'star',emoji:'⭐',name:'Estrella Cósmica',price:500,effect:'comboBonus',desc:'+1 XP extra por cada acierto seguido (permanente)'}
 ];
 
 // ========== AVATARS ==========
@@ -2726,6 +2784,108 @@ function choosePlayer(p){
 function getPlayer(){return state[state.currentPlayer]}
 function isYoung(){return state.currentPlayer==='emiliano'}
 
+// ===== Helpers semana ISO + tracking =====
+function getWeekKey(){
+  // YYYY-Wxx (semana ISO) — todos los días de la misma semana caen en el mismo key
+  const d=new Date();
+  const onejan=new Date(d.getFullYear(),0,1);
+  const week=Math.ceil((((d-onejan)/86400000)+onejan.getDay()+1)/7);
+  return d.getFullYear()+'-W'+week;
+}
+function isWeekend(){
+  const day=new Date().getDay();
+  return day===0||day===6; // domingo o sábado
+}
+// Llamar al responder: actualiza tracking semanal por área (galaxia)
+function trackWeeklyAnswer(galId,correct){
+  const p=getPlayer();if(!p)return;
+  if(!p.weekly||p.weekly.weekKey!==getWeekKey()){
+    p.weekly={weekKey:getWeekKey(),byGalaxy:{},badges:[]};
+  }
+  if(!p.weekly.byGalaxy[galId])p.weekly.byGalaxy[galId]={correct:0,total:0};
+  p.weekly.byGalaxy[galId].total++;
+  if(correct)p.weekly.byGalaxy[galId].correct++;
+}
+// Calcula badges (≥10 respuestas Y ≥80% aciertos esa semana en una galaxia)
+function computeWeeklyBadges(){
+  const p=getPlayer();if(!p||!p.weekly)return;
+  if(p.weekly.weekKey!==getWeekKey())return; // semana cambió, badges del día se re-evalúan al jugar
+  const newBadges=[];
+  GALAXIES.forEach(g=>{
+    const data=p.weekly.byGalaxy[g.id];
+    if(!data||data.total<10)return;
+    const acc=data.correct/data.total;
+    if(acc>=0.8){
+      newBadges.push(g.id);
+      if(!p.weekly.badges.includes(g.id)){
+        p.weekly.badges.push(g.id);
+        toast('🎖️ ¡Nueva insignia semanal! Maestro de '+g.name.replace('Galaxia ',''),3500);
+        confetti(30);
+      }
+    }
+  });
+}
+// Render banner de badges + estatus
+function renderBadgesBanner(){
+  const old=document.getElementById('weeklyBadgesBanner');if(old)old.remove();
+  const p=getPlayer();if(!p||!p.weekly||p.weekly.weekKey!==getWeekKey())return;
+  const badges=p.weekly.badges||[];
+  if(!badges.length)return;
+  const banner=document.createElement('div');
+  banner.id='weeklyBadgesBanner';
+  banner.style.cssText='margin:10px auto;padding:10px 16px;background:linear-gradient(135deg,rgba(255,215,0,.18),rgba(156,39,176,.12));border:2px solid #ffd700;border-radius:14px;text-align:center;max-width:560px;font-size:13px;box-shadow:0 0 18px rgba(255,215,0,.3)';
+  const labels=badges.map(bid=>{
+    const g=GALAXIES.find(x=>x.id===bid);
+    return g?'<span style="display:inline-block;margin:2px 6px;padding:4px 10px;background:rgba(255,215,0,.3);border-radius:18px;color:#ffd700;font-weight:bold">'+g.emoji+' Maestro de '+g.name.replace('Galaxia ','')+'</span>':'';
+  }).join('');
+  banner.innerHTML='🎖️ <b>Insignias de esta semana:</b><br>'+labels;
+  const grid=document.getElementById('galaxyGrid');
+  if(grid&&grid.parentNode)grid.parentNode.insertBefore(banner,grid);
+}
+// Renderizar evento fin de semana (sábado/domingo): planeta especial XP doble
+function renderWeekendEvent(){
+  const old=document.getElementById('weekendEventBanner');if(old)old.remove();
+  if(!isWeekend())return;
+  const banner=document.createElement('div');
+  banner.id='weekendEventBanner';
+  banner.style.cssText='margin:10px auto;padding:14px 18px;background:linear-gradient(135deg,#7b1fa2,#4a148c);border:3px solid #ffd700;border-radius:16px;text-align:center;max-width:560px;font-size:14px;cursor:pointer;animation:pulse 2s infinite;box-shadow:0 0 24px rgba(156,39,176,.6)';
+  banner.innerHTML='🌟 <b>¡EVENTO DE FIN DE SEMANA!</b> 🌟<br>Planeta secreto con preguntas mezcladas + <b>DOBLE XP</b><br><span style="font-size:11px;opacity:.85">Toca para entrar</span>';
+  banner.onclick=startSecretPlanet;
+  const grid=document.getElementById('galaxyGrid');
+  if(grid&&grid.parentNode)grid.parentNode.insertBefore(banner,grid);
+}
+// Planeta secreto: 10 preguntas mezcladas de TODAS las galaxias, con doble XP temporal
+function startSecretPlanet(){
+  const p=getPlayer();
+  // Mezclar 10 preguntas aleatorias de cualquier galaxia
+  let pool=[];
+  GALAXIES.forEach(g=>{
+    for(let i=0;i<g.planets.length;i++){
+      const node=QUESTIONS[g.id]&&QUESTIONS[g.id][i];
+      if(node)pool=pool.concat(Array.isArray(node)?node:(node.pool||[]));
+    }
+  });
+  // Filtrar por edad
+  const grade=gradeOf(state.currentPlayer);
+  const gIdx=gradeIndex(grade);
+  const eff=q=>q.level||(q.easy?'ce1':null);
+  pool=pool.filter(q=>{const lvl=eff(q);return !lvl||Math.abs(gradeIndex(lvl)-gIdx)<=2});
+  if(pool.length<10){toast('Pocas preguntas disponibles');return}
+  pool=pool.sort(()=>Math.random()-.5).slice(0,10);
+  // Activa doble XP durante el planeta secreto (1 hora extra de regalo)
+  p.doubleXPUntil=Math.max(p.doubleXPUntil||0,Date.now()+3600*1000);
+  toast('🌟 ¡Doble XP activado 1h por el evento!',3000);
+  // Setup como planeta especial — usamos la galaxia 0 como contenedor lógico
+  game.galaxy=0;game.planet=0;
+  game.qIdx=0;game.lives=3+(hasItem('shield')?1:0);
+  game.correct=0;game.wrong=[];game.qPool=pool;game.hintsUsed=0;
+  game.dragonBallReady=hasItem('dragon');
+  // Cabecera especial
+  show('question');
+  setTimeout(()=>{const planetEl=document.getElementById('qPlanet');if(planetEl)planetEl.textContent='🌟 Planeta Secreto · Doble XP'},50);
+  renderQuestion();
+}
+
 function renderMap(){
   const p=getPlayer();
   document.getElementById('hudName').textContent=state.currentPlayer==='emmanuel'?'Emmanuel ⚡':'Emiliano ⛏️';
@@ -2752,6 +2912,13 @@ function renderMap(){
     document.getElementById('xpFill').style.width='100%';
     document.getElementById('xpText').textContent=`${lvl.name} · NIVEL MÁXIMO (${p.xp} XP)`;
   }
+  // ===== BADGES SEMANALES por dominio de área =====
+  // Detecta semana actual (ISO) y galaxias en las que tiene ≥80% aciertos esa semana
+  computeWeeklyBadges();
+  renderBadgesBanner();
+  // ===== EVENTO DE FIN DE SEMANA: planeta secreto con XP doble =====
+  renderWeekendEvent();
+
   const grid=document.getElementById('galaxyGrid');grid.innerHTML='';
   GALAXIES.forEach((g,gi)=>{
     const unlocked=gi===0||p.bossesBeaten.includes(GALAXIES[gi-1].id);
@@ -2800,9 +2967,14 @@ function renderMap(){
 
 function startPlanet(galIdx,planetIdx){
   game.galaxy=galIdx;game.planet=planetIdx;
-  game.qIdx=0;game.lives=3;game.correct=0;game.wrong=[];
-  game.qPool=[]; // forzar nuevo sorteo de pool en cada partida
+  game.qIdx=0;
+  // Vidas: 3 base + 1 si tiene Escudo Galáctico
+  game.lives=3+(hasItem('shield')?1:0);
+  game.correct=0;game.wrong=[];
+  game.qPool=[];
   game.hintsUsed=0;game.perfectAnswers=0;
+  // Bola de Dragón: salva del primer fallo en este planeta
+  game.dragonBallReady=hasItem('dragon');
   // Reset racha actual al empezar planeta nuevo
   const p0=getPlayer();if(p0)p0.currentStreak=0;
   // Ocultar HUD de racha al inicio
@@ -2915,10 +3087,14 @@ function renderQuestion(){
 
 function useHint(){
   const p=getPlayer();
-  if(p.coins<5)return;
   if((game.hintsUsed||0)>=2){toast('Solo 2 pistas por planeta');return}
+  // Bola de Fuego: pistas gratis (3 por compra)
+  const hasFreeHint=(p.freeHints||0)>0;
+  if(!hasFreeHint&&p.coins<5)return;
   game.hintsUsed=(game.hintsUsed||0)+1;
-  p.coins-=5;save();
+  if(hasFreeHint){p.freeHints--;toast('🔥 Pista GRATIS (te quedan '+p.freeHints+')',2000)}
+  else{p.coins-=5}
+  save();
   document.getElementById('hudCoins').textContent=p.coins;
   game.hintUsedInQuestion=true; // marca que esta pregunta no cuenta como "perfecta"
   const qs=getQuestionsForCurrent();
@@ -2956,11 +3132,23 @@ function answer(idx,q,btn){
   const correctIdx=q._aShuf!=null?q._aShuf:q.a;
   const isCorrect=idx===correctIdx;
   if(!game.reviewMode)trackAnswer(GALAXIES[game.galaxy].id,game.planet,isCorrect,state.currentPlayer);
+  if(!game.reviewMode)trackWeeklyAnswer(GALAXIES[game.galaxy].id,isCorrect);
   let delay=1300;
   if(isCorrect){
     btn.classList.add('correct');
     sndCorrect();sndCoin();
-    if(!game.reviewMode){p.totalCorrect++;p.currentStreak++;if(p.currentStreak>p.bestStreak)p.bestStreak=p.currentStreak;p.coins+=isYoung()?3:5;addXP(isYoung()?1:2)}
+    if(!game.reviewMode){
+      p.totalCorrect++;p.currentStreak++;
+      if(p.currentStreak>p.bestStreak)p.bestStreak=p.currentStreak;
+      // Monedas: doble si Pico de Diamante activo
+      let coinsEarn=(isYoung()?3:5)*(isMegaCoinActive()?2:1);
+      p.coins+=coinsEarn;
+      // XP base + doble si Champiñón activo + bonus por combo si Estrella Cósmica
+      let xpEarn=isYoung()?1:2;
+      if(isDoubleXPActive())xpEarn*=2;
+      if(hasItem('star')&&p.currentStreak>=3)xpEarn+=1; // bonus por racha
+      addXP(xpEarn);
+    }
     game.correct++;
     if(!game.hintUsedInQuestion&&!game.reviewMode)game.perfectAnswers=(game.perfectAnswers||0)+1;
     // Mensaje variado, prioriza racha si es ≥3
@@ -2985,7 +3173,17 @@ function answer(idx,q,btn){
     const correctBtn=document.querySelectorAll('#answers .answer-btn')[correctIdx];
     if(correctBtn)correctBtn.classList.add('correct');
     sndWrong();
-    if(!game.reviewMode){p.currentStreak=0;game.lives--}
+    if(!game.reviewMode){
+      p.currentStreak=0;
+      // Bola de Dragón: salva del primer fallo en este planeta
+      if(game.dragonBallReady){
+        game.dragonBallReady=false;
+        toast('🟠 ¡La Bola de Dragón te ha salvado del primer fallo!',3500);
+        // No decrementa vida pero sí cuenta como fallo conceptual
+      }else{
+        game.lives--;
+      }
+    }
     game.wrong.push(q);
     const failMsg=ENCOURAGEMENT_FAIL[Math.floor(Math.random()*ENCOURAGEMENT_FAIL.length)];
     feedback(failMsg,'fail');
@@ -3333,14 +3531,33 @@ function bossLose(){
 function renderShop(){
   const p=getPlayer();
   const grid=document.getElementById('shopGrid');grid.innerHTML='';
+  // Mostrar buffs activos en banner arriba
+  const buffs=[];
+  if(isDoubleXPActive())buffs.push('🍄 Doble XP activo: '+timeLeft(p.doubleXPUntil));
+  if(isMegaCoinActive())buffs.push('⛏️ Doble monedas: '+timeLeft(p.megaCoinUntil));
+  if(p.freeHints>0)buffs.push('🔥 Pistas gratis restantes: '+p.freeHints);
+  if(hasItem('shield'))buffs.push('🛡️ +1 vida cada planeta');
+  if(hasItem('dragon'))buffs.push('🟠 Bola de Dragón activa');
+  if(hasItem('star'))buffs.push('⭐ +1 XP por racha');
+  if(buffs.length){
+    const bf=document.createElement('div');
+    bf.style.cssText='grid-column:1/-1;background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,140,0,.1));border:2px dashed #ffd700;border-radius:12px;padding:10px;margin-bottom:8px;font-size:12px;line-height:1.6;text-align:left';
+    bf.innerHTML='<b>✨ Tus poderes activos:</b><br>'+buffs.join('<br>');
+    grid.appendChild(bf);
+  }
   SHOP.forEach(it=>{
+    const consumibles=['doubleXP','freeHint','megaCoin'];
+    const isConsumible=it.effect&&consumibles.includes(it.effect);
     const owned=p.items.includes(it.id);
+    // Cosméticos/permanentes: bloquean re-compra. Consumibles: siempre disponibles.
+    const showAsOwned=owned&&!isConsumible;
     const div=document.createElement('div');
-    div.className='shop-item'+(owned?' owned':'');
-    div.innerHTML=`<div class="emoji">${it.emoji}</div><div class="name">${it.name}</div><div class="price">${owned?'✅ Comprado':it.price+'💰'}</div>`;
-    if(!owned){
+    div.className='shop-item'+(showAsOwned?' owned':'')+(it.effect?' effect-item':'');
+    const descLine=it.desc?`<div class="desc" style="font-size:11px;opacity:.8;margin:4px 0;line-height:1.3">${it.desc}</div>`:'';
+    div.innerHTML=`<div class="emoji">${it.emoji}</div><div class="name">${it.name}</div>${descLine}<div class="price">${showAsOwned?'✅ Comprado':it.price+'💰'}</div>`;
+    if(!showAsOwned){
       const b=document.createElement('button');
-      b.className='btn btn-small';b.textContent='Comprar';
+      b.className='btn btn-small';b.textContent=isConsumible?'Usar':'Comprar';
       b.disabled=p.coins<it.price;
       b.onclick=()=>buyItem(it);
       div.appendChild(b);
@@ -3348,14 +3565,38 @@ function renderShop(){
     grid.appendChild(div);
   });
 }
+// Helper: tiempo restante en formato humano
+function timeLeft(until){
+  if(!until)return '';
+  const ms=until-Date.now();if(ms<=0)return 'expirado';
+  const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);
+  return h>0?h+'h '+m+'m':m+'m';
+}
 function buyItem(it){
   const p=getPlayer();
   if(p.coins<it.price)return;
-  p.coins-=it.price;p.items.push(it.id);save();
+  // Anti-doble-compra para items permanentes (cosméticos + extraLife/reviveOnce/comboBonus)
+  const consumibles=['doubleXP','freeHint','megaCoin'];
+  const isConsumible=it.effect&&consumibles.includes(it.effect);
+  if(!isConsumible&&p.items.includes(it.id))return;
+  p.coins-=it.price;
+  if(!p.items.includes(it.id))p.items.push(it.id);
+  // Activar efecto del item
+  if(it.effect==='doubleXP'){p.doubleXPUntil=Date.now()+24*3600*1000;toast('🍄 ¡Doble XP activado 24h!',3000)}
+  else if(it.effect==='freeHint'){p.freeHints=(p.freeHints||0)+3;toast('🔥 3 pistas gratis añadidas',3000)}
+  else if(it.effect==='megaCoin'){p.megaCoinUntil=Date.now()+24*3600*1000;toast('⛏️ ¡Doble monedas 24h!',3000)}
+  else if(it.effect==='extraLife')toast('🛡️ +1 vida extra en cada planeta!',3000);
+  else if(it.effect==='reviveOnce')toast('🟠 ¡Te salva del primer fallo en cada planeta!',3000);
+  else if(it.effect==='comboBonus')toast('⭐ ¡+1 XP por cada acierto seguido!',3000);
+  save();
   sndCoin();toast(`¡${it.emoji} ${it.name} comprado!`);
   renderShop();renderMap();
   checkAchievements();
 }
+// Helpers para los items
+function hasItem(id){const p=getPlayer();return p&&(p.items||[]).includes(id)}
+function isDoubleXPActive(){const p=getPlayer();return p&&p.doubleXPUntil&&Date.now()<p.doubleXPUntil}
+function isMegaCoinActive(){const p=getPlayer();return p&&p.megaCoinUntil&&Date.now()<p.megaCoinUntil}
 
 // ========== ACHIEVEMENTS ==========
 function checkAchievements(){
