@@ -1440,17 +1440,20 @@ function trackAnswer(galaxyId,planetIdx,correct,who){
   if(!state.analytics)return;
   state.analytics.questionsByGalaxy=state.analytics.questionsByGalaxy||{};
   state.analytics.questionsByPlanet=state.analytics.questionsByPlanet||{};
-  // Por galaxia
+  // Por galaxia (totales + por niño)
   if(!state.analytics.questionsByGalaxy[galaxyId])state.analytics.questionsByGalaxy[galaxyId]={correct:0,wrong:0,em:{correct:0,wrong:0},el:{correct:0,wrong:0}};
   const g=state.analytics.questionsByGalaxy[galaxyId];
   const ch=who==='emmanuel'?'em':who==='emiliano'?'el':null;
   if(correct){g.correct++;if(ch)g[ch].correct++}
   else{g.wrong++;if(ch)g[ch].wrong++}
-  // Por planeta
-  const pk=galaxyId+'-'+planetIdx;
-  if(!state.analytics.questionsByPlanet[pk])state.analytics.questionsByPlanet[pk]={correct:0,wrong:0};
-  if(correct)state.analytics.questionsByPlanet[pk].correct++;
-  else state.analytics.questionsByPlanet[pk].wrong++;
+  // Por planeta — segregado por niño (necesario para recomendaciones personalizadas)
+  if(who){
+    state.analytics.questionsByPlanet[who]=state.analytics.questionsByPlanet[who]||{};
+    const pk=galaxyId+'-'+planetIdx;
+    if(!state.analytics.questionsByPlanet[who][pk])state.analytics.questionsByPlanet[who][pk]={correct:0,wrong:0};
+    if(correct)state.analytics.questionsByPlanet[who][pk].correct++;
+    else state.analytics.questionsByPlanet[who][pk].wrong++;
+  }
 }
 
 // ========== LEVELS / RANGOS ==========
@@ -2805,39 +2808,41 @@ function answer(idx,q,btn){
   game.answerLock=true;
   document.querySelectorAll('#answers .answer-btn').forEach(b=>b.disabled=true);
   const p=getPlayer();
-  p.totalAnswered++;
+  // En modo repaso NO contamos en analytics ni damos XP/monedas
+  if(!game.reviewMode)p.totalAnswered++;
   const correctIdx=q._aShuf!=null?q._aShuf:q.a;
   const isCorrect=idx===correctIdx;
-  trackAnswer(GALAXIES[game.galaxy].id,game.planet,isCorrect,state.currentPlayer);
+  if(!game.reviewMode)trackAnswer(GALAXIES[game.galaxy].id,game.planet,isCorrect,state.currentPlayer);
   let delay=1300;
   if(isCorrect){
     btn.classList.add('correct');
     sndCorrect();sndCoin();
-    p.totalCorrect++;p.currentStreak++;
-    if(p.currentStreak>p.bestStreak)p.bestStreak=p.currentStreak;
-    p.coins+=isYoung()?3:5;
-    addXP(isYoung()?1:2);
+    if(!game.reviewMode){p.totalCorrect++;p.currentStreak++;if(p.currentStreak>p.bestStreak)p.bestStreak=p.currentStreak;p.coins+=isYoung()?3:5;addXP(isYoung()?1:2)}
     game.correct++;
-    if(!game.hintUsedInQuestion)game.perfectAnswers=(game.perfectAnswers||0)+1;
+    if(!game.hintUsedInQuestion&&!game.reviewMode)game.perfectAnswers=(game.perfectAnswers||0)+1;
     // Mensaje variado, prioriza racha si es ≥3
     let msg;
-    if(p.currentStreak>=3){
+    const xpStr=game.reviewMode?'':' +'+(isYoung()?1:2)+' XP';
+    if(p.currentStreak>=3&&!game.reviewMode){
       const tpl=ENCOURAGEMENT_STREAK[Math.floor(Math.random()*ENCOURAGEMENT_STREAK.length)];
-      msg=tpl.replace('{n}',p.currentStreak)+' +'+(isYoung()?1:2)+' XP';
+      msg=tpl.replace('{n}',p.currentStreak)+xpStr;
+    }else if(game.reviewMode){
+      msg='✓ ¡Aprendido!';
     }else{
-      msg=ENCOURAGEMENT_OK[Math.floor(Math.random()*ENCOURAGEMENT_OK.length)]+' +'+(isYoung()?1:2)+' XP';
+      msg=ENCOURAGEMENT_OK[Math.floor(Math.random()*ENCOURAGEMENT_OK.length)]+xpStr;
     }
     feedback(msg,'success');
-    // Confetti extra en rachas grandes
-    if(p.currentStreak===5)confetti(20);
-    if(p.currentStreak===10)confetti(40);
+    // Confetti extra en rachas grandes (no en repaso)
+    if(!game.reviewMode){
+      if(p.currentStreak===5)confetti(20);
+      if(p.currentStreak===10)confetti(40);
+    }
   }else{
     btn.classList.add('wrong');
     const correctBtn=document.querySelectorAll('#answers .answer-btn')[correctIdx];
     if(correctBtn)correctBtn.classList.add('correct');
     sndWrong();
-    p.currentStreak=0;
-    game.lives--;
+    if(!game.reviewMode){p.currentStreak=0;game.lives--}
     game.wrong.push(q);
     const failMsg=ENCOURAGEMENT_FAIL[Math.floor(Math.random()*ENCOURAGEMENT_FAIL.length)];
     feedback(failMsg,'fail');
@@ -2871,6 +2876,22 @@ function answer(idx,q,btn){
     const oldExpl=document.querySelector('.question-explanation');
     if(oldExpl)oldExpl.remove();
     if(game.screen!=='question')return;
+    // En modo repaso, al acabar las preguntas → mostrar resumen y volver al mapa
+    if(game.reviewMode){
+      game.qIdx++;
+      const qs=game.qPool||[];
+      if(game.qIdx>=qs.length){
+        // Fin del repaso
+        game.reviewMode=false;
+        const okMsg=game.wrong.length===0?'🎉 ¡Perfecto! Todas correctas en repaso':'📚 Repaso terminado · te quedaron '+game.wrong.length+' por practicar';
+        toast(okMsg,3500);
+        if(game.wrong.length===0){confetti(40);sndWin()}
+        goToMap();
+        return;
+      }
+      renderQuestion();
+      return;
+    }
     if(game.lives<=0){endPlanet(true);return}
     game.qIdx++;
     renderQuestion();
@@ -2940,8 +2961,40 @@ function endPlanet(failed=false){
     }
     document.getElementById('nextBtn').style.display='inline-block';
   }
+  // RONDA DE REVISIÓN: si hay preguntas falladas, mostrar botón para repasarlas
+  setupReviewButton();
   save();
   checkAchievements();
+}
+
+// Inserta o quita el botón "Repasar lo fallado" en la pantalla de resultado
+function setupReviewButton(){
+  const existing=document.getElementById('reviewBtn');
+  const wrong=(game.wrong||[]).filter(q=>q&&q.q);
+  if(wrong.length===0){if(existing)existing.remove();return}
+  if(existing)return; // ya está
+  const btn=document.createElement('button');
+  btn.id='reviewBtn';btn.className='btn btn-blue';
+  btn.innerHTML='📚 Repasar '+wrong.length+' fallada'+(wrong.length>1?'s':'');
+  btn.onclick=startReviewRound;
+  // Insertarlo en el row de botones del resultado
+  const nextBtn=document.getElementById('nextBtn');
+  if(nextBtn&&nextBtn.parentNode)nextBtn.parentNode.insertBefore(btn,nextBtn);
+}
+
+// Inicia ronda de revisión: las preguntas falladas, sin penalización (no afecta XP/monedas/vidas)
+function startReviewRound(){
+  if(!game.wrong||!game.wrong.length){toast('No hay preguntas para repasar');return}
+  // Snapshot del modo: quitamos vidas y guardamos las falladas como pool
+  game.qPool=game.wrong.slice();
+  // Reset de las preguntas para que se barajen de nuevo
+  game.qPool.forEach(q=>{delete q._shuffled;delete q._oShuf;delete q._aShuf});
+  game.wrong=[]; // si vuelves a fallar, se acumulan otra vez
+  game.qIdx=0;game.lives=999;game.correct=0; // sin vidas en modo repaso
+  game.reviewMode=true;
+  show('question');
+  toast('📚 Modo repaso · sin vidas, aprende sin presión',3000);
+  renderQuestion();
 }
 
 function nextPlanet(){
@@ -6668,11 +6721,58 @@ function parentsRender(){
     const d=new Date(s.ts);
     return `<div class="parents-row"><span class="parents-key">${d.toLocaleString()}</span><span class="parents-val">${s.who==='emmanuel'?'⚡ Emmanuel':s.who==='emiliano'?'⛏️ Emiliano':'?'}</span></div>`;
   }).join('');
+  // === DETECCIÓN AUTOMÁTICA DE ÁREAS DÉBILES POR NIÑO ===
+  // Por planeta: si % aciertos < 60% Y al menos 5 respuestas, es área débil
+  function weakAreasFor(who){
+    const byPlanet=(a.questionsByPlanet||{})[who]||{};
+    const weak=[];
+    Object.entries(byPlanet).forEach(([key,d])=>{
+      const total=(d.correct||0)+(d.wrong||0);
+      if(total<5)return;
+      const acc=Math.round((d.correct||0)/total*100);
+      if(acc>=60)return;
+      // key: "math-2" → galaxia + planeta
+      const [galId,pIdx]=key.split('-');
+      const gal=GALAXIES.find(g=>g.id===galId);
+      if(!gal)return;
+      const planet=gal.planets[parseInt(pIdx,10)];
+      weak.push({galId,gal,planet:planet||'Planeta '+pIdx,acc,total,correct:d.correct||0});
+    });
+    weak.sort((a,b)=>a.acc-b.acc);
+    return weak;
+  }
+  // === SUGERENCIAS PERSONALIZADAS (texto humano) ===
+  function recommendationsFor(who){
+    const weak=weakAreasFor(who);
+    const p=state[who]||{};
+    const total=p.totalAnswered||0;
+    const acc=total>0?Math.round((p.totalCorrect||0)/total*100):0;
+    const tips=[];
+    if(total<20){tips.push('💡 Aún hay pocas respuestas para evaluar. Anímalos a jugar más para ver áreas débiles.');return tips}
+    if(weak.length===0){tips.push('🟢 ¡Excelente! No hay áreas débiles detectadas. Anímalos a probar nuevas galaxias o subir de grado escolar.');return tips}
+    weak.slice(0,3).forEach(w=>{
+      tips.push(`🔴 <b>${w.gal.emoji} ${w.gal.name.replace('Galaxia ','')}</b> · planeta "${w.planet}": ${w.acc}% aciertos (${w.correct}/${w.total}). Sugerencia: rejugar este planeta o usar el modo "Repasar lo fallado" al terminar.`);
+    });
+    if(acc<50)tips.push('⚠️ Precisión global baja ('+acc+'%). Considera bajar un grado escolar en Modo Padres para que se sientan capaces.');
+    if(p.bestStreak<5)tips.push('🔥 Mejor racha solo de '+p.bestStreak+'. Práctica con tiempos cortos puede ayudar a construir rachas mayores.');
+    if((p.dailyStreak||0)>=3)tips.push('🎯 ¡Lleva '+p.dailyStreak+' días seguidos jugando! Mantén el hábito diario.');
+    return tips;
+  }
+  const emmRec=recommendationsFor('emmanuel');
+  const emiRec=recommendationsFor('emiliano');
   document.getElementById('parentsContent').innerHTML=`
     ${renderChild('emmanuel')}
+    <div class="parents-section">
+      <h3>🎯 Recomendaciones para Emmanuel</h3>
+      ${emmRec.map(t=>`<div class="parents-row" style="display:block;padding:8px 4px;line-height:1.5">${t}</div>`).join('')}
+    </div>
     ${renderChild('emiliano')}
     <div class="parents-section">
-      <h3>📚 Áreas a reforzar (ordenado por mayor dificultad)</h3>
+      <h3>🎯 Recomendaciones para Emiliano</h3>
+      ${emiRec.map(t=>`<div class="parents-row" style="display:block;padding:8px 4px;line-height:1.5">${t}</div>`).join('')}
+    </div>
+    <div class="parents-section">
+      <h3>📚 Áreas a reforzar (ambos niños · por galaxia)</h3>
       ${galaxiesHtml}
       <p style="font-size:11px;opacity:.65;margin-top:8px">🟢 Buen dominio · 🔴 Necesita refuerzo (&lt;60% aciertos)</p>
     </div>
