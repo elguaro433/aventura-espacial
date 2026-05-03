@@ -80,7 +80,7 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .galaxy-card .name{font-size:14px;font-weight:bold;color:#ffd700;letter-spacing:.3px;position:relative;z-index:1;text-shadow:0 2px 4px rgba(0,0,0,.6)}
 .galaxy-card .progress{font-size:11px;opacity:.85;margin-top:4px;position:relative;z-index:1}
 .galaxy-card .boss-mark{position:absolute;top:8px;left:8px;font-size:20px;filter:drop-shadow(0 0 8px red);z-index:6}
-.galaxy-card .galaxy-flag-wrap{width:68%;max-width:130px;margin:8px auto 2px;border-radius:5px;box-shadow:0 3px 10px rgba(0,0,0,.6),0 0 0 2px rgba(255,215,0,.45);display:block;position:relative;z-index:1;aspect-ratio:3/2;background:#fff;overflow:hidden}
+.galaxy-card .galaxy-flag-wrap{width:68%;max-width:130px;margin:8px auto 2px;border-radius:5px;box-shadow:0 3px 10px rgba(0,0,0,.6),0 0 0 2px rgba(255,215,0,.45);display:block;position:relative;z-index:1;aspect-ratio:3/2;background:rgba(255,255,255,.05);overflow:hidden}
 .galaxy-card .galaxy-flag-wrap img,.galaxy-card .galaxy-flag-wrap svg{width:100%;height:100%;display:block;object-fit:cover}
 .planet-row{display:flex;justify-content:space-around;width:100%;flex-wrap:wrap;gap:8px;margin-top:8px}
 .planet-dot{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,215,0,.4);display:flex;align-items:center;justify-content:center;font-size:11px}
@@ -1606,14 +1606,14 @@ const GALAXIES=[
 ];
 
 // ============ INFO DE PAÍS (mapa + bandera + datos) ============
-// Banderas: usamos las OFICIALES de Wikimedia Commons (SVG renderizado a PNG).
-// Son auténticas y pixel-perfect — escudos, estrellas, todo correcto.
-// Si la tablet está offline, el <img> de la bandera simplemente no carga;
-// el flagSvg inline (simplificado) sirve como fallback visual.
+// Banderas: las OFICIALES de flagcdn.com (CDN especializado en banderas, basado en
+// la librería open-source lipis/flag-icons que usan miles de sitios). Garantiza
+// los escudos, estrellas y proporciones reales. Como fallback (offline) usamos
+// SVG inline lo más fieles posible (con estrellas, escudos esquemáticos, etc.).
 const COUNTRY_INFO = {
   fr:{
     name:'Francia 🇫🇷',sub:'République française',
-    flagUrl:'https://upload.wikimedia.org/wikipedia/en/thumb/c/c3/Flag_of_France.svg/320px-Flag_of_France.svg.png',
+    flagUrl:'https://flagcdn.com/w320/fr.png',
     flagSvg:`<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="2" fill="#0055A4"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>`,
     mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/EU-France_%28orthographic_projection%29.svg/320px-EU-France_%28orthographic_projection%29.svg.png',
     facts:[
@@ -1624,8 +1624,9 @@ const COUNTRY_INFO = {
   },
   es:{
     name:'España 🇪🇸',sub:'Reino de España',
-    flagUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Spain.svg/320px-Flag_of_Spain.svg.png',
-    flagSvg:`<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#AA151B"/><rect y=".5" width="3" height="1" fill="#F1BF00"/></svg>`,
+    flagUrl:'https://flagcdn.com/w320/es.png',
+    // Fallback: 3 franjas (rojo-amarillo-rojo, ratio 1:2:1) + escudo esquemático en posición correcta
+    flagSvg:`<svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="10" fill="#AA151B"/><rect y="10" width="60" height="20" fill="#F1BF00"/><rect y="30" width="60" height="10" fill="#AA151B"/><g transform="translate(20,15)"><rect width="8" height="10" fill="#fff" stroke="#000" stroke-width=".3"/><rect x="2" y="2" width="4" height="6" fill="#AA151B"/><path d="M0,0 L4,-3 L8,0" fill="none" stroke="#FFD700" stroke-width=".5"/></g></svg>`,
     mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/EU-Spain_%28orthographic_projection%29.svg/320px-EU-Spain_%28orthographic_projection%29.svg.png',
     facts:[
       ['Capital','Madrid'],['Idioma','Español (castellano)'],['Moneda','Euro €'],
@@ -1635,8 +1636,10 @@ const COUNTRY_INFO = {
   },
   en:{
     name:'Reino Unido 🇬🇧',sub:'United Kingdom',
-    flagUrl:'https://upload.wikimedia.org/wikipedia/en/thumb/a/ae/Flag_of_the_United_Kingdom.svg/320px-Flag_of_the_United_Kingdom.svg.png',
-    flagSvg:`<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/><path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6"/></svg>`,
+    flagUrl:'https://flagcdn.com/w320/gb.png',
+    // Fallback: Union Jack auténtico con cruces de San Andrés (blanca diagonal),
+    // San Patricio (roja diagonal) y San Jorge (roja recta) sobre fondo azul
+    flagSvg:`<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg"><clipPath id="ukcl"><path d="M0,0 L60,30 L60,0 Z M0,0 L60,30 L0,30 Z"/></clipPath><clipPath id="ukcl2"><path d="M0,0 L60,30 L0,30 Z M0,0 L60,30 L60,0 Z"/></clipPath><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30" stroke="#C8102E" stroke-width="2.5" clip-path="url(#ukcl)"/><path d="M60,0 L0,30" stroke="#C8102E" stroke-width="2.5" clip-path="url(#ukcl2)"/><path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/><path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6"/></svg>`,
     mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/EU-United_Kingdom_%28orthographic_projection%29.svg/320px-EU-United_Kingdom_%28orthographic_projection%29.svg.png',
     facts:[
       ['Capital','Londres'],['Idioma','Inglés'],['Moneda','Libra £'],
@@ -1646,8 +1649,9 @@ const COUNTRY_INFO = {
   },
   ca:{
     name:'Andorra 🇦🇩',sub:'Principat d\'Andorra',
-    flagUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Flag_of_Andorra.svg/320px-Flag_of_Andorra.svg.png',
-    flagSvg:`<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="2" fill="#10069F"/><rect x="1" width="1" height="2" fill="#FEDD00"/><rect x="2" width="1" height="2" fill="#D52B1E"/></svg>`,
+    flagUrl:'https://flagcdn.com/w320/ad.png',
+    // Fallback: 3 franjas verticales (azul-amarillo-rojo) + escudo central esquemático
+    flagSvg:`<svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="40" fill="#10069F"/><rect x="20" width="20" height="40" fill="#FEDD00"/><rect x="40" width="20" height="40" fill="#D52B1E"/><g transform="translate(30,20)"><rect x="-4" y="-5" width="8" height="10" fill="#fff" stroke="#000" stroke-width=".3" rx=".5"/><rect x="-3" y="-4" width="3" height="4" fill="#FEDD00"/><rect x="0" y="-4" width="3" height="4" fill="#D52B1E"/><rect x="-3" y="0" width="3" height="4" fill="#10069F"/><rect x="0" y="0" width="3" height="4" fill="#FEDD00"/></g></svg>`,
     mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Europe-Andorra.svg/320px-Europe-Andorra.svg.png',
     facts:[
       ['Capital','Andorra la Vella'],['Idioma oficial','Catalán'],['Moneda','Euro €'],
@@ -1657,8 +1661,9 @@ const COUNTRY_INFO = {
   },
   ve:{
     name:'Venezuela 🇻🇪',sub:'República Bolivariana de Venezuela',
-    flagUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Flag_of_Venezuela.svg/320px-Flag_of_Venezuela.svg.png',
-    flagSvg:`<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height=".667" fill="#FFCC00"/><rect y=".667" width="3" height=".667" fill="#003893"/><rect y="1.333" width="3" height=".667" fill="#CF142B"/></svg>`,
+    flagUrl:'https://flagcdn.com/w320/ve.png',
+    // Fallback: 3 franjas (amarillo-azul-rojo) + 8 estrellas blancas reales en arco
+    flagSvg:`<svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"><defs><symbol id="vestar2" viewBox="-1 -1 2 2"><polygon points="0,-1 0.224,-0.309 0.951,-0.309 0.363,0.118 0.588,0.809 0,0.382 -0.588,0.809 -0.363,0.118 -0.951,-0.309 -0.224,-0.309" fill="#fff"/></symbol></defs><rect width="60" height="13.33" fill="#FFCC00"/><rect y="13.33" width="60" height="13.34" fill="#003893"/><rect y="26.67" width="60" height="13.33" fill="#CF142B"/><use href="#vestar2" x="22.5" y="19.5" width="3" height="3"/><use href="#vestar2" x="24.5" y="18" width="3" height="3"/><use href="#vestar2" x="26.5" y="17" width="3" height="3"/><use href="#vestar2" x="28.2" y="16.5" width="3" height="3"/><use href="#vestar2" x="29.8" y="16.5" width="3" height="3"/><use href="#vestar2" x="31.5" y="17" width="3" height="3"/><use href="#vestar2" x="33.5" y="18" width="3" height="3"/><use href="#vestar2" x="35.5" y="19.5" width="3" height="3"/></svg>`,
     mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Venezuela_%28orthographic_projection%29.svg/320px-Venezuela_%28orthographic_projection%29.svg.png',
     facts:[
       ['Capital','Caracas'],['Idioma','Español'],['Moneda','Bolívar Bs.'],
@@ -1668,8 +1673,9 @@ const COUNTRY_INFO = {
   },
   co:{
     name:'Colombia 🇨🇴',sub:'República de Colombia',
-    flagUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Colombia.svg/320px-Flag_of_Colombia.svg.png',
-    flagSvg:`<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="1" fill="#FCD116"/><rect y="1" width="3" height=".5" fill="#003893"/><rect y="1.5" width="3" height=".5" fill="#CE1126"/></svg>`,
+    flagUrl:'https://flagcdn.com/w320/co.png',
+    // Fallback: amarillo (mitad), azul (1/4), rojo (1/4) — proporción 2:1:1 oficial
+    flagSvg:`<svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="20" fill="#FCD116"/><rect y="20" width="60" height="10" fill="#003893"/><rect y="30" width="60" height="10" fill="#CE1126"/></svg>`,
     mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Colombia_%28orthographic_projection%29.svg/320px-Colombia_%28orthographic_projection%29.svg.png',
     facts:[
       ['Capital','Bogotá'],['Idioma','Español'],['Moneda','Peso $'],
@@ -1689,11 +1695,11 @@ function showCountryInfo(galId){
     <h2>${info.name}</h2>
     <div class="country-sub">${info.sub}</div>
     <div class="country-flag" aria-label="Bandera oficial">
-      <img src="${info.flagUrl}" alt="" loading="lazy"
+      <img src="${info.flagUrl}" alt=""
            onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
       <div style="display:none;width:100%;height:100%">${info.flagSvg}</div>
     </div>
-    <img class="country-map" src="${info.mapUrl}" alt="Mapa de ${info.name}" loading="lazy"
+    <img class="country-map" src="${info.mapUrl}" alt="Mapa de ${info.name}"
          onerror="this.style.display='none'">
     <div class="country-facts">${factsHtml}</div>
     <p class="country-note">${info.note}</p>
@@ -3732,7 +3738,7 @@ function renderMap(){
     // Si la tablet está offline o falla, onerror la oculta y muestra el SVG inline simple debajo.
     const flagHtml = hasInfo
       ? `<div class="galaxy-flag-wrap" aria-label="Bandera de ${g.name}">
-           <img src="${COUNTRY_INFO[g.id].flagUrl}" alt="" loading="lazy"
+           <img src="${COUNTRY_INFO[g.id].flagUrl}" alt=""
                 onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
            <div style="display:none;width:100%;height:100%">${COUNTRY_INFO[g.id].flagSvg}</div>
          </div>`
