@@ -4079,7 +4079,9 @@ function snakeStart(){
   setupHiDPI(document.getElementById('snake-canvas'),320,320);
   snakeState={x:5,y:5,dx:1,dy:0,pendingDx:1,pendingDy:0,body:[{x:5,y:5}],food:{x:10,y:10},golden:null,goldenExpireAt:0,score:0,grid:16,size:20,speed:160,particles:[],paused:false};
   document.getElementById('snakeScore').textContent=0;
-  document.getElementById('snakeBest').textContent=state.snakeBest||0;
+  // Récord por niño (no global)
+  const _p=getPlayer();const _best=(_p&&_p.snakeBest)||state.snakeBest||0;
+  document.getElementById('snakeBest').textContent=_best;
   snakeRestartLoop();
   snakeRender();
 }
@@ -4201,9 +4203,18 @@ function snakeRender(){
 }
 function snakeOver(){
   clearInterval(snakeLoop);snakeLoop=null;sndLose();
-  if(snakeState.score>(state.snakeBest||0)){state.snakeBest=snakeState.score;save()}
-  document.getElementById('snakeBest').textContent=state.snakeBest||0;
-  toast('¡Game Over! Puntos: '+snakeState.score+(snakeState.score===state.snakeBest?' 🏆 ¡Récord!':''),3500);
+  // Récord por niño
+  const _p2=getPlayer();
+  const _prevBest=(_p2&&_p2.snakeBest)||0;
+  let _newRecord=false;
+  if(snakeState.score>_prevBest){
+    if(_p2)_p2.snakeBest=snakeState.score;
+    state.snakeBest=Math.max(state.snakeBest||0,snakeState.score);
+    save();_newRecord=true;
+  }
+  const _bestNow=(_p2&&_p2.snakeBest)||state.snakeBest||0;
+  document.getElementById('snakeBest').textContent=_bestNow;
+  toast('¡Game Over! Puntos: '+snakeState.score+(_newRecord?' 🏆 ¡Récord!':''),3500);
 }
 
 // ========== TIC TAC TOE (con minimax y 3 dificultades) ==========
@@ -4495,9 +4506,23 @@ function c4AnimateDrop(row,col,player){
 }
 function c4PCMove(){
   if(c4Done)return;
-  // IA con minimax + alpha-beta pruning. Profundidad según dificultad.
+  // Prioridad de la IA:
+  // 1) Si puedo ganar este turno → ganar
+  // 2) Si el rival gana en el siguiente → bloquear
+  // 3) Si el rival va a crear una FORK (doble amenaza) → bloquear esa columna
+  // 4) Si yo puedo crear una FORK → hacerla
+  // 5) Minimax con depth según dificultad
   let move=c4FindWinMove(c4Board,'y');
   if(move<0)move=c4FindWinMove(c4Board,'r');
+  // Solo en medio/difícil: detectar forks (en fácil dejamos al niño ganar)
+  if(move<0&&c4Difficulty!=='easy'){
+    const enemyFork=c4FindForkMove(c4Board,'r');
+    if(enemyFork>=0)move=enemyFork; // bloquear la fork rival
+  }
+  if(move<0&&c4Difficulty==='hard'){
+    const myFork=c4FindForkMove(c4Board,'y');
+    if(myFork>=0)move=myFork;
+  }
   if(move<0){
     const depth=C4_DEPTHS[c4Difficulty]||5;
     move=c4Minimax(c4Board,depth);
@@ -4587,6 +4612,26 @@ function c4FindWinMove(b,p){
     const win=c4CheckWin(b,r,c,p,false);
     b[r][c]=0;
     if(win)return c;
+  }
+  return -1;
+}
+// Detecta una "fork" (jugada de tijeras): si juega esta col, crea 2+ amenazas simultáneas.
+// Devuelve la columna que crea el fork (o -1).
+function c4FindForkMove(b,p){
+  for(let c=0;c<C4_C;c++){
+    const r=c4LowestEmpty(b,c);if(r<0)continue;
+    b[r][c]=p;
+    // Cuenta cuántas columnas crearían victoria al jugador `p` después de esta jugada
+    let threats=0;
+    for(let c2=0;c2<C4_C;c2++){
+      const r2=c4LowestEmpty(b,c2);if(r2<0)continue;
+      b[r2][c2]=p;
+      if(c4CheckWin(b,r2,c2,p,false))threats++;
+      b[r2][c2]=0;
+      if(threats>=2)break;
+    }
+    b[r][c]=0;
+    if(threats>=2)return c;
   }
   return -1;
 }
@@ -4768,8 +4813,11 @@ function minesRender(){
       if(minesGameOver)return;
       if(minesFlagMode){minesToggleFlag(r,c);return}
       const now=Date.now();
-      if(minesLastTap[key]&&(now-minesLastTap[key])<350){minesToggleFlag(r,c);minesLastTap[key]=0}
-      else{minesLastTap[key]=now;minesReveal(r,c)}
+      if(minesLastTap[key]&&(now-minesLastTap[key])<350){minesToggleFlag(r,c);minesLastTap[key]=0;return}
+      minesLastTap[key]=now;
+      // CHORD CLICK: si ya está revelada y es número, hacer chord
+      if(minesRevealed[r][c]&&minesGrid[r][c]>0){if(minesChord(r,c))return}
+      minesReveal(r,c);
     };
     cell.oncontextmenu=e=>{e.preventDefault();if(!minesGameOver)minesToggleFlag(r,c)};
     // long-press para móvil (400ms)
@@ -4779,6 +4827,24 @@ function minesRender(){
     b.appendChild(cell);
   }
   document.getElementById('minesLeft').textContent=Math.max(0,minesCount-minesFlagsCount);
+}
+// CHORD CLICK: si la celda ya está revelada y es un número, y tiene exactamente N banderas
+// alrededor (donde N = el número), revela todas las celdas no-marcadas vecinas.
+// Si las banderas están MAL, explotará una mina (penalización justa).
+function minesChord(r,c){
+  if(minesGameOver||!minesRevealed[r][c])return false;
+  const n=minesGrid[r][c];if(n<=0)return false; // sólo números >0
+  let flagsAround=0;const toReveal=[];
+  for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+    if(dr===0&&dc===0)continue;
+    const nr=r+dr,nc=c+dc;
+    if(nr<0||nr>=minesRows||nc<0||nc>=minesCols)continue;
+    if(minesFlagged[nr][nc])flagsAround++;
+    else if(!minesRevealed[nr][nc])toReveal.push([nr,nc]);
+  }
+  if(flagsAround!==n)return false; // sólo si número de banderas coincide
+  toReveal.forEach(([nr,nc])=>minesReveal(nr,nc));
+  return true;
 }
 function minesReveal(r,c){
   if(minesGameOver||minesRevealed[r][c]||minesFlagged[r][c])return;
@@ -5060,10 +5126,14 @@ function chessClick(r,c){
   if(chessSelected){
     const[sr,sc]=chessSelected;
     if(sr===r&&sc===c){chessSelected=null;chessRender();return}
-    if(chessValidMove(sr,sc,r,c)){
+    // Valida que el movimiento sea legal (geometría) Y no deje al propio rey en jaque
+    if(chessValidMove(sr,sc,r,c)&&!chessLeavesKingInCheck(sr,sc,r,c,true)){
       chessMove(sr,sc,r,c);
       chessSelected=null;chessRender();
       if(chessDone)return;
+      // Comprueba jaque mate / ahogado del rival tras tu jugada
+      if(chessIsCheckmate(false)){chessDone=true;sndWin();confetti(60);document.getElementById('chess-turn').textContent='🏆 ¡JAQUE MATE! Ganaste';addXP(50);getPlayer().coins+=80;save();return}
+      if(chessIsStalemate(false)){chessDone=true;document.getElementById('chess-turn').textContent='🤝 Empate por ahogado';addXP(15);save();return}
       chessTurn='b';
       document.getElementById('chess-turn').textContent='Pensando... 🤔';
       setTimeout(chessAI,650);
@@ -5071,16 +5141,58 @@ function chessClick(r,c){
   }else if(chessIsWhite(p)){chessSelected=[r,c];chessRender()}
 }
 
-// ¿Está el rey de `forWhite` en jaque?
+// ¿Está el rey de `forWhite` en jaque en el tablero `b`?
 function chessKingInCheck(b,forWhite){
-  // Encuentra el rey
   const kingChar=forWhite?'K':'k';
   let kr=-1,kc=-1;
   for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(b[r][c]===kingChar){kr=r;kc=c}
   if(kr<0)return false;
-  // ¿Algún movimiento del rival puede capturarlo?
-  const enemyMoves=chessAllMoves(b,forWhite); // movimientos del bando contrario al rey
+  // chessAllMoves(b, forBlack) — para atacar al rey blanco necesitamos movimientos NEGRAS
+  const enemyMoves=chessAllMoves(b,forWhite); // si forWhite=true → pide negras (correcto)
   return enemyMoves.some(m=>m[2]===kr&&m[3]===kc);
+}
+// ¿Mover (sr,sc)→(r,c) deja al propio rey en jaque?
+function chessLeavesKingInCheck(sr,sc,r,c,isWhite){
+  const captured=chessBoard[r][c];
+  const piece=chessBoard[sr][sc];
+  chessBoard[r][c]=piece;chessBoard[sr][sc]=' ';
+  const inCheck=chessKingInCheck(chessBoard,isWhite);
+  chessBoard[sr][sc]=piece;chessBoard[r][c]=captured;
+  return inCheck;
+}
+// ¿El bando `forWhite` está en jaque mate?
+function chessIsCheckmate(forWhite){
+  if(!chessKingInCheck(chessBoard,forWhite))return false;
+  // Buscar al menos un movimiento legal que saque al rey del jaque
+  return !chessHasAnyLegalMove(forWhite);
+}
+// ¿El bando `forWhite` está en ahogado (sin movimientos legales pero NO en jaque)?
+function chessIsStalemate(forWhite){
+  if(chessKingInCheck(chessBoard,forWhite))return false;
+  return !chessHasAnyLegalMove(forWhite);
+}
+// ¿Tiene ALGÚN movimiento legal el bando indicado?
+function chessHasAnyLegalMove(forWhite){
+  for(let sr=0;sr<8;sr++)for(let sc=0;sc<8;sc++){
+    const p=chessBoard[sr][sc];if(p===' ')continue;
+    if(forWhite!==chessIsWhite(p))continue;
+    for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+      if(chessValidMove(sr,sc,r,c)&&!chessLeavesKingInCheck(sr,sc,r,c,forWhite))return true;
+    }
+  }
+  return false;
+}
+// Lista TODOS los movimientos legales del bando (no expone rey)
+function chessLegalMoves(forWhite){
+  const moves=[];
+  for(let sr=0;sr<8;sr++)for(let sc=0;sc<8;sc++){
+    const p=chessBoard[sr][sc];if(p===' ')continue;
+    if(forWhite!==chessIsWhite(p))continue;
+    for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+      if(chessValidMove(sr,sc,r,c)&&!chessLeavesKingInCheck(sr,sc,r,c,forWhite))moves.push([sr,sc,r,c]);
+    }
+  }
+  return moves;
 }
 function chessMove(sr,sc,r,c){
   const captured=chessBoard[r][c];
@@ -5182,16 +5294,34 @@ function chessMinimax(b,depth,alpha,beta,maximizing){
 }
 function chessAI(){
   if(chessDone||game.screen!=='chess')return;
-  const moves=chessAllMoves(chessBoard,true);
-  if(!moves.length){chessDone=true;document.getElementById('chess-turn').textContent='🤝 Empate (PC sin movimientos)';return}
-  // 1) Si puedes capturar al rey, hazlo
-  const winMove=moves.find(m=>chessBoard[m[2]][m[3]].toLowerCase()==='k');
-  if(winMove){
-    chessMove(winMove[0],winMove[1],winMove[2],winMove[3]);
-    if(!chessDone)chessTurn='w';
-    chessRender();return;
+  // Solo movimientos LEGALES (no exponen al propio rey)
+  const moves=chessLegalMoves(false); // negras
+  if(!moves.length){
+    chessDone=true;
+    if(chessKingInCheck(chessBoard,false)){
+      document.getElementById('chess-turn').textContent='🏆 ¡JAQUE MATE! Ganaste';
+      sndWin();confetti(60);addXP(50);getPlayer().coins+=80;save();
+    }else{
+      document.getElementById('chess-turn').textContent='🤝 Empate por ahogado';
+      addXP(15);save();
+    }
+    return;
   }
-  // 2) Minimax con depth 2 (la PC piensa: mi jugada → tu respuesta → mi mejor jugada)
+  // 1) Buscar jaque mate inmediato a las blancas
+  for(const[sr,sc,tr,tc] of moves){
+    const captured=chessBoard[tr][tc];const piece=chessBoard[sr][sc];
+    chessBoard[tr][tc]=piece;chessBoard[sr][sc]=' ';
+    const isMate=chessIsCheckmate(true);
+    chessBoard[sr][sc]=piece;chessBoard[tr][tc]=captured;
+    if(isMate){
+      chessMove(sr,sc,tr,tc);
+      chessDone=true;
+      sndLose();
+      document.getElementById('chess-turn').textContent='💀 ¡JAQUE MATE! La PC ganó';
+      chessRender();return;
+    }
+  }
+  // 2) Minimax con depth 2
   let bestVal=-Infinity,bestMoves=[];
   for(const[sr,sc,tr,tc] of moves){
     const captured=chessBoard[tr][tc];
@@ -5202,10 +5332,14 @@ function chessAI(){
     if(val>bestVal){bestVal=val;bestMoves=[[sr,sc,tr,tc]]}
     else if(val===bestVal)bestMoves.push([sr,sc,tr,tc]);
   }
-  // Aleatorizamos entre las mejores para variedad
   const pick=bestMoves[Math.floor(Math.random()*bestMoves.length)];
   chessMove(pick[0],pick[1],pick[2],pick[3]);
-  if(!chessDone)chessTurn='w';
+  if(!chessDone){
+    chessTurn='w';
+    // Comprueba mate/ahogado al humano tras movimiento PC
+    if(chessIsCheckmate(true)){chessDone=true;sndLose();document.getElementById('chess-turn').textContent='💀 ¡JAQUE MATE! La PC ganó';chessRender();return}
+    if(chessIsStalemate(true)){chessDone=true;document.getElementById('chess-turn').textContent='🤝 Empate por ahogado';addXP(15);save();chessRender();return}
+  }
   chessRender();
 }
 function chessValidMove(sr,sc,r,c){
@@ -5635,13 +5769,14 @@ const MARIO_LEVELS=[
     goal:{x:6960,y:MARIO_GROUND_Y-50}
   }
 ];
-let marioPlayer,marioLevel,marioLives,marioScore,marioWorld,marioCam,marioPickups,marioEnemies,marioMovePlats=[];
+let marioPlayer,marioLevel,marioLives,marioScore,marioWorld,marioCam,marioPickups,marioEnemies,marioMovePlats=[],marioBoxes=[];
 let marioLoop=null,marioKeys={left:0,right:0,jump:0,jumpEdge:0},marioBgStars=[];
 function marioStart(){
   setupHiDPI(document.getElementById('mario-canvas'),MARIO_VW,MARIO_VH);
   if(!marioBgStars.length){for(let i=0;i<70;i++)marioBgStars.push({x:Math.random()*MARIO_VW*2,y:Math.random()*(MARIO_GROUND_Y-20),s:Math.random()*1.5+.3})}
   marioLevel=0;marioScore=0;marioLives=3;
   marioKeys={left:0,right:0,jump:0,jumpEdge:0}; // reset siempre
+  _marioLastT=0;_marioAcc=0; // reset delta-time
   marioLoadLevel();
   if(marioLoop)cancelAnimationFrame(marioLoop);
   marioLoop=requestAnimationFrame(marioStep);
@@ -5656,6 +5791,8 @@ function marioLoadLevel(){
   marioEnemies=L.enemies.map(e=>({...e,vx:.8,alive:true}));
   // Plataformas móviles: copia con estado independiente
   marioMovePlats=(L.movePlats||[]).map(mp=>({...mp,vx:mp.vx||1.2}));
+  // Cajas misteriosas (golpea desde abajo para abrirlas)
+  marioBoxes=(L.boxes||[]).map(b=>({...b,opened:false}));
   marioPickups=[];
   L.coins.forEach(c=>marioPickups.push({...c,kind:'coin',taken:false}));
   L.stars.forEach(s=>marioPickups.push({...s,kind:'star',taken:false}));
@@ -5671,10 +5808,31 @@ function marioPress(dir,on){
 // Salto desde teclado: simulamos "tap" (jump pulsado un par de frames y luego liberado).
 // Para tablet usamos los handlers ontouch directamente (mantén = altura variable).
 function marioJump(){marioPress('jump',1);setTimeout(()=>marioPress('jump',0),200)}
+// Delta-time normalizado: skip frames si vamos a 120Hz, dobla updates si vamos a 30Hz.
+// Más seguro que reescribir toda la física a multiplicaciones por dt.
+let _marioLastT=0,_marioAcc=0;
 function marioStep(){
   if(game.screen!=='mario'){marioLoop=null;return}
   const W=marioWorld,p=marioPlayer;
   if(!p||!W){marioLoop=requestAnimationFrame(marioStep);return}
+  // Frame rate normalization: ejecuta lógica a ~60 FPS independientemente de pantalla
+  const now=performance.now();
+  if(_marioLastT===0)_marioLastT=now;
+  const dt=Math.min(now-_marioLastT,100);_marioLastT=now;
+  _marioAcc+=dt;
+  const STEP=1000/60; // 16.67ms = 60FPS
+  let stepsRun=0;const MAX_STEPS=3; // evita death-spiral si pestaña inactiva
+  // Si va MUY rápido (120Hz), saltamos frames; si va lento (30Hz), corremos 2 steps
+  while(_marioAcc>=STEP&&stepsRun<MAX_STEPS){
+    marioPhysicsStep(p,W);
+    _marioAcc-=STEP;stepsRun++;
+    if(game.screen!=='mario'){marioLoop=null;return}
+  }
+  // Render solo una vez por frame (no por step)
+  marioRender();
+  marioLoop=requestAnimationFrame(marioStep);
+}
+function marioPhysicsStep(p,W){
   // Input
   if(marioKeys.left){p.vx=Math.max(p.vx-.35,-3.6);p.facing=-1}
   else if(marioKeys.right){p.vx=Math.min(p.vx+.35,3.6);p.facing=1}
@@ -5741,7 +5899,12 @@ function marioStep(){
   if(p.y>MARIO_VH+50){
     marioLives--;document.getElementById('marioLives').textContent=marioLives;
     if(marioLives<=0){marioFail();return}
-    sndLose();toast('💀 Caíste...');marioLoadLevel();
+    sndLose();toast('💀 Caíste...');
+    // Reaparece en checkpoint si lo había alcanzado, si no carga nivel desde inicio
+    const hadCheckpoint=marioPlayer&&marioPlayer.checkpointReached;
+    const cpX=marioPlayer&&marioPlayer.checkpointX;
+    marioLoadLevel();
+    if(hadCheckpoint&&cpX&&marioPlayer){marioPlayer.x=cpX;marioPlayer.checkpointReached=true;marioPlayer.checkpointX=cpX;marioCam.x=Math.max(0,cpX-MARIO_VW/2)}
   }
   // Pickups
   for(const pk of marioPickups){
@@ -5760,6 +5923,31 @@ function marioStep(){
       document.getElementById('marioScore').textContent=marioScore;
       document.getElementById('marioLives').textContent=marioLives;
     }
+  }
+  // CAJAS misteriosas: golpear desde abajo (saltando contra ellas) las abre
+  for(const box of marioBoxes){
+    if(box.opened)continue;
+    // Cuadrado 24x24 alrededor de (box.x, box.y)
+    const bx=box.x-12,by=box.y-12,bw=24,bh=24;
+    // Detección: jugador subiendo (vy<0) y cabeza tocando parte inferior de la caja
+    if(p.x+24>bx&&p.x<bx+bw&&p.y<by+bh&&p.y>by-15&&p.vy<0){
+      box.opened=true;
+      p.vy=1; // rebote ligero hacia abajo
+      // Spawnea contenido como pickup nuevo justo encima
+      if(box.content==='coin'){marioScore+=20;sndCoin();marioPickups.push({x:box.x,y:box.y-30,kind:'coin',taken:true,floatUp:performance.now()})}
+      else if(box.content==='star'){marioPickups.push({x:box.x,y:box.y-30,kind:'star',taken:false})}
+      else if(box.content==='1up'){marioLives++;sndWin();toast('💚 +1 vida!');document.getElementById('marioLives').textContent=marioLives}
+    }
+    // Solidez de la caja por arriba (puedes pisarla si está cerrada)
+    if(!box.opened&&p.x+24>bx&&p.x<bx+bw&&p.y+30>=by&&p.y+30<=by+10&&p.vy>=0){
+      p.y=by-30;p.vy=0;p.onGround=true;
+    }
+  }
+  // CHECKPOINT (mitad de cada nivel)
+  const halfX=W.width/2;
+  if(!p.checkpointReached&&p.x>=halfX){
+    p.checkpointReached=true;p.checkpointX=halfX;
+    sndCoin();toast('🏁 Checkpoint alcanzado',2500);
   }
   // Enemigos
   for(const e of marioEnemies){
@@ -5789,8 +5977,7 @@ function marioStep(){
   marioCam.x+=(target-marioCam.x)*0.18;
   // Meta
   if(p.x+24>W.goal.x&&p.x<W.goal.x+30){marioNextLevel();return}
-  marioRender();
-  marioLoop=requestAnimationFrame(marioStep);
+  // Render y RAF están en marioStep (antes era aquí, ahora movidos al wrapper con delta-time)
 }
 function marioNextLevel(){
   sndWin();confetti(40);
@@ -5886,6 +6073,29 @@ function marioRender(){
     ctx.fillStyle='rgba(255,255,255,.6)';
     const arrow=mp.vx>0?'▶':'◀';
     ctx.font='10px sans-serif';ctx.fillText(arrow,mp.x+mp.w/2-4,mp.y+12);
+  }
+  // CAJAS MISTERIOSAS (estilo Mario clásico)
+  for(const box of marioBoxes){
+    if(box.x<cam-30||box.x>cam+MARIO_VW+30)continue;
+    const bx=box.x-12,by=box.y-12;
+    if(box.opened){
+      // Caja abierta: marrón apagado
+      ctx.fillStyle='#5d4037';ctx.fillRect(bx,by,24,24);
+      ctx.fillStyle='#3e2723';ctx.fillRect(bx,by,24,3);ctx.fillRect(bx,by+21,24,3);
+    }else{
+      // Caja con interrogación pulsante
+      const pulse=1+Math.sin(performance.now()/300+box.x)*.06;
+      const cw=24*pulse,ch=24*pulse;
+      const ox=bx+(24-cw)/2,oy=by+(24-ch)/2;
+      const g=ctx.createLinearGradient(ox,oy,ox,oy+ch);
+      g.addColorStop(0,'#ffeb3b');g.addColorStop(1,'#fbc02d');
+      ctx.fillStyle=g;ctx.fillRect(ox,oy,cw,ch);
+      ctx.fillStyle='#bf8400';ctx.fillRect(ox,oy,cw,2);ctx.fillRect(ox,oy+ch-2,cw,2);
+      // Símbolo "?"
+      ctx.fillStyle='#fff';ctx.font='bold 18px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('?',ox+cw/2,oy+ch/2);
+      ctx.textAlign='left';ctx.textBaseline='alphabetic';
+    }
   }
   // Tubos (verde estilo Mario)
   for(const pipe of W.pipes){
@@ -6056,12 +6266,15 @@ function marioDrawAstronaut(ctx,p){
 
 // ========== DINO RUNNER (paisaje atardecer/noche + T-Rex con power-ups) ==========
 const DINO_W=900,DINO_H=320,DINO_GROUND=260;
-let dinoPlayer,dinoSpeed,dinoScore,dinoBest=0,dinoLoop=null,dinoObstacles=[],dinoSpawnT=0,dinoDone=false,dinoClouds=[],dinoGroundOffset=0,dinoMountains=[],dinoStars=[],dinoPowerups=[],dinoPowerupSpawn=0;
+let dinoPlayer,dinoSpeed,dinoScore,dinoBest=0,dinoLoop=null,dinoObstacles=[],dinoSpawnT=0,dinoDone=false,dinoClouds=[],dinoGroundOffset=0,dinoMountains=[],dinoStars=[],dinoPowerups=[],dinoPowerupSpawn=0,dinoSpeedBand=0;
 function dinoStart(){
   setupHiDPI(document.getElementById('dino-canvas'),DINO_W,DINO_H);
-  dinoBest=parseInt(localStorage.getItem('dino_best')||'0',10);
+  // Récord PER NIÑO (no global): cada hermano tiene su mejor puntuación
+  const p0=getPlayer();
+  dinoBest=(p0&&p0.dinoBest)||parseInt(localStorage.getItem('dino_best')||'0',10);
   dinoPlayer={x:80,y:DINO_GROUND-66,vy:0,onGround:true,crouch:false,shield:0,shieldExpireAt:0,combo:0,comboTimer:0};
   dinoSpeed=5;dinoScore=0;dinoObstacles=[];dinoPowerups=[];dinoSpawnT=90;dinoPowerupSpawn=400;dinoDone=false;dinoGroundOffset=0;
+  dinoSpeedBand=0;_dinoLastT=0;_dinoAcc=0; // reset delta-time + speed band
   dinoClouds=[];
   for(let i=0;i<5;i++)dinoClouds.push({x:Math.random()*DINO_W,y:Math.random()*80+25,size:Math.random()*0.6+0.7});
   dinoMountains=[];
@@ -6085,8 +6298,24 @@ function dinoCrouch(on){
   if(dinoPlayer&&!dinoDone&&dinoPlayer.onGround)dinoPlayer.crouch=!!on;
   else if(dinoPlayer&&!on)dinoPlayer.crouch=false;
 }
+// Delta-time wrapper: estabiliza física a 60 FPS lógicos
+let _dinoLastT=0,_dinoAcc=0;
 function dinoStep(){
   if(game.screen!=='dino'||dinoDone){dinoLoop=null;return}
+  const now=performance.now();
+  if(_dinoLastT===0)_dinoLastT=now;
+  const dt=Math.min(now-_dinoLastT,100);_dinoLastT=now;
+  _dinoAcc+=dt;
+  const STEP=1000/60;
+  let stepsRun=0;const MAX_STEPS=3;
+  while(_dinoAcc>=STEP&&stepsRun<MAX_STEPS){
+    if(!dinoPhysicsStep())return;
+    _dinoAcc-=STEP;stepsRun++;
+  }
+  dinoRender();
+  dinoLoop=requestAnimationFrame(dinoStep);
+}
+function dinoPhysicsStep(){
   const p=dinoPlayer;
   // Físicas
   p.vy+=0.78;if(p.vy>17)p.vy=17;
@@ -6114,11 +6343,13 @@ function dinoStep(){
       const h=sz==='lg'?60:(sz==='group'?42:42);
       dinoObstacles.push({type:'cactus',sz,x:DINO_W,y:DINO_GROUND-h,passed:false});
     }else{
-      // Pterodáctilo: alturas REVISADAS para que el pájaro bajo sea esquivable agachándose
-      // Alto = saltable; medio = agachable; bajo solo si hay tiempo de reacción
+      // Pterodáctilo: alturas para ser esquivable
+      // Bajo = -75 (agachado limpio: cabe debajo) — antes -60 era imposible
+      // Medio = -100 (agachable o saltable)
+      // Alto = -135 (sólo saltable)
       const yChoices=dinoSpeed<10
-        ? [DINO_GROUND-90,DINO_GROUND-130]   // velocidad media: solo alturas saltables/agachables fáciles
-        : [DINO_GROUND-60,DINO_GROUND-90,DINO_GROUND-130]; // velocidad alta: incluye bajo
+        ? [DINO_GROUND-100,DINO_GROUND-135]
+        : [DINO_GROUND-75,DINO_GROUND-100,DINO_GROUND-135];
       const y=yChoices[Math.floor(Math.random()*yChoices.length)];
       dinoObstacles.push({type:'bird',x:DINO_W,y,frame:0,passed:false});
     }
@@ -6133,7 +6364,8 @@ function dinoStep(){
     // Combo: contar al pasar al obstáculo (sólo una vez)
     if(!o.passed&&o.x+50<p.x){o.passed=true;p.combo++;p.comboTimer=120;
       if(p.combo>0&&p.combo%5===0){confetti(8);toast('🔥 Combo x'+p.combo+'!',1500)}}
-    const pw=p.crouch?56:38,ph=p.crouch?38:62;
+    // Hitbox ampliada para incluir el hocico del T-Rex (antes pw=38 dejaba el morro fuera)
+    const pw=p.crouch?70:54,ph=p.crouch?38:62;
     const px=p.x+6,py=p.y+4;
     let ow,oh,ox,oy;
     if(o.type==='bird'){ow=44;oh=26;ox=o.x+6;oy=o.y+6}
@@ -6143,7 +6375,7 @@ function dinoStep(){
     if(px+pw>ox&&px<ox+ow&&py+ph>oy&&py<oy+oh){
       // Si tiene escudo activo, lo consume y elimina obstáculo
       if(p.shield>0){p.shield=0;p.shieldExpireAt=0;dinoObstacles.splice(i,1);sndWin();confetti(15);continue}
-      dinoFail();return;
+      dinoFail();return false;
     }
   }
   // Decaer timer del combo (si no esquivamos en X frames, reset)
@@ -6172,10 +6404,12 @@ function dinoStep(){
   // Score y velocidad (multiplicador por combo)
   const mult=1+Math.min(p.combo,10)*0.1;
   dinoScore+=mult;
-  if(Math.floor(dinoScore)%180===0&&dinoSpeed<16){dinoSpeed+=0.5}
+  // Velocidad escalada por bandas (no por módulo, que falla con dinoScore decimal)
+  if(!dinoSpeedBand)dinoSpeedBand=0;
+  const currentBand=Math.floor(dinoScore/180);
+  if(currentBand>dinoSpeedBand&&dinoSpeed<16){dinoSpeed+=0.5;dinoSpeedBand=currentBand}
   document.getElementById('dinoScore').textContent=Math.floor(dinoScore/3);
-  dinoRender();
-  dinoLoop=requestAnimationFrame(dinoStep);
+  return true; // continua loop
 }
 function dinoFail(){
   dinoDone=true;
@@ -6183,7 +6417,12 @@ function dinoFail(){
   sndLose();
   const final=Math.floor(dinoScore/3);
   let nuevoRecord=false;
-  if(final>dinoBest){dinoBest=final;localStorage.setItem('dino_best',dinoBest);document.getElementById('dinoBest').textContent=dinoBest;nuevoRecord=true}
+  if(final>dinoBest){
+    dinoBest=final;
+    // Récord PER NIÑO (no global)
+    const p1=getPlayer();if(p1){p1.dinoBest=final;save()}
+    document.getElementById('dinoBest').textContent=dinoBest;nuevoRecord=true;
+  }
   document.getElementById('dinoStatus').textContent='💀 Game Over · '+final+' pts'+(nuevoRecord?' · ¡NUEVO RÉCORD!':'');
   if(final>50){addXP(10);getPlayer().coins+=10;save()}
   if(nuevoRecord)confetti(40);
