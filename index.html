@@ -1562,10 +1562,10 @@ const GALAXIES=[
   planets:['Colors','Animals','Números','Família','Andorra'],
   boss:{name:'El Drac dels Pirineus',emoji:'🐉'}},
 {id:'ve',name:'Galaxia Venezolana',emoji:'🌴',flag:'🇻🇪',color:'#fdd835',lang:'es-ES',
-  planets:['Geografía','Historia','Cultura','Símbolos','Naturaleza'],
+  planets:['Geografía','Historia','Cultura','Símbolos','Naturaleza','Himno Nacional','Estados','Próceres'],
   boss:{name:'El Tepuy Místico',emoji:'⛰️'}},
 {id:'co',name:'Galaxia Colombiana',emoji:'☕',flag:'🇨🇴',color:'#fbc02d',lang:'es-ES',
-  planets:['Geografía','Historia','Cultura','Comida','Lugares'],
+  planets:['Geografía','Historia','Cultura','Comida','Lugares','Himno Nacional','Departamentos','Personajes'],
   boss:{name:'El Cóndor de los Andes',emoji:'🦅'}}
 ];
 
@@ -2576,18 +2576,28 @@ ve:[
 {q:'¿Qué mar baña la costa de Venezuela?',o:['Mar Mediterráneo','Mar Caribe','Mar Negro','Mar Báltico'],a:1,level:'ce1'},
 {q:'¿En qué estado está el Lago de Maracaibo?',o:['Mérida','Lara','Zulia','Falcón'],a:2,level:'ce2'},
 {q:'¿Qué tepuy es el más famoso de Venezuela?',o:['Roraima','Auyán-Tepui','Ambos','Ninguno'],a:2,level:'cm1'},
-{q:'¿Cuál es la isla más grande de Venezuela?',o:['Margarita','La Tortuga','Coche','Cubagua'],a:0,level:'ce2'}
+{q:'¿Cuál es la isla más grande de Venezuela?',o:['Margarita','La Tortuga','Coche','Cubagua'],a:0,level:'ce2'},
+{q:'¿Con qué tres países tiene frontera Venezuela?',o:['Brasil, Colombia y Guyana','Perú, Ecuador y Brasil','Argentina, Chile y Uruguay','México, Cuba y Haití'],a:0,level:'cm1'},
+{q:'¿Cuál es el segundo lago más grande de Sudamérica que está en Venezuela?',o:['Titicaca','Maracaibo','Valencia','Guri'],a:1,level:'cm1'},
+{q:'¿Cómo se llama la cordillera que cruza el oeste de Venezuela?',o:['Andina','Costanera','Pirineos','Cordillera Central'],a:0,level:'cm2'},
+{q:'¿Qué estado venezolano está en el extremo occidental?',o:['Sucre','Zulia','Amazonas','Bolívar'],a:1,level:'cm1'},
+{q:'¿Cuál es la altura del Salto Ángel?',o:['979 metros','500 metros','1500 metros','200 metros'],a:0,level:'cm2'}
 ],[ // Planeta 2 — Historia
 {q:'¿Quién es "El Libertador" de Venezuela?',o:['Francisco de Miranda','Simón Bolívar','José Antonio Páez','Antonio José de Sucre'],a:1,level:'cp'},
 {q:'¿En qué año declaró Venezuela su independencia?',o:['1810','1811','1819','1821'],a:1,level:'ce2'},
 {q:'¿Qué se celebra el 5 de julio en Venezuela?',o:['Día del trabajador','Día de la independencia','Día de la madre','Día del niño'],a:1,level:'cp'},
-{q:'¿Quién escribió la primera bandera de Venezuela?',o:['Simón Bolívar','Francisco de Miranda','Antonio José de Sucre','José Félix Ribas'],a:1,level:'cm1'},
+{q:'¿Quién diseñó la primera bandera de Venezuela?',o:['Simón Bolívar','Francisco de Miranda','Antonio José de Sucre','José Félix Ribas'],a:1,level:'cm1'},
 {q:'¿Quién venció en la Batalla de Carabobo (1821)?',o:['España','Venezuela (Bolívar)','Francia','Empate'],a:1,level:'cm1'},
 {q:'¿Quién fue el principal estratega militar de Bolívar?',o:['Sucre','Páez','Miranda','Ribas'],a:0,level:'cm2'},
 {q:'¿En qué ciudad nació Simón Bolívar?',o:['Maracaibo','Caracas','Valencia','Mérida'],a:1,level:'ce1'},
 {q:'¿Qué países liberó Bolívar?',o:['Solo Venezuela','Venezuela y Colombia','Venezuela, Colombia, Ecuador, Perú y Bolivia','Ninguno'],a:2,level:'cm2'},
 {q:'¿Cómo se llama la "Casa Natal" de Bolívar?',o:['Casa Bolívar','Casa Natal del Libertador','Casa de la Independencia','Casa Roja'],a:1,level:'cm1'},
-{q:'¿Quién fue Manuela Sáenz?',o:['Esposa de Bolívar','Compañera y libertadora','Hermana de Bolívar','Una poeta'],a:1,level:'cm2'}
+{q:'¿Quién fue Manuela Sáenz?',o:['Esposa de Bolívar','Compañera y libertadora','Hermana de Bolívar','Una poeta'],a:1,level:'cm2'},
+{q:'¿En qué fecha exacta firmó Venezuela su acta de independencia?',o:['19 de abril de 1810','5 de julio de 1811','24 de junio de 1821','17 de diciembre de 1830'],a:1,level:'cm2'},
+{q:'¿Quién fue el primer presidente de Venezuela tras la separación de la Gran Colombia?',o:['Simón Bolívar','José Antonio Páez','Antonio Guzmán Blanco','Cipriano Castro'],a:1,level:'cm2'},
+{q:'¿En qué año murió Simón Bolívar?',o:['1819','1825','1830','1842'],a:2,level:'cm2'},
+{q:'¿En qué ciudad de Colombia murió Bolívar?',o:['Bogotá','Cartagena','Santa Marta','Cali'],a:2,level:'cm2'},
+{q:'¿Cómo se llamó la república que unió Venezuela, Colombia, Ecuador y Panamá?',o:['Federación Andina','Gran Colombia','Confederación del Sur','Liga Bolivariana'],a:1,level:'cm1'}
 ],[ // Planeta 3 — Cultura
 {q:'¿Cuál es el plato típico de Venezuela?',o:['Pizza','Arepa','Sushi','Croissant'],a:1,level:'cp'},
 {q:'¿Qué baile es famoso en Venezuela (los llanos)?',o:['Tango','Joropo','Flamenco','Samba'],a:1,level:'ce1'},
@@ -2596,20 +2606,30 @@ ve:[
 {q:'¿Qué bebida típica se hace con maíz dulce?',o:['Café','Chicha venezolana','Leche','Té'],a:1,level:'ce2'},
 {q:'¿Qué instrumento típico del joropo es de cuerda?',o:['Cuatro','Guitarra eléctrica','Piano','Trompeta'],a:0,level:'cm1'},
 {q:'¿Cómo se llama el muñeco que se quema en fin de año?',o:['Año Viejo','Pepe','Don Quijote','Bolívar'],a:0,level:'ce2'},
-{q:'¿Quién es Hugo Chávez?',o:['Un cantante','Un expresidente de Venezuela','Un futbolista','Un poeta'],a:1,level:'cm2'},
+{q:'¿Quién fue Hugo Chávez?',o:['Un cantante','Un expresidente de Venezuela','Un futbolista','Un poeta'],a:1,level:'cm2'},
 {q:'¿Cuál es la bebida nacional?',o:['Té','Café','Coca','Vino'],a:1,level:'ce1'},
-{q:'¿Qué fruta es muy típica de Venezuela?',o:['Mango','Manzana','Pera','Uva'],a:0,level:'cp'}
+{q:'¿Qué fruta es muy típica de Venezuela?',o:['Mango','Manzana','Pera','Uva'],a:0,level:'cp'},
+{q:'¿Qué festividad religiosa atrae miles de peregrinos a Mérida cada año?',o:['Día de los Muertos','Paradura del Niño','Carnaval','Semana Santa Rusa'],a:1,level:'cm2'},
+{q:'¿Qué tipo de música se canta a la Virgen del Valle?',o:['Reggaeton','Gaitas zulianas y galerones','Flamenco','Tango'],a:1,level:'cm1'},
+{q:'¿Qué baile afro-venezolano se acompaña con tambores?',o:['Vals','San Juan / Tambor','Mambo','Cumbia'],a:1,level:'cm1'},
+{q:'¿Qué deporte es el más popular en Venezuela?',o:['Fútbol americano','Béisbol','Cricket','Hockey'],a:1,level:'ce1'},
+{q:'¿Qué se acostumbra comer el Día de la Cruz de Mayo?',o:['Hallacas','Sancocho y sopa','Pizza','Hamburguesas'],a:1,level:'cm2'}
 ],[ // Planeta 4 — Símbolos patrios
 {q:'¿De qué colores es la bandera venezolana?',o:['Rojo, blanco y azul','Amarillo, azul y rojo','Verde, blanco y rojo','Negro, rojo y amarillo'],a:1,level:'cp'},
 {q:'¿Cuántas estrellas tiene la bandera venezolana?',o:['5','7','8','10'],a:2,level:'ce1'},
-{q:'¿Qué representan las 8 estrellas?',o:['Las regiones','Las provincias que firmaron la independencia','Las playas','Los presidentes'],a:1,level:'cm1'},
+{q:'¿Qué representan las 8 estrellas de la bandera?',o:['Las regiones','Las provincias que firmaron la independencia + Guayana','Las playas','Los presidentes'],a:1,level:'cm1'},
 {q:'¿Cómo se llama el himno nacional de Venezuela?',o:['"La Marcha"','"Gloria al Bravo Pueblo"','"Patria Hermosa"','"Caballo Viejo"'],a:1,level:'ce2'},
 {q:'¿Cuál es el ave nacional?',o:['Águila','Turpial','Cóndor','Pelícano'],a:1,level:'ce1'},
-{q:'¿Cuál es la flor nacional?',o:['Rosa','Orquídea','Girasol','Tulipán'],a:1,level:'ce2'},
+{q:'¿Cuál es la flor nacional?',o:['Rosa','Orquídea (Flor de Mayo)','Girasol','Tulipán'],a:1,level:'ce2'},
 {q:'¿Cuál es el árbol nacional?',o:['Palmera','Araguaney','Cedro','Pino'],a:1,level:'ce2'},
-{q:'¿Qué animal aparece en el escudo?',o:['León','Caballo blanco','Águila','Tigre'],a:1,level:'cm1'},
-{q:'¿De qué color son las ramas del escudo?',o:['Verde','Una de oliva (paz) y otra de palma (victoria)','Rojas','Azules'],a:1,level:'cm2'},
-{q:'¿Cuál es la moneda oficial?',o:['Peso','Bolívar','Dólar','Real'],a:1,level:'ce1'}
+{q:'¿Qué animal aparece corriendo libre en el escudo?',o:['León','Caballo blanco','Águila','Tigre'],a:1,level:'cm1'},
+{q:'¿Qué simbolizan las ramas del escudo (oliva y palma)?',o:['Riqueza','Paz y victoria','Libertad','Honor'],a:1,level:'cm2'},
+{q:'¿Cuál es la moneda oficial?',o:['Peso','Bolívar','Dólar','Real'],a:1,level:'ce1'},
+{q:'¿Qué color de la bandera representa las riquezas del país?',o:['Amarillo (oro)','Azul','Rojo','Blanco'],a:0,level:'cm1'},
+{q:'¿Qué representa el azul en la bandera?',o:['El cielo','El mar que separó a Venezuela de España','Los ríos','Las montañas'],a:1,level:'cm2'},
+{q:'¿Qué representa el rojo en la bandera?',o:['El amor','La sangre derramada por la libertad','El sol','La tierra'],a:1,level:'cm1'},
+{q:'¿Cuántas franjas horizontales tiene la bandera de Venezuela?',o:['2','3','4','5'],a:1,level:'cp'},
+{q:'¿Quién creó el escudo nacional de Venezuela?',o:['Bolívar personalmente','Lo decretó el Congreso de 1836','Miranda','Páez'],a:1,level:'cm2'}
 ],[ // Planeta 5 — Naturaleza
 {q:'¿Qué animal en peligro vive en los Andes venezolanos?',o:['Oso panda','Oso frontino (de anteojos)','Oso polar','Lobo'],a:1,level:'cm1'},
 {q:'¿Qué pájaro tiene el plumaje rojo y vive en los llanos?',o:['Águila','Garza','Ibis escarlata (corocoro)','Loro'],a:2,level:'cm1'},
@@ -2617,10 +2637,58 @@ ve:[
 {q:'¿Qué reptil grande vive en el Orinoco?',o:['Caimán del Orinoco','Cocodrilo del Nilo','Tortuga','Boa'],a:0,level:'cm1'},
 {q:'¿Cómo se llama el delfín del río Orinoco?',o:['Delfín gris','Tonina (delfín rosado)','Delfín mular','Orca'],a:1,level:'cm2'},
 {q:'¿Qué flor es la nacional?',o:['Rosa de Pascua','Flor de Mayo (orquídea)','Tulipán','Cactus'],a:1,level:'ce2'},
-{q:'¿Qué fenómeno luminoso aparece en el Catatumbo?',o:['Auroras','Relámpagos del Catatumbo','Cometas','Eclipses'],a:1,level:'cm2'},
-{q:'¿Qué animal grande pasta en los llanos?',o:['Capibara','Vaca','Caballo salvaje','Todos'],a:3,level:'ce2'},
+{q:'¿Qué fenómeno luminoso aparece sobre el río Catatumbo?',o:['Auroras','Relámpagos del Catatumbo','Cometas','Eclipses'],a:1,level:'cm2'},
+{q:'¿Qué roedor gigante pasta en los llanos?',o:['Capibara (chigüire)','Conejo','Ardilla','Ratón'],a:0,level:'ce2'},
 {q:'¿Qué fauna típica se ve en el Salto Ángel?',o:['Pingüinos','Aves rapaces y monos aulladores','Osos polares','Camellos'],a:1,level:'cm1'},
-{q:'¿Qué planta da el cacao venezolano (chocolate)?',o:['Caña','Theobroma cacao','Café','Maíz'],a:1,level:'cm2'}
+{q:'¿De qué planta se hace el chocolate venezolano de fama mundial?',o:['Caña','Theobroma cacao','Café','Maíz'],a:1,level:'cm2'},
+{q:'¿Cómo se llama el parque nacional donde está el Salto Ángel?',o:['Henri Pittier','Canaima','Médanos de Coro','Mochima'],a:1,level:'cm1'},
+{q:'¿Qué parque marino tiene playas e islas en el oriente del país?',o:['Mochima','Canaima','Sierra Nevada','Yacambú'],a:0,level:'cm2'},
+{q:'¿Qué felino emblemático de los llanos es el más grande de América?',o:['Puma','Jaguar','Ocelote','Lince'],a:1,level:'cm1'},
+{q:'¿Qué reptil acuático muy grande también vive en el Orinoco y se llama "anaconda"?',o:['Boa esmeralda','Anaconda verde','Cobra','Mamba'],a:1,level:'cm2'},
+{q:'¿Cómo se llaman las mesetas de roca con cima plana del sur de Venezuela?',o:['Mesas','Tepuyes','Volcanes','Glaciares'],a:1,level:'cm1'}
+],[ // Planeta 6 — Himno Nacional "Gloria al Bravo Pueblo"
+{q:'¿Cómo empieza el coro del himno de Venezuela?',o:['"¡Oh gloria inmarcesible!"','"Gloria al bravo pueblo"','"Patria querida"','"Viva la patria"'],a:1,level:'cp'},
+{q:'¿Quién compuso la música del himno de Venezuela?',o:['Vicente Salias','Juan José Landaeta','José María Vargas','Lino Gallardo'],a:1,level:'ce2'},
+{q:'¿A quién se atribuye la letra del himno?',o:['Vicente Salias','Andrés Bello','Bolívar','Miranda'],a:0,level:'cm1'},
+{q:'¿En qué año se adoptó oficialmente "Gloria al Bravo Pueblo" como himno?',o:['1811','1830','1881','1947'],a:2,level:'cm2'},
+{q:'¿Qué presidente lo declaró himno nacional oficial?',o:['Páez','Antonio Guzmán Blanco','Juan Vicente Gómez','Cipriano Castro'],a:1,level:'cm2'},
+{q:'En el coro: "Gloria al bravo pueblo / que el yugo lanzó", ¿qué significa "yugo"?',o:['Una flor','La opresión / dominación','Una bebida','Una montaña'],a:1,level:'cm1'},
+{q:'¿Qué virtudes nombra el coro del himno?',o:['Fuerza y poder','La Ley, la virtud y el honor','Riqueza y gloria','Amor y paz'],a:1,level:'cm1'},
+{q:'¿En qué año se compuso originalmente la canción (antes de ser himno)?',o:['1810','1820','1850','1881'],a:0,level:'cm2'},
+{q:'¿Cuántas estrofas tiene el himno nacional de Venezuela?',o:['1','2','3','4'],a:2,level:'cm1'},
+{q:'En la primera estrofa, ¿qué se le pide a la patria?',o:['"Abajo cadenas / abajo cadenas"','"Despierta dormida"','"Adiós tristeza"','"Ven luz divina"'],a:0,level:'cm2'},
+{q:'¿Qué frase repite el coro del himno?',o:['"¡Viva la patria!"','"Gloria al bravo pueblo"','"Libertad, libertad"','"Adelante valientes"'],a:1,level:'ce2'},
+{q:'En la 2ª estrofa: "Gritaba el señor / y el pobre en su choza / libertad pidió", ¿qué pide el pobre?',o:['Pan','Libertad','Trabajo','Tierra'],a:1,level:'cm2'},
+{q:'En la 3ª estrofa: "Unida con lazos / que el cielo formó", ¿de qué une la patria?',o:['De familias','De América entera (toda la nación)','De ejércitos','De ciudades'],a:1,level:'cm2'},
+{q:'¿Cuándo es obligatorio entonar el himno en Venezuela?',o:['Solo en bodas','En actos oficiales y escolares','Solo en cumpleaños','Nunca'],a:1,level:'ce1'},
+{q:'¿Cómo debe pararse uno cuando suena el himno?',o:['Sentado','De pie y firme','Acostado','Bailando'],a:1,level:'cp'}
+],[ // Planeta 7 — Estados de Venezuela
+{q:'¿Cuál es la capital del estado Zulia?',o:['Maracay','Maracaibo','Valencia','Coro'],a:1,level:'ce1'},
+{q:'¿En qué estado están los Andes venezolanos y la ciudad de Mérida?',o:['Mérida','Táchira','Trujillo','Todos los anteriores'],a:3,level:'cm1'},
+{q:'¿Cuál es el estado más grande de Venezuela?',o:['Zulia','Bolívar','Amazonas','Guárico'],a:1,level:'cm1'},
+{q:'¿En qué estado está la ciudad de Valencia?',o:['Carabobo','Aragua','Lara','Yaracuy'],a:0,level:'ce2'},
+{q:'¿Cuál es la capital del estado Aragua?',o:['Maracay','Maracaibo','Mérida','Valera'],a:0,level:'ce2'},
+{q:'¿En qué estado está la Isla de Margarita?',o:['Sucre','Nueva Esparta','Anzoátegui','Falcón'],a:1,level:'ce2'},
+{q:'¿Cuál es la capital del estado Lara?',o:['Barquisimeto','Acarigua','Carora','El Tocuyo'],a:0,level:'ce2'},
+{q:'¿En qué estado están los Médanos de Coro?',o:['Falcón','Zulia','Yaracuy','Lara'],a:0,level:'cm1'},
+{q:'¿Qué estado es famoso por sus llanos y por el ganado?',o:['Mérida','Apure','Sucre','Vargas'],a:1,level:'ce2'},
+{q:'¿En qué estado está la capital Caracas (Distrito Capital)?',o:['Es un Distrito Capital independiente','Miranda','Vargas','Aragua'],a:0,level:'cm1'},
+{q:'¿Cuál es la capital del estado Bolívar?',o:['Ciudad Guayana','Ciudad Bolívar','Tucupita','Puerto Ordaz'],a:1,level:'cm1'},
+{q:'¿En qué estado está la represa del Guri (hidroeléctrica)?',o:['Bolívar','Amazonas','Delta Amacuro','Sucre'],a:0,level:'cm2'}
+],[ // Planeta 8 — Próceres y personajes
+{q:'¿Quién fue Andrés Bello?',o:['Un militar','Un sabio, gramático y maestro de Bolívar','Un pintor','Un futbolista'],a:1,level:'cm1'},
+{q:'¿Quién fue Simón Rodríguez?',o:['Maestro y mentor de Bolívar','Un cantante','Un soldado','Un pintor'],a:0,level:'cm1'},
+{q:'¿Quién fue Antonio José de Sucre?',o:['Un poeta','Mariscal de Ayacucho, héroe de la independencia','Un presidente colombiano','Un escritor'],a:1,level:'cm2'},
+{q:'¿Quién fue José Antonio Páez?',o:['Pintor','Un caudillo llanero, primer presidente de Venezuela','Un cantante','Un sacerdote'],a:1,level:'cm1'},
+{q:'¿Quién fue Luisa Cáceres de Arismendi?',o:['Una pintora','Una heroína de la independencia','Una poeta','Una reina'],a:1,level:'cm2'},
+{q:'¿Quién fue Rafael Urdaneta?',o:['Un general de la independencia','Un cantante','Un futbolista','Un explorador'],a:0,level:'cm2'},
+{q:'¿Quién fue Teresa Carreño?',o:['Una pianista venezolana mundialmente famosa','Una pintora','Una bailarina','Una actriz'],a:0,level:'cm2'},
+{q:'¿Quién fue Arturo Uslar Pietri?',o:['Un escritor y político venezolano','Un cantante','Un futbolista','Un boxeador'],a:0,level:'cm2'},
+{q:'¿Quién fue Rómulo Betancourt?',o:['Un cantante','Un presidente de Venezuela ("padre de la democracia")','Un militar','Un escritor'],a:1,level:'cm2'},
+{q:'¿Quién es José Gregorio Hernández?',o:['Un militar','Un médico beato, llamado "el médico de los pobres"','Un cantante','Un escritor'],a:1,level:'cm1'},
+{q:'¿Quién es Yulimar Rojas?',o:['Atleta venezolana, campeona olímpica de triple salto','Cantante','Actriz','Pintora'],a:0,level:'ce2'},
+{q:'¿Quién es Carolina Herrera?',o:['Una diseñadora venezolana de moda mundial','Una cantante','Una científica','Una actriz'],a:0,level:'cm1'},
+{q:'¿Quién fue Armando Reverón?',o:['Un pintor venezolano famoso','Un escritor','Un militar','Un cantante'],a:0,level:'cm2'}
 ]
 ],
 // ============ GALAXIA COLOMBIANA 🇨🇴 ============
@@ -2631,11 +2699,16 @@ co:[
 {q:'¿Qué cordillera atraviesa Colombia?',o:['Los Andes','Los Alpes','Los Pirineos','Los Apalaches'],a:0,level:'ce1'},
 {q:'¿Qué océanos baña Colombia?',o:['Solo Atlántico','Solo Pacífico','Atlántico y Pacífico','Ninguno'],a:2,level:'ce2'},
 {q:'¿Cuál es el río más largo de Colombia?',o:['Magdalena','Cauca','Amazonas','Orinoco'],a:0,level:'ce2'},
-{q:'¿Cuáles son las regiones naturales de Colombia?',o:['3','4','5','6'],a:3,level:'cm1'},
+{q:'¿Cuántas regiones naturales tiene Colombia?',o:['3','4','5','6'],a:3,level:'cm1'},
 {q:'¿En qué región está Bogotá?',o:['Caribe','Pacífica','Andina','Amazonía'],a:2,level:'ce1'},
 {q:'¿Qué archipiélago colombiano está en el Caribe?',o:['Galápagos','San Andrés y Providencia','Canarias','Baleares'],a:1,level:'cm1'},
 {q:'¿Cuál es la ciudad más grande del Caribe colombiano?',o:['Cartagena','Barranquilla','Santa Marta','Riohacha'],a:1,level:'cm1'},
-{q:'¿Qué nevado es el más alto de Colombia?',o:['Nevado del Ruiz','Pico Cristóbal Colón','Nevado del Tolima','Volcán Galeras'],a:1,level:'cm2'}
+{q:'¿Qué nevado es el más alto de Colombia?',o:['Nevado del Ruiz','Pico Cristóbal Colón','Nevado del Tolima','Volcán Galeras'],a:1,level:'cm2'},
+{q:'¿Con qué países tiene frontera Colombia?',o:['Venezuela, Brasil, Perú, Ecuador y Panamá','Solo Venezuela','Solo Ecuador','Brasil y Argentina'],a:0,level:'cm1'},
+{q:'¿En qué continente está Colombia?',o:['África','América del Sur','Centroamérica','Norteamérica'],a:1,level:'cp'},
+{q:'¿Cuál es la región más selvática de Colombia?',o:['Andina','Amazonía','Pacífica','Caribe'],a:1,level:'ce2'},
+{q:'¿Cuál es la región más lluviosa de Colombia (y del mundo)?',o:['Pacífica (Chocó)','Andina','Caribe','Llanos'],a:0,level:'cm2'},
+{q:'¿Qué río separa a Colombia de Venezuela en parte de su frontera?',o:['Amazonas','Orinoco / Arauca','Magdalena','Cauca'],a:1,level:'cm2'}
 ],[ // Planeta 2 — Historia
 {q:'¿En qué año se independizó Colombia?',o:['1810','1819','1821','1825'],a:1,level:'ce2'},
 {q:'¿Qué se celebra el 20 de julio en Colombia?',o:['Día de la independencia','Día del trabajador','Día de la madre','Día del idioma'],a:0,level:'cp'},
@@ -2646,7 +2719,12 @@ co:[
 {q:'¿Quién fue Antonia Santos?',o:['Una líder guerrillera de la independencia','Una pintora','Una doctora','Una atleta'],a:0,level:'cm2'},
 {q:'¿Quién es el escritor colombiano premio Nobel?',o:['Gabriel García Márquez','Pablo Neruda','Mario Vargas Llosa','Octavio Paz'],a:0,level:'cm1'},
 {q:'¿Qué famoso libro escribió García Márquez?',o:['Don Quijote','Cien años de soledad','El Aleph','Pedro Páramo'],a:1,level:'cm2'},
-{q:'¿Quién fue Camilo Torres Tenorio?',o:['Un médico','Un abogado y prócer ("Memorial de agravios")','Un soldado','Un poeta'],a:1,level:'cm2'}
+{q:'¿Quién fue Camilo Torres Tenorio?',o:['Un médico','Un abogado y prócer ("Memorial de agravios")','Un soldado','Un poeta'],a:1,level:'cm2'},
+{q:'¿Qué pasó el 20 de julio de 1810 en Bogotá?',o:['"El Florero de Llorente" (grito de independencia)','La firma de la paz','Una batalla','Una boda real'],a:0,level:'cm1'},
+{q:'¿Cuál fue la primera capital del Virreinato de la Nueva Granada?',o:['Cartagena','Santafé de Bogotá','Lima','Quito'],a:1,level:'cm2'},
+{q:'¿Quién fue el primer presidente de la Gran Colombia?',o:['Santander','Simón Bolívar','Páez','Sucre'],a:1,level:'cm1'},
+{q:'¿En qué año Panamá se separó de Colombia?',o:['1819','1830','1903','1948'],a:2,level:'cm2'},
+{q:'¿Quién pintó la obra "La balsa muisca" simbólica de la leyenda de El Dorado?',o:['Lo creó la cultura muisca prehispánica','Botero','Doris Salcedo','Picasso'],a:0,level:'cm2'}
 ],[ // Planeta 3 — Cultura
 {q:'¿Qué baile colombiano es famoso en todo el mundo?',o:['Tango','Cumbia','Flamenco','Samba'],a:1,level:'cp'},
 {q:'¿Qué otra música típica nació en la costa caribe?',o:['Vallenato','Bachata','Salsa','Reggaeton'],a:0,level:'ce1'},
@@ -2657,7 +2735,12 @@ co:[
 {q:'¿Qué pintor colombiano es famoso por sus figuras "gorditas"?',o:['Botero (Fernando)','Picasso','Dalí','Miró'],a:0,level:'cm1'},
 {q:'¿Qué es el "Carnaval de Barranquilla"?',o:['Una boda','Un festival enorme de música y baile','Un partido','Un concurso'],a:1,level:'ce2'},
 {q:'¿Qué cantante colombiana joven canta "Tusa"?',o:['Shakira','Karol G','Anitta','Rosalía'],a:1,level:'cm1'},
-{q:'¿Qué se celebra el 7 de diciembre (Día de las velitas)?',o:['Independencia','La Inmaculada Concepción (con velas y faroles)','Año nuevo','Día de la madre'],a:1,level:'cm1'}
+{q:'¿Qué se celebra el 7 de diciembre (Día de las velitas)?',o:['Independencia','La Inmaculada Concepción (con velas y faroles)','Año nuevo','Día de la madre'],a:1,level:'cm1'},
+{q:'¿Qué instrumento de origen indígena se usa en la cumbia?',o:['Gaita y tambor','Piano','Trompeta','Violín'],a:0,level:'cm1'},
+{q:'¿Qué famoso ciclista colombiano ganó el Tour de Francia 2019?',o:['Nairo Quintana','Egan Bernal','Rigoberto Urán','Fernando Gaviria'],a:1,level:'cm1'},
+{q:'¿Qué cantante reciente colombiana es famosa por "Despechá" y otras?',o:['Karol G','Shakira','Greeicy','Todas las anteriores'],a:3,level:'ce2'},
+{q:'¿Cómo se llama el carnaval de las flores en Medellín?',o:['Feria de las Flores','Carnaval de Río','Festival del Sol','Fiesta Brava'],a:0,level:'cm1'},
+{q:'¿Qué actor colombiano fue premiado por "El Olvido que Seremos"?',o:['Sebastián Yatra','Juan Pablo Urrego','Juancho Cardona','Javier Cámara (español, en la peli)'],a:3,level:'cm2'}
 ],[ // Planeta 4 — Comida típica
 {q:'¿Cuál es el plato más famoso de Colombia?',o:['Pizza','Bandeja paisa','Paella','Tacos'],a:1,level:'ce1'},
 {q:'¿Qué lleva la "bandeja paisa"?',o:['Frijol, arroz, carne, chorizo, huevo, plátano y aguacate','Solo carne','Pasta','Sopa'],a:0,level:'ce2'},
@@ -2668,7 +2751,11 @@ co:[
 {q:'¿Qué fruta exótica colombiana es amarilla y dulce?',o:['Lulo','Maracuyá','Mangostino','Curuba'],a:1,level:'cm1'},
 {q:'¿Qué se sirve dentro de una arepa rellena?',o:['Solo queso','Carne, queso, huevo, aguacate (de todo)','Mermelada','Pasta'],a:1,level:'ce1'},
 {q:'¿Cuál es el plato típico de la costa caribe?',o:['Sancocho de pescado','Pizza','Sushi','Pasta'],a:0,level:'ce2'},
-{q:'¿Qué fruta tropical es el "rey" en Colombia?',o:['Manzana','Mango','Pera','Cereza'],a:1,level:'cp'}
+{q:'¿Qué fruta tropical es el "rey" en Colombia?',o:['Manzana','Mango','Pera','Cereza'],a:1,level:'cp'},
+{q:'¿Qué se llama "lechona"?',o:['Cerdo entero relleno de arroz, asado al horno (típico Tolima)','Una sopa','Un postre','Una bebida'],a:0,level:'cm1'},
+{q:'¿Cuál es el producto agrícola más famoso de Colombia?',o:['Café','Té','Cacao','Arroz'],a:0,level:'cp'},
+{q:'¿Qué se llama un "buñuelo" colombiano?',o:['Pan','Bollo frito de queso y harina de maíz','Sopa','Pasta'],a:1,level:'ce2'},
+{q:'¿Qué empanada colombiana se hace de masa de maíz amarillo?',o:['Empanada paisa','Empanada gallega','Empanada china','Empanada de carne italiana'],a:0,level:'cm1'}
 ],[ // Planeta 5 — Lugares
 {q:'¿Qué ciudad colombiana es famosa por sus murallas y casco antiguo?',o:['Cali','Cartagena de Indias','Bogotá','Medellín'],a:1,level:'ce1'},
 {q:'¿Qué ciudad es la "ciudad de la eterna primavera"?',o:['Bogotá','Medellín','Cali','Cartagena'],a:1,level:'ce2'},
@@ -2679,7 +2766,62 @@ co:[
 {q:'¿Qué ciudad es famosa por la salsa?',o:['Bogotá','Cali','Medellín','Cartagena'],a:1,level:'ce1'},
 {q:'¿Qué montaña sagrada está cerca de Santa Marta?',o:['Sierra Nevada de Santa Marta','Pico Bolívar','Nevado del Ruiz','Galeras'],a:0,level:'cm1'},
 {q:'¿Qué parque arqueológico es famoso por sus estatuas?',o:['Tikal','San Agustín','Machu Picchu','Tulum'],a:1,level:'cm2'},
-{q:'¿Qué deporte de aventura se practica mucho en San Gil?',o:['Surf','Rafting y deportes extremos','Esquí','Golf'],a:1,level:'cm1'}
+{q:'¿Qué deporte de aventura se practica mucho en San Gil?',o:['Surf','Rafting y deportes extremos','Esquí','Golf'],a:1,level:'cm1'},
+{q:'¿Qué catedral está construida dentro de una mina de sal?',o:['Catedral Primada','Catedral de Sal de Zipaquirá','Catedral de Cali','Catedral de Sevilla'],a:1,level:'cm1'},
+{q:'¿Qué famoso peñón se sube por una escalera de 740 escalones cerca de Medellín?',o:['Peñol de Guatapé','Roca Galera','Roca Mágica','Cerro de Monserrate'],a:0,level:'cm1'},
+{q:'¿Qué cerro famoso está sobre Bogotá con un santuario?',o:['Pan de Azúcar','Monserrate','Volcán Galeras','El Ávila'],a:1,level:'ce2'},
+{q:'¿Qué ciudad colombiana es Patrimonio de la Humanidad por su centro histórico colonial?',o:['Bogotá','Cartagena de Indias','Cali','Bucaramanga'],a:1,level:'cm1'},
+{q:'¿Qué ciudad colombiana es la "puerta de entrada al Amazonas"?',o:['Leticia','Florencia','Mocoa','Mitú'],a:0,level:'cm2'}
+],[ // Planeta 6 — Himno Nacional "Oh Gloria Inmarcesible"
+{q:'¿Cómo empieza el coro del himno de Colombia?',o:['"Gloria al bravo pueblo"','"¡Oh gloria inmarcesible!"','"Adelante valientes"','"Patria querida"'],a:1,level:'cp'},
+{q:'¿Quién escribió la letra del himno de Colombia?',o:['Rafael Núñez','José Asunción Silva','Antonio Nariño','Bolívar'],a:0,level:'cm1'},
+{q:'¿Quién compuso la música del himno de Colombia?',o:['Oreste Sindici (italiano)','Rafael Núñez','Pedro Morales Pino','Adolfo Mejía'],a:0,level:'cm2'},
+{q:'¿En qué año se estrenó el himno (Cartagena, 1887)?',o:['1810','1819','1887','1920'],a:2,level:'cm2'},
+{q:'¿En qué año se adoptó oficialmente como himno (Ley 33)?',o:['1887','1903','1920','1948'],a:2,level:'cm2'},
+{q:'En el coro: "¡Oh gloria inmarcesible! / ¡Oh júbilo inmortal!", ¿qué significa "inmarcesible"?',o:['Que se marchita','Que no se marchita / eterna','Pequeña','Lejana'],a:1,level:'cm1'},
+{q:'¿Qué frase del coro habla del bien que crece tras el dolor?',o:['"En surcos de dolores / el bien germina ya"','"La virtud y honor"','"Patria querida"','"Adelante valientes"'],a:0,level:'cm2'},
+{q:'¿Cuántas estrofas tiene el himno nacional de Colombia?',o:['5','7','9','11'],a:3,level:'cm2'},
+{q:'¿Cuántas estrofas se cantan habitualmente?',o:['Coro y 1ª estrofa','Las 11 completas','Solo el coro','Coro y 5'],a:0,level:'cm1'},
+{q:'En la 1ª estrofa: "Cesó la horrible noche...", ¿a qué noche se refiere?',o:['A una tormenta','A la opresión colonial española','A un eclipse','A un sueño'],a:1,level:'cm2'},
+{q:'¿Quién era Rafael Núñez cuando escribió el himno?',o:['Un soldado','Presidente y poeta de Colombia','Un cura','Un científico'],a:1,level:'cm1'},
+{q:'¿En qué ciudad se interpretó por primera vez el himno?',o:['Bogotá','Cartagena de Indias','Medellín','Cali'],a:1,level:'cm2'},
+{q:'¿Cómo se debe estar cuando suena el himno nacional?',o:['Sentado','De pie y en silencio','Bailando','Acostado'],a:1,level:'cp'},
+{q:'¿Qué dice la 6ª estrofa famosa: "Centauros indomables / descienden a los llanos"? ¿A quiénes se refiere?',o:['A los caballos salvajes','A los llaneros que lucharon por la independencia','A unos extranjeros','A los músicos'],a:1,level:'cm2'},
+{q:'¿Qué fiesta nacional se acompaña SIEMPRE del himno?',o:['Halloween','El 20 de julio (Día de la Independencia)','Navidad','Año Nuevo'],a:1,level:'ce1'}
+],[ // Planeta 7 — Departamentos y capitales
+{q:'¿Cuál es la capital del departamento de Antioquia?',o:['Cali','Medellín','Pereira','Manizales'],a:1,level:'ce1'},
+{q:'¿Cuál es la capital del departamento del Valle del Cauca?',o:['Cali','Bogotá','Medellín','Pasto'],a:0,level:'ce2'},
+{q:'¿Cuál es la capital del departamento de Atlántico?',o:['Cartagena','Barranquilla','Santa Marta','Sincelejo'],a:1,level:'ce2'},
+{q:'¿Cuál es la capital del departamento de Bolívar?',o:['Cartagena de Indias','Cali','Pereira','Cúcuta'],a:0,level:'ce2'},
+{q:'¿Cuál es la capital del departamento de Santander?',o:['Bucaramanga','Cúcuta','Tunja','Ibagué'],a:0,level:'cm1'},
+{q:'¿Cuál es la capital del departamento de Norte de Santander?',o:['Cúcuta','Bucaramanga','Tunja','Pamplona'],a:0,level:'cm1'},
+{q:'¿Cuál es la capital del departamento de Boyacá?',o:['Tunja','Sogamoso','Duitama','Chiquinquirá'],a:0,level:'cm1'},
+{q:'¿Cuál es la capital del departamento del Tolima?',o:['Ibagué','Espinal','Honda','Mariquita'],a:0,level:'cm1'},
+{q:'¿Cuál es la capital del departamento del Huila?',o:['Neiva','Pitalito','Garzón','La Plata'],a:0,level:'cm1'},
+{q:'¿Cuál es la capital del departamento del Magdalena?',o:['Santa Marta','Cartagena','Riohacha','Sincelejo'],a:0,level:'cm1'},
+{q:'¿Cuál es la capital del departamento de Nariño?',o:['Pasto','Ipiales','Tumaco','Túquerres'],a:0,level:'cm1'},
+{q:'¿Cuál es la capital del departamento del Cauca?',o:['Popayán','Cali','Pasto','Buenaventura'],a:0,level:'cm1'},
+{q:'¿Cuál es la capital del departamento de Risaralda?',o:['Manizales','Pereira','Armenia','Cartago'],a:1,level:'cm1'},
+{q:'¿Cuál es la capital del departamento del Quindío?',o:['Manizales','Pereira','Armenia','Salento'],a:2,level:'cm1'},
+{q:'¿Cuál es la capital del departamento de Caldas?',o:['Manizales','Pereira','Armenia','Anserma'],a:0,level:'cm1'},
+{q:'¿Cuál es la capital del departamento de La Guajira?',o:['Riohacha','Maicao','Uribia','Manaure'],a:0,level:'cm2'},
+{q:'¿Cuál es la capital del departamento del Amazonas?',o:['Leticia','Mitú','Mocoa','Inírida'],a:0,level:'cm2'}
+],[ // Planeta 8 — Personajes ilustres
+{q:'¿Quién es Gabriel García Márquez?',o:['Un futbolista','Escritor Premio Nobel ("Gabo")','Un militar','Un cantante'],a:1,level:'ce2'},
+{q:'¿Quién es Fernando Botero?',o:['Pintor y escultor de figuras "voluminosas"','Un cantante','Un militar','Un científico'],a:0,level:'ce2'},
+{q:'¿Quién fue Antonio Nariño?',o:['Prócer, tradujo los Derechos del Hombre','Un cantante','Un poeta','Un cura'],a:0,level:'cm2'},
+{q:'¿Quién es Shakira?',o:['Una cantante colombiana mundialmente famosa','Una pintora','Una atleta','Una científica'],a:0,level:'cp'},
+{q:'¿Quién fue Manuel Elkin Patarroyo?',o:['Científico colombiano (vacuna sintética contra malaria)','Un pintor','Un cantante','Un futbolista'],a:0,level:'cm2'},
+{q:'¿Quién es Egan Bernal?',o:['Ciclista, ganador del Tour de Francia','Cantante','Pintor','Boxeador'],a:0,level:'cm1'},
+{q:'¿Quién es Juan Valdez?',o:['Personaje símbolo del café colombiano','Un futbolista real','Un presidente','Un cantante'],a:0,level:'ce2'},
+{q:'¿Quién fue Jorge Eliécer Gaitán?',o:['Líder político liberal asesinado en 1948','Un cantante','Un pintor','Un explorador'],a:0,level:'cm2'},
+{q:'¿Quién es Sofía Vergara?',o:['Una actriz colombiana famosa en Hollywood','Una científica','Una atleta','Una pintora'],a:0,level:'ce2'},
+{q:'¿Quién es Maluma?',o:['Cantante colombiano de reggaetón','Un futbolista','Un actor','Un escritor'],a:0,level:'cp'},
+{q:'¿Quién es J Balvin?',o:['Cantante colombiano de reggaetón','Un pintor','Un militar','Un escritor'],a:0,level:'cp'},
+{q:'¿Quién fue José Asunción Silva?',o:['Poeta colombiano del modernismo','Un militar','Un científico','Un pintor'],a:0,level:'cm2'},
+{q:'¿Quién es Doris Salcedo?',o:['Escultora y artista contemporánea','Una atleta','Una cantante','Una bailarina'],a:0,level:'cm2'},
+{q:'¿Quién es Caterine Ibargüen?',o:['Atleta, campeona mundial y olímpica de salto','Cantante','Pintora','Actriz'],a:0,level:'cm1'},
+{q:'¿Quién fue Policarpa Salavarrieta "La Pola"?',o:['Heroína espía de la independencia','Una pintora','Una cantante','Una reina'],a:0,level:'ce2'}
 ]
 ]
 };
