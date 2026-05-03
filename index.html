@@ -555,6 +555,10 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .orientation-hint{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);border:2px solid #ffd700;color:#ffd700;padding:8px 16px;border-radius:18px;font-size:12px;z-index:1500;pointer-events:none;animation:fadeOut 3s ease-out forwards}
 @keyframes fadeOut{0%{opacity:0;transform:translateX(-50%) translateY(10px)}10%{opacity:1;transform:translateX(-50%) translateY(0)}80%{opacity:1}100%{opacity:0}}
 
+/* === Explicación tras fallar (didáctica) === */
+.question-explanation{margin:14px auto;padding:14px 18px;background:linear-gradient(135deg,rgba(255,235,59,.18),rgba(255,152,0,.12));border:2px dashed #ffd700;border-radius:14px;color:#fff;font-size:14px;line-height:1.45;max-width:560px;text-align:left;box-shadow:0 2px 12px rgba(255,215,0,.25);animation:slideDown .3s ease-out}
+.question-explanation b{color:#ffd700}
+
 /* === ESCUDOS HERÁLDICOS + FIRMA FAMILIAR === */
 .crest{position:absolute;width:90px;height:auto;max-height:120px;z-index:5;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5)) drop-shadow(0 0 12px rgba(255,215,0,.35));transition:transform .3s}
 .crest-img{object-fit:contain;background:transparent}
@@ -936,6 +940,7 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   <div class="hud">
     <div class="hud-info" id="qPlanet">Planeta</div>
     <div class="hud-stat" id="qNum">1/10</div>
+    <div class="hud-stat" id="liveStreak" style="display:none;background:linear-gradient(135deg,#ff6b00,#d32f2f);color:#fff;font-weight:bold;animation:pulse 1.2s infinite">🔥 0</div>
     <div class="lives" id="lives"></div>
   </div>
   <div class="center" style="flex:1">
@@ -1450,19 +1455,21 @@ function trackAnswer(galaxyId,planetIdx,correct,who){
 
 // ========== LEVELS / RANGOS ==========
 // Sistema de progresión a largo plazo. XP se gana respondiendo bien y completando planetas/jefes.
+// Curva XP rebalanceada: niveles altos alcanzables con esfuerzo razonable
+// (antes el nivel 12 requería 25000 XP — inalcanzable. Ahora 7500.)
 const LEVELS=[
   {n:1,name:'Cadete',emoji:'🚀',xp:0},
   {n:2,name:'Recluta',emoji:'🛸',xp:50},
   {n:3,name:'Piloto',emoji:'👨‍🚀',xp:150},
-  {n:4,name:'Navegante',emoji:'🧭',xp:350},
-  {n:5,name:'Oficial',emoji:'🎖️',xp:700},
-  {n:6,name:'Capitán',emoji:'⭐',xp:1200},
-  {n:7,name:'Almirante',emoji:'🌟',xp:2000},
-  {n:8,name:'Comandante',emoji:'💫',xp:3500},
-  {n:9,name:'Maestro Astronauta',emoji:'👑',xp:6000},
-  {n:10,name:'Leyenda Galáctica',emoji:'🏆',xp:10000},
-  {n:11,name:'Estrella Suprema',emoji:'✨',xp:15000},
-  {n:12,name:'Cósmico Eterno',emoji:'🌌',xp:25000}
+  {n:4,name:'Navegante',emoji:'🧭',xp:300},
+  {n:5,name:'Oficial',emoji:'🎖️',xp:550},
+  {n:6,name:'Capitán',emoji:'⭐',xp:900},
+  {n:7,name:'Almirante',emoji:'🌟',xp:1400},
+  {n:8,name:'Comandante',emoji:'💫',xp:2100},
+  {n:9,name:'Maestro Astronauta',emoji:'👑',xp:3000},
+  {n:10,name:'Leyenda Galáctica',emoji:'🏆',xp:4200},
+  {n:11,name:'Estrella Suprema',emoji:'✨',xp:5800},
+  {n:12,name:'Cósmico Eterno',emoji:'🌌',xp:7500}
 ];
 function getLevel(xp){if(typeof xp!=='number'||!isFinite(xp))xp=0;let cur=LEVELS[0];for(const l of LEVELS){if(xp>=l.xp)cur=l;else break}return cur}
 function getNextLevel(xp){if(typeof xp!=='number'||!isFinite(xp))xp=0;for(const l of LEVELS){if(xp<l.xp)return l}return null}
@@ -2068,7 +2075,7 @@ es:[
 {q:'¿Cuál lleva tilde?',o:['Pajaro','Pájaro','Pájáro','Pájara'],a:1,easy:true},
 {q:'¿Cuál es correcta?',o:['Vamos','Bamos','Vamoz','Vamus'],a:0,easy:true},
 {q:'¿Cuál es correcta?',o:['Casa','Caza','Kasa','Cása'],a:0,easy:true},
-{q:'¿Cuál lleva H?',o:['Iglesia','Hiena','Iuevo','Iola'],a:1},
+{q:'¿Cuál se escribe con H al inicio?',o:['Olla','Hiena','Esquí','Mesa'],a:1},
 {q:'¿Cuál es correcta?',o:['Vibir','Bivir','Vivir','Bibir'],a:2},
 {q:'¿Cuál es correcta?',o:['Tambien','También','Tanvién','Tambíen'],a:1},
 {q:'¿Cuál es correcta?',o:['Vurro','Burro','Bourro','Vourro'],a:1,easy:true}
@@ -2284,7 +2291,7 @@ ca:[
 {q:'¿Cuál es correcta? (enviar)',o:['emviar','enviar','enbiar','emiar'],a:1,level:'cm1'},
 {q:'¿Cuál es correcta? (cambiar al català)',o:['canbiar','cambiar','canviar','camviar'],a:2,level:'cm1'},
 // Ortografía r / rr (Emmanuel CM1: PA en r/rr)
-{q:'¿Cuál es correcta? (caro - perro en català = gos)',o:['caro','carro','qarro','quarro'],a:0,level:'cm1'},
+{q:'¿Cómo se escribe "carro" (vehículo) en català?',o:['caro','carro','karro','quarro'],a:1,level:'cm1'},
 {q:'¿Cuál es correcta? (mare = madre, en català)',o:['marre','mare','màre','mara'],a:1,level:'cm1'},
 {q:'En català, RR entre vocales suena:',o:['Suave','Fuerte','Igual que R','No suena'],a:1,level:'cm1'},
 {q:'¿Cómo se dice "perro" (animal) en català?',o:['perro','gos','can','goz'],a:1,level:'ce1'},
@@ -2301,10 +2308,10 @@ ca:[
 {q:'¿"Llibre" en català?',o:['Cuaderno','Libro','Lápiz','Mesa'],a:1,level:'ce2'},
 {q:'¿"Jugar" en català?',o:['Trabajar','Estudiar','Jugar','Correr'],a:2,level:'ce2'},
 // CM2 (10-11 años) — Andorra cultural y gramatical
-{q:'¿Cuántas parròquies tiene Andorra?',o:['5','6','7','8'],a:2,level:'cm2'},
+{q:'¿Quina parròquia és la capital d\'Andorra?',o:['Encamp','Andorra la Vella','Canillo','Escaldes'],a:1,level:'cm2'},
 {q:'¿"Coprínceps" d\'Andorra son?',o:['Bisbe i President francès','Rei i Papa','Alcaldes','Regidors'],a:0,level:'cm2'},
 {q:'¿"Síndic General" és el cap de:',o:['Govern','Consell General','Justícia','Església'],a:1,level:'cm2'},
-{q:'¿Idioma cooficial NO de Andorra:',o:['Català','Castellà','Italiano','Francès'],a:2,level:'cm2'},
+{q:'¿Quina és la llengua OFICIAL d\'Andorra?',o:['Castellà','Català','Francès','Italià'],a:1,level:'cm2'},
 {q:'Conjuga "anar" en present, jo: ?',o:['vaig','vas','va','aniré'],a:0,level:'cm2'},
 {q:'Pretèrit perfet de "menjar", jo:',o:['menjava','vaig menjar','menjaré','menji'],a:1,level:'cm2'},
 {q:'Plural de "el llibre":',o:['els llibre','els llibres','les llibres','els llibrer'],a:1,level:'cm2'},
@@ -2317,7 +2324,7 @@ ca:[
 {q:'Sinònim de "bonic":',o:['lleig','formós','trist','vell'],a:1,level:'6e'},
 {q:'Article "el" + "home" → ?',o:['el home','l\'home','lo home','la home'],a:1,level:'6e'},
 {q:'Subjuntiu present de "ser", jo:',o:['sóc','sigui','seré','era'],a:1,level:'6e'},
-{q:'¿Quantes parròquies té Andorra?',o:['5','6','7','8'],a:2,level:'6e'}
+{q:'¿Quina és la muntanya més alta d\'Andorra?',o:['Pic de Coma Pedrosa','Pic d\'Estats','Mont Blanc','Pic Carlit'],a:0,level:'6e'}
 ]
 ]
 };
@@ -2651,12 +2658,26 @@ function startPlanet(galIdx,planetIdx){
   game.galaxy=galIdx;game.planet=planetIdx;
   game.qIdx=0;game.lives=3;game.correct=0;game.wrong=[];
   game.qPool=[]; // forzar nuevo sorteo de pool en cada partida
-  game.hintsUsed=0;
+  game.hintsUsed=0;game.perfectAnswers=0;
+  // Reset racha actual al empezar planeta nuevo
+  const p0=getPlayer();if(p0)p0.currentStreak=0;
+  // Ocultar HUD de racha al inicio
+  const streakEl=document.getElementById('liveStreak');if(streakEl)streakEl.style.display='none';
   // Verifica que haya preguntas antes de mostrar la pantalla
   const g=GALAXIES[galIdx];
   const test=pickQuestions(g.id,planetIdx,state.currentPlayer);
   if(!test.length){toast('⚠️ Este planeta aún no tiene preguntas. Vuelve pronto.',3000);return}
-  game.qPool=test;
+  // ANTI-REPETICIÓN: filtrar preguntas vistas en esta sesión (últimas 30 únicas)
+  if(!state.sessionSeenQ)state.sessionSeenQ=[];
+  const seen=new Set(state.sessionSeenQ);
+  const fresh=test.filter(q=>!seen.has(q.q));
+  // Si quedan ≥6 preguntas frescas, usamos solo esas; si no, pool completo
+  const final=(fresh.length>=6)?fresh.slice(0,10):test.slice(0,10);
+  // Marcar las usadas
+  final.forEach(q=>state.sessionSeenQ.push(q.q));
+  // Limitar memoria de sesión a últimas 50 preguntas
+  if(state.sessionSeenQ.length>50)state.sessionSeenQ=state.sessionSeenQ.slice(-50);
+  game.qPool=final;
   show('question');
   renderQuestion();
 }
@@ -2774,6 +2795,11 @@ function useHint(){
   toast('Pista usada -5💰 ('+(2-game.hintsUsed)+' restantes)');
 }
 
+// Mensajes variados para evitar monotonía y reforzar positivamente
+const ENCOURAGEMENT_OK = ['✓ ¡Correcto!','✓ ¡Genial!','✓ ¡Eres un genio!','✓ ¡Perfecto!','✓ ¡Imparable!','✓ ¡Brillante!','✓ ¡Sigue así!','✓ ¡Crack!'];
+const ENCOURAGEMENT_STREAK = ['🔥 ¡Racha de {n}!','⚡ ¡{n} seguidas!','🌟 ¡Imparable! x{n}','💫 ¡Combo x{n}!'];
+const ENCOURAGEMENT_FAIL = ['✗ Casi','✗ Inténtalo de nuevo','✗ No pasa nada','✗ Aprendes así','✗ Sigue intentando'];
+
 function answer(idx,q,btn){
   if(game.answerLock)return; // anti doble-tap
   game.answerLock=true;
@@ -2783,16 +2809,28 @@ function answer(idx,q,btn){
   const correctIdx=q._aShuf!=null?q._aShuf:q.a;
   const isCorrect=idx===correctIdx;
   trackAnswer(GALAXIES[game.galaxy].id,game.planet,isCorrect,state.currentPlayer);
+  let delay=1300;
   if(isCorrect){
     btn.classList.add('correct');
     sndCorrect();sndCoin();
     p.totalCorrect++;p.currentStreak++;
     if(p.currentStreak>p.bestStreak)p.bestStreak=p.currentStreak;
     p.coins+=isYoung()?3:5;
-    addXP(isYoung()?1:2); // +XP por cada acierto
+    addXP(isYoung()?1:2);
     game.correct++;
     if(!game.hintUsedInQuestion)game.perfectAnswers=(game.perfectAnswers||0)+1;
-    feedback('✓ ¡Correcto! +'+(isYoung()?1:2)+' XP','success');
+    // Mensaje variado, prioriza racha si es ≥3
+    let msg;
+    if(p.currentStreak>=3){
+      const tpl=ENCOURAGEMENT_STREAK[Math.floor(Math.random()*ENCOURAGEMENT_STREAK.length)];
+      msg=tpl.replace('{n}',p.currentStreak)+' +'+(isYoung()?1:2)+' XP';
+    }else{
+      msg=ENCOURAGEMENT_OK[Math.floor(Math.random()*ENCOURAGEMENT_OK.length)]+' +'+(isYoung()?1:2)+' XP';
+    }
+    feedback(msg,'success');
+    // Confetti extra en rachas grandes
+    if(p.currentStreak===5)confetti(20);
+    if(p.currentStreak===10)confetti(40);
   }else{
     btn.classList.add('wrong');
     const correctBtn=document.querySelectorAll('#answers .answer-btn')[correctIdx];
@@ -2801,17 +2839,42 @@ function answer(idx,q,btn){
     p.currentStreak=0;
     game.lives--;
     game.wrong.push(q);
-    feedback('✗ Incorrecto','fail');
+    const failMsg=ENCOURAGEMENT_FAIL[Math.floor(Math.random()*ENCOURAGEMENT_FAIL.length)];
+    feedback(failMsg,'fail');
+    // Si la pregunta tiene explicación, mostrarla bajo el feedback (más tiempo de lectura)
+    if(q.explanation){
+      const expl=document.createElement('div');
+      expl.className='question-explanation';
+      expl.innerHTML='💡 <b>Explicación:</b> '+q.explanation;
+      const ans=document.getElementById('answers');
+      if(ans)ans.parentNode.insertBefore(expl,ans.nextSibling);
+      delay=3500; // más tiempo para leer
+    }
+    // Si es Emiliano (TTS auto), leer la respuesta correcta
+    if(isYoung()){
+      const correctOpt=q._oShuf?q._oShuf[correctIdx]:q.o[correctIdx];
+      const g=GALAXIES[game.galaxy];
+      try{speechSynthesis.cancel();setTimeout(()=>speak('La respuesta correcta era: '+correctOpt,g.lang),900)}catch(e){}
+    }
   }
   save();
+  // Actualiza HUD de racha en vivo
+  const streakEl=document.getElementById('liveStreak');
+  if(streakEl){
+    if(p.currentStreak>=2){streakEl.style.display='inline-block';streakEl.textContent='🔥 '+p.currentStreak}
+    else{streakEl.style.display='none'}
+  }
   game.hintUsedInQuestion=false;
   game.answerTimeout=setTimeout(()=>{
     game.answerTimeout=null;game.answerLock=false;
-    if(game.screen!=='question')return; // el usuario salió, no avanzar
+    // Limpiar explicación al pasar
+    const oldExpl=document.querySelector('.question-explanation');
+    if(oldExpl)oldExpl.remove();
+    if(game.screen!=='question')return;
     if(game.lives<=0){endPlanet(true);return}
     game.qIdx++;
     renderQuestion();
-  },1300);
+  },delay);
 }
 
 function endPlanet(failed=false){
@@ -2897,13 +2960,25 @@ function nextPlanet(){
 }
 
 // ========== BOSS ==========
+// Frases del Profesor Cosmos antes de cada jefe (mantiene la narrativa viva)
+const COSMOS_BOSS_INTRO={
+  math:'¡Cuidado! El Robot Calculador odia los números... ¡Demuéstrale tus matemáticas!',
+  logic:'La Esfinge Cósmica te pondrá acertijos. Piensa con calma, joven aventurero.',
+  fr:'Le Grand Méchant ne parle qu\'en français. ¡Dale una lección con tus palabras!',
+  es:'El Dragón de Letras escupe palabras mal escritas. ¡Corrígelas todas!',
+  en:'The Word Wizard speaks only in English. Show no fear, young hero!',
+  ca:'El Drac dels Pirineus protegeix Andorra. Parla-li en català per derrotar-lo!'
+};
+
 function startBoss(galIdx){
   const g=GALAXIES[galIdx];
   game.galaxy=galIdx;
-  // HP escalado por edad: niño pequeño tiene más HP, jefe más débil. Adolescente al revés.
+  // HP escalado por edad + por galaxia (jefes más tarde son más fuertes)
   const young=isYoung();
   game.playerHp=young?120:100;
-  const baseBossHp=young?80:100;
+  // Escalado por galaxia: G1=80/100 → G6=110/130 (más reto al final)
+  const galBonus=Math.min(galIdx*6,30);
+  const baseBossHp=(young?80:100)+galBonus;
   // Si vienes de una derrota previa, el jefe empieza con HP reducido (entre 50% y 100%)
   const p0=getPlayer();
   const savedPct=p0.bossProgress&&p0.bossProgress[g.id];
@@ -2922,6 +2997,9 @@ function startBoss(galIdx){
   if(!pool.length){toast('⚠️ El jefe no tiene preguntas. Vuelve cuando haya contenido.');goToMap();return}
   pool=pool.sort(()=>Math.random()-.5).slice(0,12);
   game.bossQs=pool;game.bossQIdx=0;game.bossAnswerLock=false;game.bossCorrectCount=0;
+  // Frase del Profesor Cosmos al iniciar (narrativa viva)
+  const intro=COSMOS_BOSS_INTRO[g.id];
+  if(intro)setTimeout(()=>toast('🧙 Profesor Cosmos: '+intro,3500),300);
   if(game.bossAnswerTimeout){clearTimeout(game.bossAnswerTimeout);game.bossAnswerTimeout=null}
   show('boss');
   document.getElementById('bossEmoji').textContent=g.boss.emoji;
@@ -3021,7 +3099,17 @@ function bossWin(){
   show('result');
   document.getElementById('resultEmoji').textContent='👑';
   document.getElementById('resultTitle').textContent='¡JEFE DERROTADO!';
-  document.getElementById('resultText').textContent=`Has vencido a ${g.boss.name}. +10⭐ +100💰. Galaxia conquistada!`;
+  // Frases del Profesor Cosmos personalizadas por galaxia
+  const winMsgs={
+    math:'¡Increíble! Has derrotado al Robot. Las matemáticas ya no tienen secretos para ti.',
+    logic:'La Esfinge ha caído. Tu mente es más rápida que la luz, joven sabio.',
+    fr:'Magnifique! Le Grand Méchant est vaincu. Tu parles français comme un vrai!',
+    es:'¡Bravo! El Dragón de Letras se rinde ante tu ortografía perfecta.',
+    en:'Amazing! The Word Wizard bows before you. Your English is brilliant!',
+    ca:'Visca! Has alliberat els Pirineus. Andorra t\'està agraïda, jove heroi!'
+  };
+  const cosmos=winMsgs[g.id]||'¡Una galaxia más conquistada!';
+  document.getElementById('resultText').innerHTML=`<div style="font-style:italic;color:#ffd700;margin-bottom:10px">🧙 Profesor Cosmos: "${cosmos}"</div>Has vencido a <b>${g.boss.name}</b>. <br>+10⭐ +100💰. ¡Galaxia conquistada!`;
   document.getElementById('nextBtn').style.display='none';
   checkAchievements();
   if(p.bossesBeaten.length>=6&&!p.certShown){p.certShown=true;save();setTimeout(()=>show('cert'),2500)}
@@ -3032,7 +3120,8 @@ function bossLose(){
   const p=getPlayer();const g=GALAXIES[game.galaxy];
   if(!p.bossProgress)p.bossProgress={};
   // Guarda el HP del jefe para que el próximo intento empiece con esa ventaja (mín 50% del inicial)
-  const remainingPct=Math.max(50,Math.round((game.bossHp/game.bossInitialHp)*100));
+  // Próximo intento empieza con HP del jefe entre 75% y 100% (antes era 50% — muy generoso)
+  const remainingPct=Math.max(75,Math.round((game.bossHp/game.bossInitialHp)*100));
   p.bossProgress[g.id]=remainingPct;
   save();
   sndLose();
