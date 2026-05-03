@@ -72,8 +72,7 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .hud-stat{background:rgba(255,255,255,.1);border-radius:10px;padding:4px 10px;font-size:14px;font-weight:bold}
 .galaxy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:12px;width:100%;max-width:960px;margin:0 auto}
 .galaxy-card{background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.02));border:2px solid rgba(255,215,0,.3);border-radius:20px;padding:14px 14px 12px;text-align:center;cursor:pointer;transition:transform .25s,box-shadow .25s,border-color .25s;position:relative;min-height:200px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07)}
-.galaxy-card::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,transparent,var(--galaxy-color,#ffd700),transparent);opacity:.85}
-.galaxy-card::after{content:"";position:absolute;inset:0;border-radius:20px;pointer-events:none;background:radial-gradient(circle at 50% -10%,var(--galaxy-color,#ffd700)22,transparent 60%)}
+.galaxy-card::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,transparent,var(--galaxy-color,#ffd700),transparent);opacity:.95;z-index:2}
 .galaxy-card:hover{transform:translateY(-2px);border-color:var(--galaxy-color,#ffd700);box-shadow:0 10px 26px rgba(0,0,0,.5),0 0 24px var(--galaxy-color,#ffd700)55}
 .galaxy-card:active{transform:scale(.96)}
 .galaxy-card.locked{opacity:.45;cursor:not-allowed;filter:grayscale(70%)}
@@ -81,8 +80,8 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .galaxy-card .name{font-size:14px;font-weight:bold;color:#ffd700;letter-spacing:.3px;position:relative;z-index:1;text-shadow:0 2px 4px rgba(0,0,0,.6)}
 .galaxy-card .progress{font-size:11px;opacity:.85;margin-top:4px;position:relative;z-index:1}
 .galaxy-card .boss-mark{position:absolute;top:8px;left:8px;font-size:20px;filter:drop-shadow(0 0 8px red);z-index:6}
-.galaxy-card .galaxy-flag-svg{width:64%;max-width:120px;height:auto;margin:8px auto 2px;border-radius:4px;box-shadow:0 3px 10px rgba(0,0,0,.6),0 0 0 1px rgba(255,215,0,.3);display:block;position:relative;z-index:1;aspect-ratio:3/2;object-fit:cover}
-.galaxy-card .galaxy-flag-emoji{font-size:34px;margin-top:6px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));position:relative;z-index:1}
+.galaxy-card .galaxy-flag-wrap{width:68%;max-width:130px;margin:8px auto 2px;border-radius:5px;box-shadow:0 3px 10px rgba(0,0,0,.6),0 0 0 2px rgba(255,215,0,.45);display:block;position:relative;z-index:1;aspect-ratio:3/2;background:#fff;overflow:hidden}
+.galaxy-card .galaxy-flag-wrap img,.galaxy-card .galaxy-flag-wrap svg{width:100%;height:100%;display:block;object-fit:cover}
 .planet-row{display:flex;justify-content:space-around;width:100%;flex-wrap:wrap;gap:8px;margin-top:8px}
 .planet-dot{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,215,0,.4);display:flex;align-items:center;justify-content:center;font-size:11px}
 .planet-dot.done{background:#4caf50;border-color:#2e7d32;box-shadow:0 0 10px #4caf50}
@@ -611,8 +610,8 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
 .country-card{background:linear-gradient(160deg,#1e1e4a 0%,#0f0f2e 60%,#080820 100%);border:3px solid #ffd700;border-radius:24px;padding:24px 22px 22px;max-width:580px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 0 60px rgba(255,215,0,.45),0 20px 60px rgba(0,0,0,.7);position:relative;animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
 .country-card h2{margin:0 0 4px;text-align:center;color:#ffd700;font-size:24px;letter-spacing:.5px;text-shadow:0 2px 8px rgba(255,215,0,.3)}
 .country-card .country-sub{text-align:center;font-size:13px;opacity:.75;margin-bottom:18px;font-style:italic}
-.country-card .country-flag{display:block;width:100%;max-width:320px;height:auto;margin:0 auto 16px;border-radius:8px;box-shadow:0 6px 22px rgba(0,0,0,.7),0 0 0 2px rgba(255,215,0,.45);aspect-ratio:3/2;background:#000}
-.country-card .country-flag svg{width:100%;height:100%;display:block;border-radius:6px}
+.country-card .country-flag{display:block;width:100%;max-width:320px;margin:0 auto 16px;border-radius:8px;box-shadow:0 6px 22px rgba(0,0,0,.7),0 0 0 2px rgba(255,215,0,.45);aspect-ratio:3/2;background:#fff;overflow:hidden}
+.country-card .country-flag img,.country-card .country-flag svg{width:100%;height:100%;display:block;object-fit:cover}
 .country-card .country-map{display:block;width:100%;max-width:300px;height:auto;margin:0 auto 16px;background:radial-gradient(circle at 50% 40%,#fff,#e8eef5);border-radius:14px;padding:8px;box-shadow:0 6px 22px rgba(0,0,0,.7),0 0 0 2px rgba(255,215,0,.3)}
 .country-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
 .country-fact{background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,255,255,.04));border:1px solid rgba(255,215,0,.3);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.3}
@@ -1607,12 +1606,14 @@ const GALAXIES=[
 ];
 
 // ============ INFO DE PAÍS (mapa + bandera + datos) ============
-// Banderas como SVG inline (escalan, nítidas en cualquier pantalla, funcionan offline).
-// Mapas como URL a Wikimedia Commons (proyección ortográfica, claras y oficiales).
-// Si la tablet está offline, el <img> del mapa simplemente no carga; la bandera siempre se ve.
+// Banderas: usamos las OFICIALES de Wikimedia Commons (SVG renderizado a PNG).
+// Son auténticas y pixel-perfect — escudos, estrellas, todo correcto.
+// Si la tablet está offline, el <img> de la bandera simplemente no carga;
+// el flagSvg inline (simplificado) sirve como fallback visual.
 const COUNTRY_INFO = {
   fr:{
     name:'Francia 🇫🇷',sub:'République française',
+    flagUrl:'https://upload.wikimedia.org/wikipedia/en/thumb/c/c3/Flag_of_France.svg/320px-Flag_of_France.svg.png',
     flagSvg:`<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="2" fill="#0055A4"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>`,
     mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/EU-France_%28orthographic_projection%29.svg/320px-EU-France_%28orthographic_projection%29.svg.png',
     facts:[
@@ -1623,6 +1624,7 @@ const COUNTRY_INFO = {
   },
   es:{
     name:'España 🇪🇸',sub:'Reino de España',
+    flagUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Spain.svg/320px-Flag_of_Spain.svg.png',
     flagSvg:`<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#AA151B"/><rect y=".5" width="3" height="1" fill="#F1BF00"/></svg>`,
     mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/EU-Spain_%28orthographic_projection%29.svg/320px-EU-Spain_%28orthographic_projection%29.svg.png',
     facts:[
@@ -1633,7 +1635,8 @@ const COUNTRY_INFO = {
   },
   en:{
     name:'Reino Unido 🇬🇧',sub:'United Kingdom',
-    flagSvg:`<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg"><clipPath id="ukcl"><path d="M30,15 h30 v15 z M30,15 v15 h-30 z M30,15 h-30 v-15 z M30,15 v-15 h30 z"/></clipPath><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="4" clip-path="url(#ukcl)"/><path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/><path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6"/></svg>`,
+    flagUrl:'https://upload.wikimedia.org/wikipedia/en/thumb/a/ae/Flag_of_the_United_Kingdom.svg/320px-Flag_of_the_United_Kingdom.svg.png',
+    flagSvg:`<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/><path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6"/></svg>`,
     mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/EU-United_Kingdom_%28orthographic_projection%29.svg/320px-EU-United_Kingdom_%28orthographic_projection%29.svg.png',
     facts:[
       ['Capital','Londres'],['Idioma','Inglés'],['Moneda','Libra £'],
@@ -1643,6 +1646,7 @@ const COUNTRY_INFO = {
   },
   ca:{
     name:'Andorra 🇦🇩',sub:'Principat d\'Andorra',
+    flagUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Flag_of_Andorra.svg/320px-Flag_of_Andorra.svg.png',
     flagSvg:`<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="2" fill="#10069F"/><rect x="1" width="1" height="2" fill="#FEDD00"/><rect x="2" width="1" height="2" fill="#D52B1E"/></svg>`,
     mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Europe-Andorra.svg/320px-Europe-Andorra.svg.png',
     facts:[
@@ -1653,7 +1657,8 @@ const COUNTRY_INFO = {
   },
   ve:{
     name:'Venezuela 🇻🇪',sub:'República Bolivariana de Venezuela',
-    flagSvg:`<svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg"><rect width="30" height="20" fill="#FCE300"/><rect y="6.67" width="30" height="6.67" fill="#00247D"/><rect y="13.34" width="30" height="6.67" fill="#CF142B"/><g fill="#fff"><circle cx="11" cy="10" r=".5"/><circle cx="13" cy="9" r=".5"/><circle cx="15" cy="8.5" r=".5"/><circle cx="17" cy="9" r=".5"/><circle cx="19" cy="10" r=".5"/><circle cx="13.5" cy="11.2" r=".5"/><circle cx="16.5" cy="11.2" r=".5"/><circle cx="15" cy="12" r=".5"/></g></svg>`,
+    flagUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Flag_of_Venezuela.svg/320px-Flag_of_Venezuela.svg.png',
+    flagSvg:`<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height=".667" fill="#FFCC00"/><rect y=".667" width="3" height=".667" fill="#003893"/><rect y="1.333" width="3" height=".667" fill="#CF142B"/></svg>`,
     mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Venezuela_%28orthographic_projection%29.svg/320px-Venezuela_%28orthographic_projection%29.svg.png',
     facts:[
       ['Capital','Caracas'],['Idioma','Español'],['Moneda','Bolívar Bs.'],
@@ -1663,6 +1668,7 @@ const COUNTRY_INFO = {
   },
   co:{
     name:'Colombia 🇨🇴',sub:'República de Colombia',
+    flagUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Colombia.svg/320px-Flag_of_Colombia.svg.png',
     flagSvg:`<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="1" fill="#FCD116"/><rect y="1" width="3" height=".5" fill="#003893"/><rect y="1.5" width="3" height=".5" fill="#CE1126"/></svg>`,
     mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Colombia_%28orthographic_projection%29.svg/320px-Colombia_%28orthographic_projection%29.svg.png',
     facts:[
@@ -1682,7 +1688,11 @@ function showCountryInfo(galId){
   cont.innerHTML = `
     <h2>${info.name}</h2>
     <div class="country-sub">${info.sub}</div>
-    <div class="country-flag" aria-label="Bandera">${info.flagSvg}</div>
+    <div class="country-flag" aria-label="Bandera oficial">
+      <img src="${info.flagUrl}" alt="" loading="lazy"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <div style="display:none;width:100%;height:100%">${info.flagSvg}</div>
+    </div>
     <img class="country-map" src="${info.mapUrl}" alt="Mapa de ${info.name}" loading="lazy"
          onerror="this.style.display='none'">
     <div class="country-facts">${factsHtml}</div>
@@ -3718,9 +3728,14 @@ function renderMap(){
     const card=document.createElement('div');
     card.className='galaxy-card'+(unlocked?'':' locked');
     const hasInfo = !!COUNTRY_INFO[g.id];
-    // Bandera: SVG inline si hay COUNTRY_INFO (siempre se ve, en cualquier OS), si no, sin bandera (Mate/Lógica)
+    // Bandera: <img> con la URL OFICIAL de Wikimedia Commons (auténtica, pixel-perfect).
+    // Si la tablet está offline o falla, onerror la oculta y muestra el SVG inline simple debajo.
     const flagHtml = hasInfo
-      ? `<div class="galaxy-flag-svg" aria-label="Bandera">${COUNTRY_INFO[g.id].flagSvg}</div>`
+      ? `<div class="galaxy-flag-wrap" aria-label="Bandera de ${g.name}">
+           <img src="${COUNTRY_INFO[g.id].flagUrl}" alt="" loading="lazy"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+           <div style="display:none;width:100%;height:100%">${COUNTRY_INFO[g.id].flagSvg}</div>
+         </div>`
       : '';
     card.style.setProperty('--galaxy-color', g.color || '#ffd700');
     card.innerHTML=`
