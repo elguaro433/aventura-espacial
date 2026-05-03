@@ -6652,6 +6652,121 @@ function init(){
     if(Math.abs(dx)>Math.abs(dy)){if(dx>20)snakeDir(1,0);else if(dx<-20)snakeDir(-1,0)}
     else{if(dy>20)snakeDir(0,1);else if(dy<-20)snakeDir(0,-1)}
   },{passive:true});
+
+  // === DINO RUNNER: tap = saltar, swipe abajo = agachar ===
+  const dinoCanvas=document.getElementById('dino-canvas');
+  if(dinoCanvas){
+    let dx0=0,dy0=0,dt0=0,dinoCrouching=false;
+    dinoCanvas.addEventListener('touchstart',e=>{
+      e.preventDefault();
+      dx0=e.touches[0].clientX;dy0=e.touches[0].clientY;dt0=performance.now();
+      dinoCrouching=false;
+    },{passive:false});
+    dinoCanvas.addEventListener('touchmove',e=>{
+      // Si arrastras hacia abajo mientras tocas, agacharse
+      const dy=e.touches[0].clientY-dy0;
+      if(dy>30&&!dinoCrouching){dinoCrouching=true;dinoCrouch(true)}
+    },{passive:true});
+    dinoCanvas.addEventListener('touchend',e=>{
+      const dx=e.changedTouches[0].clientX-dx0;
+      const dy=e.changedTouches[0].clientY-dy0;
+      const elapsed=performance.now()-dt0;
+      if(dinoCrouching){dinoCrouch(false);dinoCrouching=false;return}
+      // Tap rápido (poco movimiento + tiempo corto) = saltar
+      if(Math.abs(dx)<30&&Math.abs(dy)<30&&elapsed<400){dinoJump()}
+      // Swipe arriba largo también salta
+      else if(dy<-30){dinoJump()}
+    },{passive:true});
+    // Click con ratón también salta (escritorio)
+    dinoCanvas.addEventListener('click',e=>{
+      if(game.screen==='dino')dinoJump();
+    });
+  }
+
+  // === ASTRO BROS: zonas táctiles en el canvas ===
+  // Tap/hold zona izquierda → mover izq
+  // Tap/hold zona derecha → mover der
+  // Tap/hold zona superior → saltar
+  const marioCanvas=document.getElementById('mario-canvas');
+  if(marioCanvas){
+    const activeTouches=new Map(); // touchId → zona
+    function getZone(t){
+      const r=marioCanvas.getBoundingClientRect();
+      const lx=(t.clientX-r.left)/r.width;
+      const ly=(t.clientY-r.top)/r.height;
+      if(ly<0.4)return 'jump';
+      if(lx<0.4)return 'left';
+      if(lx>0.6)return 'right';
+      return 'jump'; // centro inferior también salta
+    }
+    marioCanvas.addEventListener('touchstart',e=>{
+      e.preventDefault();
+      for(const t of e.changedTouches){
+        const zone=getZone(t);
+        activeTouches.set(t.identifier,zone);
+        if(zone==='left')marioPress('left',1);
+        else if(zone==='right')marioPress('right',1);
+        else if(zone==='jump')marioPress('jump',1);
+      }
+    },{passive:false});
+    marioCanvas.addEventListener('touchend',e=>{
+      for(const t of e.changedTouches){
+        const zone=activeTouches.get(t.identifier);
+        if(zone==='left')marioPress('left',0);
+        else if(zone==='right')marioPress('right',0);
+        else if(zone==='jump')marioPress('jump',0);
+        activeTouches.delete(t.identifier);
+      }
+    },{passive:true});
+    marioCanvas.addEventListener('touchcancel',e=>{
+      for(const t of e.changedTouches){
+        const zone=activeTouches.get(t.identifier);
+        if(zone==='left')marioPress('left',0);
+        else if(zone==='right')marioPress('right',0);
+        else if(zone==='jump')marioPress('jump',0);
+        activeTouches.delete(t.identifier);
+      }
+    },{passive:true});
+  }
+
+  // === TETRIS: gestos en canvas ===
+  // Swipe lateral = mover, swipe abajo = soft drop, swipe arriba = rotar, tap = hard drop
+  const tetrisCanvas=document.getElementById('tetris-canvas');
+  if(tetrisCanvas){
+    let tx0=0,ty0=0,tt0=0,moved=false;
+    tetrisCanvas.addEventListener('touchstart',e=>{
+      e.preventDefault();
+      tx0=e.touches[0].clientX;ty0=e.touches[0].clientY;tt0=performance.now();moved=false;
+    },{passive:false});
+    tetrisCanvas.addEventListener('touchmove',e=>{
+      // Movimiento lateral incremental: cada 25px = 1 columna
+      const dx=e.touches[0].clientX-tx0;
+      const dy=e.touches[0].clientY-ty0;
+      if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>25){
+        if(dx>0){tetrisMove(1)}else{tetrisMove(-1)}
+        tx0=e.touches[0].clientX;moved=true;
+      }else if(dy>30){
+        tetrisSoftDrop();ty0=e.touches[0].clientY;moved=true;
+      }
+    },{passive:false});
+    tetrisCanvas.addEventListener('touchend',e=>{
+      const dx=e.changedTouches[0].clientX-tx0;
+      const dy=e.changedTouches[0].clientY-ty0;
+      const elapsed=performance.now()-tt0;
+      if(moved)return;
+      if(elapsed<300&&Math.abs(dx)<20&&Math.abs(dy)<20){
+        // Tap corto = rotar
+        tetrisRotate();
+      }else if(dy<-30){
+        // Swipe arriba = rotar
+        tetrisRotate();
+      }else if(dy>50){
+        // Swipe largo abajo = hard drop
+        tetrisDrop();
+      }
+    },{passive:true});
+    tetrisCanvas.addEventListener('click',()=>{if(game.screen==='tetris')tetrisRotate()});
+  }
 }
 init();
 </script>

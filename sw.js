@@ -1,9 +1,9 @@
 // Service Worker - Permite que el juego funcione sin internet (offline)
 // Estrategia: network-first con timeout para HTML, cache-first para assets locales,
 // nada de cachear cross-origin (Wikipedia, etc.) para evitar que la cache crezca infinito.
-// 20260503-045808 se reemplaza automáticamente en cada push con el timestamp UTC actual.
+// 20260503-050036 se reemplaza automáticamente en cada push con el timestamp UTC actual.
 // Si el script de push no se ejecuta, fallback al timestamp de instalación del SW.
-const RAW_BUILD_TIME = '20260503-045808';
+const RAW_BUILD_TIME = '20260503-050036';
 const BUILD_TIME = RAW_BUILD_TIME.indexOf('BUILD_TIME') !== -1 ? String(Date.now()) : RAW_BUILD_TIME;
 const CACHE_NAME = 'aventura-espacial-' + BUILD_TIME;
 const NETWORK_TIMEOUT_MS = 3000; // si tarda más, va a cache
