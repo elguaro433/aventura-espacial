@@ -3441,7 +3441,8 @@ function renderMap(){
 
   const grid=document.getElementById('galaxyGrid');grid.innerHTML='';
   GALAXIES.forEach((g,gi)=>{
-    const unlocked=gi===0||p.bossesBeaten.includes(GALAXIES[gi-1].id);
+    const alwaysUnlocked=g.id==='ve'||g.id==='co';
+    const unlocked=gi===0||alwaysUnlocked||p.bossesBeaten.includes(GALAXIES[gi-1].id);
     const beatenInGal=g.planets.filter((_,pi)=>p.planetsBeaten.includes(g.id+'-'+pi)).length;
     const totalPlanets=g.planets.length;
     const starsInGal=g.planets.reduce((acc,_,pi)=>acc+(p.planetStars[g.id+'-'+pi]||0),0);
