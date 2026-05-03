@@ -595,6 +595,21 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
 @media (max-width:380px){
   .crest{width:42px;height:55px}
 }
+
+/* ===== Modal de País (mapa + bandera + datos) ===== */
+.country-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:3000;display:none;align-items:center;justify-content:center;padding:14px;overflow-y:auto}
+.country-modal.show{display:flex}
+.country-card{background:linear-gradient(135deg,#1a1a3e,#0a0a25);border:3px solid #ffd700;border-radius:22px;padding:20px;max-width:560px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 0 40px rgba(255,215,0,.4);position:relative}
+.country-card h2{margin:0 0 6px;text-align:center;color:#ffd700;font-size:22px}
+.country-card .country-sub{text-align:center;font-size:13px;opacity:.85;margin-bottom:14px}
+.country-card .country-flag{display:block;width:100%;max-width:280px;height:auto;margin:0 auto 14px;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.6);border:1px solid rgba(255,215,0,.3)}
+.country-card .country-map{display:block;width:100%;max-width:340px;height:auto;margin:0 auto 14px;background:#fff;border-radius:10px;padding:6px;box-shadow:0 4px 14px rgba(0,0,0,.6)}
+.country-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px}
+.country-fact{background:rgba(255,255,255,.07);border:1px solid rgba(255,215,0,.25);border-radius:10px;padding:8px 10px;font-size:13px}
+.country-fact b{display:block;color:#ffd700;font-size:11px;margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px}
+.country-close{position:absolute;top:8px;right:10px;background:rgba(0,0,0,.6);border:2px solid #ffd700;color:#ffd700;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.galaxy-card .info-btn{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.55);border:2px solid #ffd700;color:#ffd700;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5}
+.galaxy-card{position:relative}
 </style>
 </head>
 <body>
@@ -605,6 +620,14 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
 <button class="back-btn" id="backBtn" onclick="goBack()" style="display:none">←</button>
 
 <div id="app">
+
+<!-- Modal de País (mapa + bandera + datos) -->
+<div class="country-modal" id="countryModal" onclick="if(event.target===this)closeCountryInfo()">
+  <div class="country-card" id="countryCard">
+    <button class="country-close" onclick="closeCountryInfo()" aria-label="Cerrar">✕</button>
+    <div id="countryContent"></div>
+  </div>
+</div>
 
 <!-- INTRO -->
 <div class="screen active" id="intro">
@@ -1568,6 +1591,94 @@ const GALAXIES=[
   planets:['Geografía','Historia','Cultura','Comida','Lugares','Himno Nacional','Departamentos','Personajes'],
   boss:{name:'El Cóndor de los Andes',emoji:'🦅'}}
 ];
+
+// ============ INFO DE PAÍS (mapa + bandera + datos) ============
+// Banderas como SVG inline (escalan, nítidas en cualquier pantalla, funcionan offline).
+// Mapas como URL a Wikimedia Commons (proyección ortográfica, claras y oficiales).
+// Si la tablet está offline, el <img> del mapa simplemente no carga; la bandera siempre se ve.
+const COUNTRY_INFO = {
+  fr:{
+    name:'Francia 🇫🇷',sub:'République française',
+    flagSvg:`<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="2" fill="#0055A4"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>`,
+    mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/EU-France_%28orthographic_projection%29.svg/320px-EU-France_%28orthographic_projection%29.svg.png',
+    facts:[
+      ['Capital','París'],['Idioma','Francés'],['Moneda','Euro €'],
+      ['Población','≈ 68 millones'],['Continente','Europa'],['Gentilicio','Francés/a']
+    ],
+    note:'Andorra está al sur de Francia, en los Pirineos. Aquí van Emiliano y Emmanuel a la escuela.'
+  },
+  es:{
+    name:'España 🇪🇸',sub:'Reino de España',
+    flagSvg:`<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#AA151B"/><rect y=".5" width="3" height="1" fill="#F1BF00"/></svg>`,
+    mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/EU-Spain_%28orthographic_projection%29.svg/320px-EU-Spain_%28orthographic_projection%29.svg.png',
+    facts:[
+      ['Capital','Madrid'],['Idioma','Español (castellano)'],['Moneda','Euro €'],
+      ['Población','≈ 48 millones'],['Continente','Europa'],['Gentilicio','Español/a']
+    ],
+    note:'Andorra está entre España y Francia. El catalán y el español se hablan a diario.'
+  },
+  en:{
+    name:'Reino Unido 🇬🇧',sub:'United Kingdom',
+    flagSvg:`<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="30" fill="#012169"/><path d="M0,0 60,30 M60,0 0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 60,30 M60,0 0,30" stroke="#C8102E" stroke-width="2" clip-path="url(#cl)"/><path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/><path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6"/></svg>`,
+    mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/EU-United_Kingdom_%28orthographic_projection%29.svg/320px-EU-United_Kingdom_%28orthographic_projection%29.svg.png',
+    facts:[
+      ['Capital','Londres'],['Idioma','Inglés'],['Moneda','Libra £'],
+      ['Población','≈ 67 millones'],['Continente','Europa'],['Gentilicio','Británico/a']
+    ],
+    note:'El inglés se habla en todo el mundo. Es el idioma número 1 para viajar y para internet.'
+  },
+  ca:{
+    name:'Andorra 🇦🇩',sub:'Principat d\'Andorra',
+    flagSvg:`<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="2" fill="#10069F"/><rect x="1" width="1" height="2" fill="#FEDD00"/><rect x="2" width="1" height="2" fill="#D52B1E"/></svg>`,
+    mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Europe-Andorra.svg/320px-Europe-Andorra.svg.png',
+    facts:[
+      ['Capital','Andorra la Vella'],['Idioma oficial','Catalán'],['Moneda','Euro €'],
+      ['Población','≈ 80 mil'],['Continente','Europa'],['Gentilicio','Andorrano/a']
+    ],
+    note:'¡Aquí vivís Emi y Emma! Pequeña, montañosa, entre Francia y España. La capital más alta de Europa.'
+  },
+  ve:{
+    name:'Venezuela 🇻🇪',sub:'República Bolivariana de Venezuela',
+    flagSvg:`<svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg"><rect width="30" height="20" fill="#FCE300"/><rect y="6.67" width="30" height="6.67" fill="#00247D"/><rect y="13.34" width="30" height="6.67" fill="#CF142B"/><g fill="#fff"><circle cx="11" cy="10" r=".5"/><circle cx="13" cy="9" r=".5"/><circle cx="15" cy="8.5" r=".5"/><circle cx="17" cy="9" r=".5"/><circle cx="19" cy="10" r=".5"/><circle cx="13.5" cy="11.2" r=".5"/><circle cx="16.5" cy="11.2" r=".5"/><circle cx="15" cy="12" r=".5"/></g></svg>`,
+    mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Venezuela_%28orthographic_projection%29.svg/320px-Venezuela_%28orthographic_projection%29.svg.png',
+    facts:[
+      ['Capital','Caracas'],['Idioma','Español'],['Moneda','Bolívar Bs.'],
+      ['Población','≈ 28 millones'],['Continente','América del Sur'],['Gentilicio','Venezolano/a']
+    ],
+    note:'Cuna de Simón Bolívar "El Libertador". Tiene el Salto Ángel: la cascada más alta del mundo (979 m).'
+  },
+  co:{
+    name:'Colombia 🇨🇴',sub:'República de Colombia',
+    flagSvg:`<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="1" fill="#FCD116"/><rect y="1" width="3" height=".5" fill="#003893"/><rect y="1.5" width="3" height=".5" fill="#CE1126"/></svg>`,
+    mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Colombia_%28orthographic_projection%29.svg/320px-Colombia_%28orthographic_projection%29.svg.png',
+    facts:[
+      ['Capital','Bogotá'],['Idioma','Español'],['Moneda','Peso $'],
+      ['Población','≈ 52 millones'],['Continente','América del Sur'],['Gentilicio','Colombiano/a']
+    ],
+    note:'País del café, la cumbia y el vallenato. Bañado por el Caribe y el Pacífico. Casa de García Márquez y Botero.'
+  }
+};
+
+function showCountryInfo(galId){
+  const info = COUNTRY_INFO[galId]; if(!info) return;
+  const cont = document.getElementById('countryContent');
+  if(!cont) return;
+  const factsHtml = info.facts.map(f=>`<div class="country-fact"><b>${f[0]}</b>${f[1]}</div>`).join('');
+  // El mapa usa <img> con onerror para esconderse si está offline o falla cross-origin.
+  cont.innerHTML = `
+    <h2>${info.name}</h2>
+    <div class="country-sub">${info.sub}</div>
+    <div class="country-flag" aria-label="Bandera">${info.flagSvg}</div>
+    <img class="country-map" src="${info.mapUrl}" alt="Mapa de ${info.name}" loading="lazy"
+         onerror="this.style.display='none'">
+    <div class="country-facts">${factsHtml}</div>
+    <p style="font-size:13px;line-height:1.5;margin:0;text-align:center;color:#ffd700cc">${info.note}</p>
+  `;
+  document.getElementById('countryModal').classList.add('show');
+}
+function closeCountryInfo(){
+  document.getElementById('countryModal').classList.remove('show');
+}
 
 // Questions per galaxy/planet (10 per planet for older, easier versions for younger)
 // Format: [question, [4 options], correctIndex, lang?]
@@ -3592,7 +3703,9 @@ function renderMap(){
     const bossReady=beatenInGal>=totalPlanets&&!p.bossesBeaten.includes(g.id);
     const card=document.createElement('div');
     card.className='galaxy-card'+(unlocked?'':' locked');
+    const hasInfo = !!COUNTRY_INFO[g.id];
     card.innerHTML=`
+      ${hasInfo?`<button class="info-btn" title="Ver mapa y bandera" onclick="event.stopPropagation();showCountryInfo('${g.id}')">ℹ️</button>`:''}
       ${bossReady?'<div class="boss-mark">👹</div>':p.bossesBeaten.includes(g.id)?'<div class="boss-mark">✅</div>':''}
       <div class="emoji">${g.emoji}</div>
       <div class="name">${g.name}</div>
