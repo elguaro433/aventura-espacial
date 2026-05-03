@@ -771,6 +771,8 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
     <button class="btn btn-purple" onclick="show('classic')">🎮 Juegos Clásicos</button>
     <button class="btn btn-blue" onclick="show('dict')">📖 Diccionario</button>
     <button class="btn btn-green" onclick="show('wiki')">🌐 Enciclopedia</button>
+    <button class="btn btn-red" onclick="show('dailyChallenge')">⚡ Reto Diario</button>
+    <button class="btn btn-blue" onclick="show('duel')">⚔️ Duelo entre Hermanos</button>
   </div>
   <!-- Firma familiar -->
   <div class="family-signature">
@@ -849,6 +851,22 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
     <div id="dictResult" class="dict-result"></div>
     <div id="dictSuggestions" class="dict-suggestions"></div>
     <button class="btn btn-purple" onclick="show('intro')">← Volver</button>
+  </div>
+</div>
+
+<!-- DAILY CHALLENGE -->
+<div class="screen" id="dailyChallenge">
+  <div class="center">
+    <h1>⚡ Reto Diario</h1>
+    <div id="dailyChallengeContent" style="text-align:center;width:100%;max-width:600px"></div>
+  </div>
+</div>
+
+<!-- DUEL MODE -->
+<div class="screen" id="duel">
+  <div class="center">
+    <h1>⚔️ Duelo entre Hermanos</h1>
+    <div id="duelContent" style="text-align:center;width:100%;max-width:700px"></div>
   </div>
 </div>
 
@@ -1501,7 +1519,7 @@ function addXP(amount){
   const after=getLevel(p.xp);
   save();
   if(after.n>before.n){
-    sndWin();
+    sndLevelUp(); // melodía exclusiva de subir de nivel
     toast(`🎉 ¡Subiste a ${after.emoji} ${after.name} (Nivel ${after.n})!`,3500);
     confetti(40);
   }
@@ -2546,7 +2564,28 @@ const ACHIEVEMENTS=[
 {id:'shopper',emoji:'🛍️',name:'Comprador',desc:'Compra 3 items',cond:s=>s.items.length>=3},
 {id:'streak20',emoji:'💫',name:'Imparable absoluto',desc:'20 aciertos seguidos',cond:s=>s.bestStreak>=20},
 {id:'collector',emoji:'📦',name:'Coleccionista',desc:'Compra 7 items',cond:s=>s.items.length>=7},
-{id:'polyglot',emoji:'🌍',name:'Políglota',desc:'Conquista francés, inglés y catalán',cond:s=>['fr','en','ca'].every(g=>s.bossesBeaten.includes(g))}
+{id:'polyglot',emoji:'🌍',name:'Políglota',desc:'Conquista francés, inglés y catalán',cond:s=>['fr','en','ca'].every(g=>s.bossesBeaten.includes(g))},
+// === LOGROS NUEVOS ===
+{id:'perfectPlanet',emoji:'✨',name:'Perfección',desc:'Consigue 3⭐ en un planeta',cond:s=>Object.values(s.planetStars||{}).some(v=>v>=3)},
+{id:'perfectGalaxy',emoji:'💎',name:'Maestría',desc:'Consigue 3⭐ en TODA una galaxia',cond:s=>{
+  for(const g of (typeof GALAXIES!=='undefined'?GALAXIES:[])){
+    const allPerfect=g.planets.every((_,i)=>(s.planetStars||{})[g.id+'-'+i]>=3);
+    if(allPerfect&&g.planets.length>0)return true;
+  }return false;
+}},
+{id:'dailyStreak3',emoji:'📅',name:'Constante',desc:'3 días seguidos jugando',cond:s=>s.dailyStreak>=3},
+{id:'dailyStreak7',emoji:'🗓️',name:'Habitual',desc:'7 días seguidos jugando',cond:s=>s.dailyStreak>=7},
+{id:'dailyStreak30',emoji:'🏅',name:'Disciplinado',desc:'30 días seguidos jugando',cond:s=>s.dailyStreak>=30},
+{id:'firstChallenge',emoji:'⚡',name:'Reto aceptado',desc:'Completa tu primer Reto Diario',cond:s=>!!s.dailyChallengeDate},
+{id:'duelWinner',emoji:'⚔️',name:'Duelista',desc:'Gana 3 duelos entre hermanos',cond:s=>s.duelWins>=3},
+{id:'noHints',emoji:'🧠',name:'Mente brillante',desc:'Conquista una galaxia entera sin pistas',cond:s=>{
+  for(const g of (typeof GALAXIES!=='undefined'?GALAXIES:[])){
+    if(s.bossesBeaten.includes(g.id)&&!(s.usedHintsInGalaxy||{})[g.id])return true;
+  }return false;
+}},
+{id:'reviewer',emoji:'📚',name:'Estudioso',desc:'Usa el modo "Repasar lo fallado" 5 veces',cond:s=>s.reviewsDone>=5},
+{id:'level10',emoji:'🏆',name:'Veterano',desc:'Llega a Nivel 10',cond:s=>s.xp>=4200},
+{id:'weekendExplorer',emoji:'🌟',name:'Explorador del Cosmos',desc:'Completa el Planeta Secreto del fin de semana',cond:s=>!!s.secretPlanetDone}
 ];
 
 // Shop
@@ -2641,6 +2680,33 @@ function sndWrong(){snd(220,.2,'sawtooth');setTimeout(()=>snd(165,.3,'sawtooth')
 function sndCoin(){snd(988,.08);setTimeout(()=>snd(1318,.12),60)}
 function sndWin(){snd(523,.1);setTimeout(()=>snd(659,.1),100);setTimeout(()=>snd(784,.1),200);setTimeout(()=>snd(1047,.3),300)}
 function sndLose(){snd(330,.15,'sawtooth');setTimeout(()=>snd(247,.15,'sawtooth'),150);setTimeout(()=>snd(165,.4,'sawtooth'),300)}
+// === Melodías nuevas para eventos clave ===
+// Sube de nivel: arpegio ascendente brillante
+function sndLevelUp(){
+  [523,659,784,1047,1319,1568].forEach((f,i)=>setTimeout(()=>snd(f,.13,'triangle'),i*70));
+  setTimeout(()=>snd(2093,.3,'triangle'),420);
+}
+// Vence jefe: fanfarria épica
+function sndBossWin(){
+  [523,659,784].forEach((f,i)=>setTimeout(()=>snd(f,.18,'square'),i*100));
+  setTimeout(()=>snd(1047,.4,'square'),320);
+  setTimeout(()=>snd(784,.18,'square'),720);
+  setTimeout(()=>snd(1047,.5,'square'),900);
+}
+// Insignia / logro desbloqueado: sonido cristal
+function sndBadge(){
+  snd(1568,.1,'sine');
+  setTimeout(()=>snd(2093,.15,'sine'),80);
+  setTimeout(()=>snd(2637,.2,'sine'),200);
+}
+// Racha alcanzada: sonido fuego
+function sndStreak(){
+  [659,784,988,1175].forEach((f,i)=>setTimeout(()=>snd(f,.08,'square'),i*50));
+}
+// Doble XP / power-up activado: zumbido ascendente
+function sndPowerUp(){
+  [330,440,550,660,880].forEach((f,i)=>setTimeout(()=>snd(f,.07,'sawtooth'),i*40));
+}
 function toggleSound(){state.soundOn=!state.soundOn;save();document.getElementById('soundBtn').textContent=state.soundOn?'🔊':'🔇'}
 
 // ========== TEXT-TO-SPEECH ==========
@@ -2700,6 +2766,8 @@ function show(id){
   if(id==='wiki'){updateOfflineBanner();miniInit();wikiInit()}
   if(id==='parents')parentsRender();
   if(id==='admin')adminRender();
+  if(id==='dailyChallenge')dailyChallengeRender();
+  if(id==='duel'){if(!game.duel)game.duel=null;duelRender()}
   // stop minigames if leaving
   if(id!=='snake'&&snakeLoop){clearInterval(snakeLoop);snakeLoop=null}
   if(id!=='memo'&&memTimer){clearTimeout(memTimer);memTimer=null}
@@ -2784,6 +2852,199 @@ function choosePlayer(p){
 function getPlayer(){return state[state.currentPlayer]}
 function isYoung(){return state.currentPlayer==='emiliano'}
 
+// ============ RETO DIARIO ============
+// 5 preguntas mezcladas, una vez al día, con XP bonus al completar
+function dailyChallengeRender(){
+  const p=getPlayer();
+  if(!p){document.getElementById('dailyChallengeContent').innerHTML='<p>Elige primero un astronauta</p><button class="btn" onclick="show(\'select\')">Elegir</button>';return}
+  const today=new Date().toISOString().slice(0,10);
+  const done=p.dailyChallengeDate===today;
+  const c=document.getElementById('dailyChallengeContent');
+  if(done){
+    c.innerHTML=`
+      <div style="font-size:60px">✅</div>
+      <h2>¡Ya completaste el reto de hoy!</h2>
+      <p style="opacity:.85;margin:10px 0">Vuelve mañana para nuevo reto. Mantén tu racha diaria 🔥</p>
+      <p>Resultado de hoy: <b>${p.dailyChallengeScore||0}/5 aciertos</b></p>
+      <p>Racha actual: <b>🔥 ${p.dailyStreak||0} día(s) seguidos</b></p>
+      <div class="row"><button class="btn btn-purple" onclick="goBack()">← Volver</button></div>`;
+    return;
+  }
+  c.innerHTML=`
+    <div style="font-size:60px">⚡</div>
+    <p style="font-size:15px;line-height:1.5">5 preguntas rápidas mezcladas de todas las galaxias.<br>Solo puedes hacerlo <b>una vez al día</b>.<br>Recompensa: <b>+50 XP base + bonus por aciertos</b>.</p>
+    <p style="margin:10px 0">🔥 Tu racha diaria: <b>${p.dailyStreak||0}</b> día(s)</p>
+    <div class="row" style="margin-top:14px">
+      <button class="btn btn-green" onclick="dailyChallengeStart()">▶ Empezar reto</button>
+      <button class="btn btn-purple" onclick="goBack()">← Volver</button>
+    </div>`;
+}
+function dailyChallengeStart(){
+  // Construye pool de TODAS las galaxias filtrado por edad, 5 preguntas
+  let pool=[];
+  GALAXIES.forEach(g=>{
+    for(let i=0;i<g.planets.length;i++){
+      const node=QUESTIONS[g.id]&&QUESTIONS[g.id][i];
+      if(node)pool=pool.concat(Array.isArray(node)?node:(node.pool||[]));
+    }
+  });
+  const grade=gradeOf(state.currentPlayer);
+  const gIdx=gradeIndex(grade);
+  const eff=q=>q.level||(q.easy?'ce1':null);
+  pool=pool.filter(q=>{const lvl=eff(q);return !lvl||Math.abs(gradeIndex(lvl)-gIdx)<=2});
+  if(pool.length<5){toast('Pocas preguntas');return}
+  pool=pool.sort(()=>Math.random()-.5).slice(0,5);
+  game.galaxy=0;game.planet=0;game.qIdx=0;game.lives=999;game.correct=0;game.wrong=[];
+  game.qPool=pool;game.hintsUsed=0;
+  game.dailyChallengeMode=true; // flag para handler especial al final
+  game.reviewMode=false;
+  show('question');
+  setTimeout(()=>{const planetEl=document.getElementById('qPlanet');if(planetEl)planetEl.textContent='⚡ Reto Diario'},50);
+  renderQuestion();
+}
+// Cuando el reto diario acaba (manejado en answer setTimeout), llamamos a esta
+function dailyChallengeFinish(){
+  const p=getPlayer();
+  const today=new Date().toISOString().slice(0,10);
+  p.dailyChallengeDate=today;
+  p.dailyChallengeScore=game.correct;
+  // Recompensa: 50 base + 10 por acierto
+  const xpBonus=50+game.correct*10;
+  const coinsBonus=20+game.correct*5;
+  addXP(xpBonus);
+  p.coins+=coinsBonus;
+  save();
+  show('result');
+  document.getElementById('resultEmoji').textContent=game.correct>=4?'🏆':game.correct>=3?'🎉':'😊';
+  document.getElementById('resultTitle').textContent='¡Reto Diario completado!';
+  document.getElementById('resultText').innerHTML=`Aciertos: <b>${game.correct}/5</b><br>Recompensa: <b>+${xpBonus} XP</b> · <b>+${coinsBonus}💰</b><br>🔥 Racha diaria: <b>${p.dailyStreak||0}</b> día(s)`;
+  document.getElementById('nextBtn').style.display='none';
+  setupReviewButton();
+  game.dailyChallengeMode=false;
+  if(game.correct===5)confetti(80);
+}
+
+// ============ MODO DUELO HERMANOS ============
+// 2 jugadores se turnan en la misma tablet. 6 preguntas (3 cada uno). Gana quien más acierte.
+function duelRender(){
+  const c=document.getElementById('duelContent');
+  if(!game.duel||!game.duel.started){
+    c.innerHTML=`
+      <div style="font-size:60px">⚔️</div>
+      <p style="font-size:15px;line-height:1.5">Modo para 2 jugadores en la misma tablet.<br>6 preguntas alternadas (3 cada uno).<br><b>Gana quien más aciertos consiga.</b></p>
+      <p style="margin:10px 0;opacity:.85;font-size:12px">Las preguntas se eligen entre los grados de ambos hermanos para que sea justo.</p>
+      <div class="row" style="margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-blue" onclick="duelStart('emmanuel','emiliano')">⚡ Emmanuel vs Emiliano ⛏️</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn btn-purple" onclick="goBack()">← Volver</button>
+      </div>`;
+    return;
+  }
+  // Estado del duelo
+  const d=game.duel;
+  if(d.qIdx>=d.qs.length){
+    // Resultado final
+    const winner=d.scoreEmmanuel>d.scoreEmiliano?'emmanuel':d.scoreEmmanuel<d.scoreEmiliano?'emiliano':'tie';
+    const winnerLabel=winner==='tie'?'🤝 ¡EMPATE!':winner==='emmanuel'?'⚡ ¡Gana EMMANUEL!':'⛏️ ¡Gana EMILIANO!';
+    if(winner!=='tie'){
+      // Recompensa: 30 XP al ganador + 10 al perdedor (participación)
+      const winK=winner,loseK=winner==='emmanuel'?'emiliano':'emmanuel';
+      if(state[winK]){state[winK].xp=(state[winK].xp||0)+30;state[winK].coins=(state[winK].coins||0)+20;state[winK].duelWins=(state[winK].duelWins||0)+1}
+      if(state[loseK]){state[loseK].xp=(state[loseK].xp||0)+10;state[loseK].coins=(state[loseK].coins||0)+5}
+      save();
+      sndWin();confetti(60);
+    }else{
+      // Empate: 20 XP cada uno
+      ['emmanuel','emiliano'].forEach(k=>{if(state[k]){state[k].xp=(state[k].xp||0)+20;state[k].coins=(state[k].coins||0)+10}});
+      save();sndCorrect();
+    }
+    c.innerHTML=`
+      <div style="font-size:80px">🏆</div>
+      <h2 style="color:#ffd700">${winnerLabel}</h2>
+      <p style="font-size:18px;margin:10px 0">⚡ Emmanuel: <b>${d.scoreEmmanuel}/3</b></p>
+      <p style="font-size:18px">⛏️ Emiliano: <b>${d.scoreEmiliano}/3</b></p>
+      <p style="opacity:.85;margin-top:14px">${winner==='tie'?'+20 XP a cada uno':winnerLabel.split(' ')[0]+' gana +30 XP, el otro +10 XP'}</p>
+      <div class="row" style="margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-green" onclick="duelStart('emmanuel','emiliano')">🔁 Revancha</button>
+        <button class="btn btn-purple" onclick="game.duel=null;goBack()">← Salir</button>
+      </div>`;
+    return;
+  }
+  const q=d.qs[d.qIdx];
+  // Shuffle por pregunta
+  if(!q._duelShuffled){
+    const order=q.o.map((_,i)=>i).sort(()=>Math.random()-.5);
+    q._duelOShuf=order.map(i=>q.o[i]);
+    q._duelAShuf=order.indexOf(q.a);
+    q._duelShuffled=true;
+  }
+  const turnPlayer=d.qIdx%2===0?'emmanuel':'emiliano';
+  const turnLabel=turnPlayer==='emmanuel'?'⚡ Turno de Emmanuel':'⛏️ Turno de Emiliano';
+  const turnColor=turnPlayer==='emmanuel'?'#2196f3':'#ff7043';
+  c.innerHTML=`
+    <div style="background:linear-gradient(135deg,${turnColor},rgba(0,0,0,.4));padding:14px;border-radius:14px;margin-bottom:14px;border:3px solid #ffd700">
+      <div style="font-size:22px;font-weight:bold;color:#fff">${turnLabel}</div>
+      <div style="font-size:12px;opacity:.85;margin-top:4px">Pregunta ${d.qIdx+1} de ${d.qs.length}</div>
+      <div style="margin-top:8px;display:flex;justify-content:space-around;font-size:14px">
+        <span>⚡ ${d.scoreEmmanuel}</span><span>⛏️ ${d.scoreEmiliano}</span>
+      </div>
+    </div>
+    <div class="question-box" style="margin:14px 0">${escapeHtml(q.q)}</div>
+    <div class="answers" id="duelAnswers"></div>
+    <button class="btn btn-purple btn-small" style="margin-top:14px" onclick="game.duel=null;duelRender()">✗ Cancelar duelo</button>`;
+  const ansEl=document.getElementById('duelAnswers');
+  q._duelOShuf.forEach((opt,i)=>{
+    const b=document.createElement('button');
+    b.className='answer-btn';b.textContent=opt;
+    b.onclick=()=>duelAnswer(i,q,b);
+    ansEl.appendChild(b);
+  });
+}
+function duelStart(p1,p2){
+  // Pool: mezcla preguntas que sean válidas para AMBOS grados (intersección suave)
+  let pool=[];
+  GALAXIES.forEach(g=>{
+    for(let i=0;i<g.planets.length;i++){
+      const node=QUESTIONS[g.id]&&QUESTIONS[g.id][i];
+      if(node)pool=pool.concat(Array.isArray(node)?node:(node.pool||[]));
+    }
+  });
+  // Filtrar por grado del jugador menor (Emiliano CE1) ±1 para que sea justo
+  const youngGrade=gradeOf('emiliano');
+  const yIdx=gradeIndex(youngGrade);
+  const eff=q=>q.level||(q.easy?'ce1':null);
+  pool=pool.filter(q=>{const lvl=eff(q);return !lvl||Math.abs(gradeIndex(lvl)-yIdx)<=2});
+  if(pool.length<6){toast('Pocas preguntas');return}
+  pool=pool.sort(()=>Math.random()-.5).slice(0,6);
+  game.duel={started:true,p1,p2,qs:pool,qIdx:0,scoreEmmanuel:0,scoreEmiliano:0,locked:false};
+  duelRender();
+}
+function duelAnswer(idx,q,btn){
+  if(game.duel.locked)return;
+  game.duel.locked=true;
+  document.querySelectorAll('#duelAnswers .answer-btn').forEach(b=>b.disabled=true);
+  const correctIdx=q._duelAShuf!=null?q._duelAShuf:q.a;
+  const isCorrect=idx===correctIdx;
+  const turnPlayer=game.duel.qIdx%2===0?'emmanuel':'emiliano';
+  if(isCorrect){
+    btn.classList.add('correct');sndCorrect();sndCoin();
+    if(turnPlayer==='emmanuel')game.duel.scoreEmmanuel++;
+    else game.duel.scoreEmiliano++;
+    feedback('✓ ¡Correcto!','success');
+  }else{
+    btn.classList.add('wrong');
+    const correctBtn=document.querySelectorAll('#duelAnswers .answer-btn')[correctIdx];
+    if(correctBtn)correctBtn.classList.add('correct');
+    sndWrong();
+    feedback('✗ Falló','fail');
+  }
+  setTimeout(()=>{
+    game.duel.locked=false;game.duel.qIdx++;
+    duelRender();
+  },1500);
+}
+
 // ===== Helpers semana ISO + tracking =====
 function getWeekKey(){
   // YYYY-Wxx (semana ISO) — todos los días de la misma semana caen en el mismo key
@@ -2857,6 +3118,8 @@ function renderWeekendEvent(){
 // Planeta secreto: 10 preguntas mezcladas de TODAS las galaxias, con doble XP temporal
 function startSecretPlanet(){
   const p=getPlayer();
+  // Marca para logro "Explorador del Cosmos"
+  p.secretPlanetDone=true;
   // Mezclar 10 preguntas aleatorias de cualquier galaxia
   let pool=[];
   GALAXIES.forEach(g=>{
@@ -3088,6 +3351,9 @@ function renderQuestion(){
 function useHint(){
   const p=getPlayer();
   if((game.hintsUsed||0)>=2){toast('Solo 2 pistas por planeta');return}
+  // Marca que en esta galaxia se usó pista (para logro "Mente brillante")
+  const galId=GALAXIES[game.galaxy]&&GALAXIES[game.galaxy].id;
+  if(galId){p.usedHintsInGalaxy=p.usedHintsInGalaxy||{};p.usedHintsInGalaxy[galId]=true}
   // Bola de Fuego: pistas gratis (3 por compra)
   const hasFreeHint=(p.freeHints||0)>0;
   if(!hasFreeHint&&p.coins<5)return;
@@ -3163,10 +3429,10 @@ function answer(idx,q,btn){
       msg=ENCOURAGEMENT_OK[Math.floor(Math.random()*ENCOURAGEMENT_OK.length)]+xpStr;
     }
     feedback(msg,'success');
-    // Confetti extra en rachas grandes (no en repaso)
+    // Confetti + sonido de racha en hitos clave (no en repaso)
     if(!game.reviewMode){
-      if(p.currentStreak===5)confetti(20);
-      if(p.currentStreak===10)confetti(40);
+      if(p.currentStreak===5){confetti(20);sndStreak()}
+      if(p.currentStreak===10){confetti(40);sndStreak();setTimeout(sndStreak,300)}
     }
   }else{
     btn.classList.add('wrong');
@@ -3235,6 +3501,11 @@ function answer(idx,q,btn){
     }
     if(game.lives<=0){endPlanet(true);return}
     game.qIdx++;
+    // Si es Reto Diario y se acaban las 5 → finish especial
+    if(game.dailyChallengeMode&&game.qIdx>=(game.qPool||[]).length){
+      dailyChallengeFinish();
+      return;
+    }
     renderQuestion();
   },delay);
 }
@@ -3326,6 +3597,8 @@ function setupReviewButton(){
 // Inicia ronda de revisión: las preguntas falladas, sin penalización (no afecta XP/monedas/vidas)
 function startReviewRound(){
   if(!game.wrong||!game.wrong.length){toast('No hay preguntas para repasar');return}
+  // Tracking para logro "Estudioso"
+  const p=getPlayer();if(p){p.reviewsDone=(p.reviewsDone||0)+1;save()}
   // Snapshot del modo: quitamos vidas y guardamos las falladas como pool
   game.qPool=game.wrong.slice();
   // Reset de las preguntas para que se barajen de nuevo
@@ -3489,7 +3762,7 @@ function bossWin(){
     addXP(30); // re-derrota: recompensa pequeña
   }
   save();
-  sndWin();confetti(60);
+  sndBossWin();confetti(60); // fanfarria épica para vencer al jefe
   show('result');
   document.getElementById('resultEmoji').textContent='👑';
   document.getElementById('resultTitle').textContent='¡JEFE DERROTADO!';
@@ -3581,7 +3854,8 @@ function buyItem(it){
   if(!isConsumible&&p.items.includes(it.id))return;
   p.coins-=it.price;
   if(!p.items.includes(it.id))p.items.push(it.id);
-  // Activar efecto del item
+  // Activar efecto del item — con sonido power-up si es de gameplay
+  if(it.effect)sndPowerUp();
   if(it.effect==='doubleXP'){p.doubleXPUntil=Date.now()+24*3600*1000;toast('🍄 ¡Doble XP activado 24h!',3000)}
   else if(it.effect==='freeHint'){p.freeHints=(p.freeHints||0)+3;toast('🔥 3 pistas gratis añadidas',3000)}
   else if(it.effect==='megaCoin'){p.megaCoinUntil=Date.now()+24*3600*1000;toast('⛏️ ¡Doble monedas 24h!',3000)}
@@ -3605,7 +3879,7 @@ function checkAchievements(){
     if(!p.achievements.includes(a.id)&&a.cond(p)){
       p.achievements.push(a.id);save();
       toast(`🏆 ¡Logro desbloqueado!\n${a.emoji} ${a.name}`,3500);
-      sndWin();
+      sndBadge(); // sonido cristal específico para logros
     }
   });
 }
