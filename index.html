@@ -170,7 +170,9 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .dpad-btn{width:55px;height:55px;background:linear-gradient(135deg,#9c27b0,#673ab7);border:none;border-radius:14px;color:#fff;font-size:26px;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 0 #4a148c}
 .dpad-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #4a148c}
 .dpad-up{grid-area:up}.dpad-down{grid-area:down}.dpad-left{grid-area:left}.dpad-right{grid-area:right}
-.back-btn{position:fixed;top:14px;left:14px;width:44px;height:44px;background:rgba(0,0,0,.7);border:2px solid #ffd700;border-radius:50%;color:#ffd700;font-size:22px;cursor:pointer;z-index:100;font-family:inherit;display:flex;align-items:center;justify-content:center}
+.back-btn{position:fixed;top:14px;left:14px;width:50px;height:50px;background:linear-gradient(135deg,#9c27b0,#673ab7);border:3px solid #ffd700;border-radius:50%;color:#fff;font-size:24px;font-weight:bold;cursor:pointer;z-index:1000;font-family:inherit;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.5),0 0 16px rgba(255,215,0,.4);transition:transform .15s}
+.back-btn:hover{transform:scale(1.08)}
+.back-btn:active{transform:scale(.92)}
 .sound-btn{position:fixed;top:14px;right:14px;width:44px;height:44px;background:rgba(0,0,0,.7);border:2px solid #ffd700;border-radius:50%;color:#ffd700;font-size:20px;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center}
 .welcome-msg{background:linear-gradient(135deg,rgba(255,215,0,.2),rgba(156,39,176,.2));border:2px solid #ffd700;border-radius:18px;padding:16px;margin:10px auto;max-width:600px;font-size:14px;text-align:center;line-height:1.5}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:10px}
@@ -2470,7 +2472,8 @@ function show(id){
   game.screen=id;
   if(id!==game.history[game.history.length-1])game.history.push(id);
   document.getElementById('soundBtn').style.display=id==='intro'?'none':'flex';
-  document.getElementById('backBtn').style.display=(id==='snake'||id==='tictac'||id==='memo'||id==='c4'||id==='g2048'||id==='mines'||id==='tetris'||id==='chess'||id==='mario'||id==='dino'||id==='classic'||id==='select'||id==='parents'||id==='admin'||id==='dict'||id==='wiki')?'flex':'none';
+  // Botón de volver visible en TODAS las pantallas excepto la intro (incluye question, boss, result, map, etc.)
+  document.getElementById('backBtn').style.display=id==='intro'?'none':'flex';
   // Tracking de juego clásico (lista de IDs que cuentan como "juego")
   const trackedGames=['snake','tictac','memo','c4','g2048','mines','tetris','chess','mario','dino'];
   if(trackedGames.includes(id))trackGame(id);
