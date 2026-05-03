@@ -3,7 +3,7 @@
 // nada de cachear cross-origin (Wikipedia, etc.) para evitar que la cache crezca infinito.
 // 1777808655487 se reemplaza automÃ¡ticamente en cada push con el timestamp UTC actual.
 // Si el script de push no se ejecuta, fallback al timestamp de instalaciÃ³n del SW.
-const RAW_BUILD_TIME = '1777808655487';
+const RAW_BUILD_TIME = '1777820852525';
 const BUILD_TIME = RAW_BUILD_TIME.indexOf('BUILD_TIME') !== -1 ? String(Date.now()) : RAW_BUILD_TIME;
 const CACHE_NAME = 'aventura-espacial-' + BUILD_TIME;
 const NETWORK_TIMEOUT_MS = 3000; // si tarda mÃ¡s, va a cache

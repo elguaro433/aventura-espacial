@@ -2387,7 +2387,7 @@ fr:[
 {q:'"Je le vois" — "le" es:',o:['Sujeto','COD','COI','Adjetivo'],a:1,level:'cm2'},
 {q:'"Je lui parle" — "lui" es:',o:['COD','COI','Adverbio','Sujeto'],a:1,level:'cm2'},
 {q:'Conjuga "manger" en imparfait, je: ?',o:['mangeai','mangeais','mangerai','mangé'],a:1,level:'cm2'},
-{q:'Sinónimo de "rapide":',o:['lent','vite','tard','dur'],a:1,level:'cm2'},
+{q:'Sinónimo de "soudain":',o:['lent','brusque','calme','long'],a:1,level:'cm2'},
 {q:'Antónimo de "facile":',o:['simple','difficile','clair','lourd'],a:1,level:'cm2'},
 {q:'¿Cuál es el participio pasado de "prendre"?',o:['prendu','prenu','pris','prendé'],a:2,level:'cm2'},
 // 6ème — pronombres, subjonctif intro, conditionnel
@@ -2414,16 +2414,16 @@ fr:[
 ],
 es:[
 [ // Ortografía
-{q:'¿Cuál es correcta?',o:['Aver','Haver','Haber','Aber'],a:2},
-{q:'¿Cuál es correcta?',o:['Bueno','Vueno','Bweno','Buenu'],a:0,easy:true},
-{q:'¿Cuál es correcta?',o:['Hola','Ola','Hhola','Olla'],a:0,easy:true},
+{q:'¿Cuál es correcta? (haber)',o:['Aver','Haver','Haber','Aber'],a:2},
+{q:'¿Cuál es correcta? (bueno)',o:['Bueno','Vueno','Bweno','Buenu'],a:0,easy:true},
+{q:'¿Cuál es correcta? (hola)',o:['Hola','Ola','Hhola','Olla'],a:0,easy:true},
 {q:'¿Cuál lleva tilde?',o:['Pajaro','Pájaro','Pájáro','Pájara'],a:1,easy:true},
-{q:'¿Cuál es correcta?',o:['Vamos','Bamos','Vamoz','Vamus'],a:0,easy:true},
-{q:'¿Cuál es correcta?',o:['Casa','Caza','Kasa','Cása'],a:0,easy:true},
+{q:'¿Cuál es correcta? (vamos)',o:['Vamos','Bamos','Vamoz','Vamus'],a:0,easy:true},
+{q:'¿Cuál es correcta? (casa)',o:['Casa','Caza','Kasa','Cása'],a:0,easy:true},
 {q:'¿Cuál se escribe con H al inicio?',o:['Olla','Hiena','Esquí','Mesa'],a:1},
-{q:'¿Cuál es correcta?',o:['Vibir','Bivir','Vivir','Bibir'],a:2},
-{q:'¿Cuál es correcta?',o:['Tambien','También','Tanvién','Tambíen'],a:1},
-{q:'¿Cuál es correcta?',o:['Vurro','Burro','Bourro','Vourro'],a:1,easy:true}
+{q:'¿Cuál es correcta? (vivir)',o:['Vibir','Bivir','Vivir','Bibir'],a:2},
+{q:'¿Cuál es correcta? (también)',o:['Tambien','También','Tanvién','Tambíen'],a:1},
+{q:'¿Cuál es correcta? (burro)',o:['Vurro','Burro','Bourro','Vourro'],a:1,easy:true}
 ],[ // Sinónimos
 {q:'Sinónimo de FELIZ:',o:['Triste','Contento','Enojado','Cansado'],a:1,easy:true},
 {q:'Sinónimo de RÁPIDO:',o:['Lento','Veloz','Pesado','Tarde'],a:1,easy:true},
@@ -2654,7 +2654,7 @@ ca:[
 // Ortografía -mb / -nv (Emmanuel CM1: PA en -mb, -nv)
 {q:'En català, ¿qué letra va delante de B y P? (regla)',o:['n','m','ambas','ninguna'],a:1,level:'cm1'},
 {q:'En català, ¿qué letra va delante de V y F? (regla)',o:['m','n','ambas','ninguna'],a:1,level:'cm1'},
-{q:'¿Cuál es correcta? (también)',o:['tanbé','tambè','també','tanbe'],a:2,level:'cm1'},
+{q:'¿Cuál es correcta? (també, en català)',o:['tanbé','tambè','també','tanbe'],a:2,level:'cm1'},
 {q:'¿Cuál es correcta? (enviar)',o:['emviar','enviar','enbiar','emiar'],a:1,level:'cm1'},
 {q:'¿Cuál es correcta? (cambiar al català)',o:['canbiar','cambiar','canviar','camviar'],a:2,level:'cm1'},
 // Ortografía r / rr (Emmanuel CM1: PA en r/rr)
@@ -3002,7 +3002,6 @@ const ACHIEVEMENTS=[
 {id:'dailyStreak7',emoji:'🗓️',name:'Habitual',desc:'7 días seguidos jugando',cond:s=>s.dailyStreak>=7},
 {id:'dailyStreak30',emoji:'🏅',name:'Disciplinado',desc:'30 días seguidos jugando',cond:s=>s.dailyStreak>=30},
 {id:'firstChallenge',emoji:'⚡',name:'Reto aceptado',desc:'Completa tu primer Reto Diario',cond:s=>!!s.dailyChallengeDate},
-// (logro Duelista eliminado al quitarse el modo)
 {id:'noHints',emoji:'🧠',name:'Mente brillante',desc:'Conquista una galaxia entera sin pistas',cond:s=>{
   for(const g of (typeof GALAXIES!=='undefined'?GALAXIES:[])){
     if(s.bossesBeaten.includes(g.id)&&!(s.usedHintsInGalaxy||{})[g.id])return true;
@@ -3451,127 +3450,6 @@ function dailyChallengeFinish(){
   setupReviewButton();
   game.dailyChallengeMode=false;
   if(game.correct===5)confetti(80);
-}
-
-// ============ MODO DUELO HERMANOS ============
-// 2 jugadores se turnan en la misma tablet. 6 preguntas (3 cada uno). Gana quien más acierte.
-function duelRender(){
-  const c=document.getElementById('duelContent');
-  if(!game.duel||!game.duel.started){
-    c.innerHTML=`
-      <div style="font-size:60px">⚔️</div>
-      <p style="font-size:15px;line-height:1.5">Modo para 2 jugadores en la misma tablet.<br>6 preguntas alternadas (3 cada uno).<br><b>Gana quien más aciertos consiga.</b></p>
-      <p style="margin:10px 0;opacity:.85;font-size:12px">Las preguntas se eligen entre los grados de ambos hermanos para que sea justo.</p>
-      <div class="row" style="margin-top:14px;flex-wrap:wrap">
-        <button class="btn btn-blue" onclick="duelStart('emmanuel','emiliano')">⚡ Emmanuel vs Emiliano ⛏️</button>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <button class="btn btn-purple" onclick="goBack()">← Volver</button>
-      </div>`;
-    return;
-  }
-  // Estado del duelo
-  const d=game.duel;
-  if(d.qIdx>=d.qs.length){
-    // Resultado final
-    const winner=d.scoreEmmanuel>d.scoreEmiliano?'emmanuel':d.scoreEmmanuel<d.scoreEmiliano?'emiliano':'tie';
-    const winnerLabel=winner==='tie'?'🤝 ¡EMPATE!':winner==='emmanuel'?'⚡ ¡Gana EMMANUEL!':'⛏️ ¡Gana EMILIANO!';
-    if(winner!=='tie'){
-      // Recompensa: 30 XP al ganador + 10 al perdedor (participación)
-      const winK=winner,loseK=winner==='emmanuel'?'emiliano':'emmanuel';
-      if(state[winK]){state[winK].xp=(state[winK].xp||0)+30;state[winK].coins=(state[winK].coins||0)+20;state[winK].duelWins=(state[winK].duelWins||0)+1}
-      if(state[loseK]){state[loseK].xp=(state[loseK].xp||0)+10;state[loseK].coins=(state[loseK].coins||0)+5}
-      save();
-      sndWin();confetti(60);
-    }else{
-      // Empate: 20 XP cada uno
-      ['emmanuel','emiliano'].forEach(k=>{if(state[k]){state[k].xp=(state[k].xp||0)+20;state[k].coins=(state[k].coins||0)+10}});
-      save();sndCorrect();
-    }
-    c.innerHTML=`
-      <div style="font-size:80px">🏆</div>
-      <h2 style="color:#ffd700">${winnerLabel}</h2>
-      <p style="font-size:18px;margin:10px 0">⚡ Emmanuel: <b>${d.scoreEmmanuel}/3</b></p>
-      <p style="font-size:18px">⛏️ Emiliano: <b>${d.scoreEmiliano}/3</b></p>
-      <p style="opacity:.85;margin-top:14px">${winner==='tie'?'+20 XP a cada uno':winnerLabel.split(' ')[0]+' gana +30 XP, el otro +10 XP'}</p>
-      <div class="row" style="margin-top:14px;flex-wrap:wrap">
-        <button class="btn btn-green" onclick="duelStart('emmanuel','emiliano')">🔁 Revancha</button>
-        <button class="btn btn-purple" onclick="game.duel=null;goBack()">← Salir</button>
-      </div>`;
-    return;
-  }
-  const q=d.qs[d.qIdx];
-  // Shuffle por pregunta
-  if(!q._duelShuffled){
-    const order=q.o.map((_,i)=>i).sort(()=>Math.random()-.5);
-    q._duelOShuf=order.map(i=>q.o[i]);
-    q._duelAShuf=order.indexOf(q.a);
-    q._duelShuffled=true;
-  }
-  const turnPlayer=d.qIdx%2===0?'emmanuel':'emiliano';
-  const turnLabel=turnPlayer==='emmanuel'?'⚡ Turno de Emmanuel':'⛏️ Turno de Emiliano';
-  const turnColor=turnPlayer==='emmanuel'?'#2196f3':'#ff7043';
-  c.innerHTML=`
-    <div style="background:linear-gradient(135deg,${turnColor},rgba(0,0,0,.4));padding:14px;border-radius:14px;margin-bottom:14px;border:3px solid #ffd700">
-      <div style="font-size:22px;font-weight:bold;color:#fff">${turnLabel}</div>
-      <div style="font-size:12px;opacity:.85;margin-top:4px">Pregunta ${d.qIdx+1} de ${d.qs.length}</div>
-      <div style="margin-top:8px;display:flex;justify-content:space-around;font-size:14px">
-        <span>⚡ ${d.scoreEmmanuel}</span><span>⛏️ ${d.scoreEmiliano}</span>
-      </div>
-    </div>
-    <div class="question-box" style="margin:14px 0">${escapeHtml(q.q)}</div>
-    <div class="answers" id="duelAnswers"></div>
-    <button class="btn btn-purple btn-small" style="margin-top:14px" onclick="game.duel=null;duelRender()">✗ Cancelar duelo</button>`;
-  const ansEl=document.getElementById('duelAnswers');
-  q._duelOShuf.forEach((opt,i)=>{
-    const b=document.createElement('button');
-    b.className='answer-btn';b.textContent=opt;
-    b.onclick=()=>duelAnswer(i,q,b);
-    ansEl.appendChild(b);
-  });
-}
-function duelStart(p1,p2){
-  // Pool: mezcla preguntas que sean válidas para AMBOS grados (intersección suave)
-  let pool=[];
-  GALAXIES.forEach(g=>{
-    for(let i=0;i<g.planets.length;i++){
-      const node=QUESTIONS[g.id]&&QUESTIONS[g.id][i];
-      if(node)pool=pool.concat(Array.isArray(node)?node:(node.pool||[]));
-    }
-  });
-  // Filtrar por grado del jugador menor (Emiliano CE1) ±1 para que sea justo
-  const youngGrade=gradeOf('emiliano');
-  const yIdx=gradeIndex(youngGrade);
-  const eff=q=>q.level||(q.easy?'ce1':null);
-  pool=pool.filter(q=>{const lvl=eff(q);return !lvl||Math.abs(gradeIndex(lvl)-yIdx)<=2});
-  if(pool.length<6){toast('Pocas preguntas');return}
-  pool=pool.sort(()=>Math.random()-.5).slice(0,6);
-  game.duel={started:true,p1,p2,qs:pool,qIdx:0,scoreEmmanuel:0,scoreEmiliano:0,locked:false};
-  duelRender();
-}
-function duelAnswer(idx,q,btn){
-  if(game.duel.locked)return;
-  game.duel.locked=true;
-  document.querySelectorAll('#duelAnswers .answer-btn').forEach(b=>b.disabled=true);
-  const correctIdx=q._duelAShuf!=null?q._duelAShuf:q.a;
-  const isCorrect=idx===correctIdx;
-  const turnPlayer=game.duel.qIdx%2===0?'emmanuel':'emiliano';
-  if(isCorrect){
-    btn.classList.add('correct');sndCorrect();sndCoin();
-    if(turnPlayer==='emmanuel')game.duel.scoreEmmanuel++;
-    else game.duel.scoreEmiliano++;
-    feedback('✓ ¡Correcto!','success');
-  }else{
-    btn.classList.add('wrong');
-    const correctBtn=document.querySelectorAll('#duelAnswers .answer-btn')[correctIdx];
-    if(correctBtn)correctBtn.classList.add('correct');
-    sndWrong();
-    feedback('✗ Falló','fail');
-  }
-  setTimeout(()=>{
-    game.duel.locked=false;game.duel.qIdx++;
-    duelRender();
-  },1500);
 }
 
 // ===== Helpers semana ISO + tracking =====
@@ -8276,12 +8154,13 @@ const MINI_CATS=[
 ];
 const MINI_TTSLANGS={es:'es-ES',fr:'fr-FR',en:'en-US',ca:'ca-ES'};
 function miniInit(){
-  document.getElementById('miniInput').value='';
+  const initInp=document.getElementById('wikiInput');
+  if(initInp)initInp.value='';
   miniLang='es';miniActiveCat='all';
   document.querySelectorAll('[data-mlang]').forEach(b=>b.classList.toggle('active',b.dataset.mlang==='es'));
   miniRenderCats();
   miniFilterCat('all');
-  const inp=document.getElementById('miniInput');
+  const inp=document.getElementById('wikiInput');
   if(inp&&!inp.dataset.bound){
     inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();miniSearch()}});
     inp.dataset.bound='1';
@@ -8306,7 +8185,8 @@ function miniSetLang(l){
   miniFilterCat(miniActiveCat);
 }
 function miniSearch(){
-  const q=(document.getElementById('miniInput').value||'').toLowerCase().trim();
+  const inpEl=document.getElementById('wikiInput');
+  const q=((inpEl&&inpEl.value)||'').toLowerCase().trim();
   if(!q){miniFilterCat(miniActiveCat);return}
   const found=ENCYCLOPEDIA.filter(e=>{
     const titles=[e.title.es,e.title.fr,e.title.en,e.title.ca].join(' ').toLowerCase();
@@ -8424,8 +8304,6 @@ function updateOfflineBanner(){
   if(!banner)return;
   const isOnline=navigator.onLine;
   banner.style.display=isOnline?'none':'block';
-  const onlineTab=document.getElementById('wikiTabOnline');
-  if(onlineTab)onlineTab.classList.toggle('disabled',!isOnline);
 }
 
 // ========== MODO PADRES (analytics) ==========

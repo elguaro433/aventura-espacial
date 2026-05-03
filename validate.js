@@ -66,10 +66,11 @@ while ((m = qRegex.exec(HTML)) !== null) {
   if (lvlMatch && !VALID_GRADES.has(lvlMatch[1])) {
     err('Grado desconocido "' + lvlMatch[1] + '" en pregunta: ' + q.slice(0, 60));
   }
-  // Detectar duplicados (misma pregunta exacta)
-  const key = q.trim();
+  // Detectar duplicados (misma pregunta exacta dentro del mismo nivel/dificultad)
+  const lvlKey = lvlMatch ? lvlMatch[1] : (/easy:\s*true/.test(tail) ? 'easy' : 'none');
+  const key = lvlKey + '|' + q.trim();
   if (seen.has(key)) {
-    warn('Pregunta duplicada: ' + key.slice(0, 60));
+    warn('Pregunta duplicada en nivel "' + lvlKey + '": ' + q.trim().slice(0, 60));
   }
   seen.add(key);
 }

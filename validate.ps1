@@ -64,10 +64,11 @@ foreach ($m in $qRegex.Matches($html)) {
             $errors++
         }
     }
-    # Duplicados
-    $key = $q.Trim()
+    # Duplicados (solo dentro del mismo nivel/dificultad)
+    $lvlKey = if ($lvlMatch.Success) { $lvlMatch.Groups[1].Value } elseif ($tail -match 'easy:\s*true') { 'easy' } else { 'none' }
+    $key = "$lvlKey|$($q.Trim())"
     if ($seenQuestions.ContainsKey($key)) {
-        Write-Host "! Pregunta duplicada: $($key.Substring(0,[Math]::Min(60,$key.Length)))" -ForegroundColor Yellow
+        Write-Host "! Pregunta duplicada en nivel '$lvlKey': $($q.Substring(0,[Math]::Min(60,$q.Length)))" -ForegroundColor Yellow
         $warnings++
     }
     $seenQuestions[$key] = $true
