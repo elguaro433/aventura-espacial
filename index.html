@@ -771,7 +771,6 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
     <button class="btn btn-purple" onclick="show('classic')">🎮 Juegos Clásicos</button>
     <button class="btn btn-blue" onclick="show('dict')">📖 Diccionario</button>
     <button class="btn btn-green" onclick="show('wiki')">🌐 Enciclopedia</button>
-    <button class="btn btn-red" onclick="show('dailyChallenge')">⚡ Reto Diario</button>
     <button class="btn btn-blue" onclick="show('duel')">⚔️ Duelo entre Hermanos</button>
   </div>
   <!-- Firma familiar -->
@@ -918,6 +917,8 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   </div>
   <div class="tab-content active" id="mapTab">
     <div id="welcomeMsg" class="welcome-msg" style="display:none"></div>
+    <!-- Botón destacado del Reto Diario, dentro del perfil -->
+    <div id="dailyChallengeBtn" style="text-align:center;margin:6px 0 14px"></div>
     <div class="galaxy-grid" id="galaxyGrid"></div>
     <div style="text-align:center;margin-top:20px">
       <button class="btn btn-red btn-small" onclick="confirmReset()">🔄 Reiniciar Progreso</button>
@@ -3174,6 +3175,17 @@ function renderMap(){
   }else{
     document.getElementById('xpFill').style.width='100%';
     document.getElementById('xpText').textContent=`${lvl.name} · NIVEL MÁXIMO (${p.xp} XP)`;
+  }
+  // ===== BOTÓN DEL RETO DIARIO (por niño) =====
+  const dcBtnEl=document.getElementById('dailyChallengeBtn');
+  if(dcBtnEl){
+    const today=new Date().toISOString().slice(0,10);
+    const done=p.dailyChallengeDate===today;
+    if(done){
+      dcBtnEl.innerHTML='<button class="btn" style="background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;box-shadow:0 6px 0 #1b5e20,0 8px 14px rgba(0,0,0,.4)" onclick="show(\'dailyChallenge\')">✅ Reto Diario hecho hoy ('+(p.dailyChallengeScore||0)+'/5)</button>';
+    }else{
+      dcBtnEl.innerHTML='<button class="btn btn-red" style="animation:pulse 2s infinite" onclick="show(\'dailyChallenge\')">⚡ Reto Diario · ¡Hazlo HOY!</button>';
+    }
   }
   // ===== BADGES SEMANALES por dominio de área =====
   // Detecta semana actual (ISO) y galaxias en las que tiene ≥80% aciertos esa semana
