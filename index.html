@@ -1531,6 +1531,57 @@ const GALAXIES=[
 
 // Questions per galaxy/planet (10 per planet for older, easier versions for younger)
 // Format: [question, [4 options], correctIndex, lang?]
+// ============ EXPLICACIONES PEDAGÓGICAS ============
+// Diccionario de explicaciones que se muestran al niño cuando falla una pregunta.
+// La clave es el campo `q` exacto de la pregunta. Si está, se muestra como ayuda.
+const MATH_EXPLANATIONS = {
+  '9 + 6 = ?':'Truco: para sumar 9, suma 10 y resta 1. 6+10=16, menos 1 = 15. ¡Funciona siempre!',
+  '15 + 9 = ?':'Sumar 9 = sumar 10 y quitar 1. 15+10=25, menos 1 = 24.',
+  '99 + 99 = ?':'Truco: 99 es casi 100. 100+100=200, y como quitamos 1 dos veces, son 200-2=198.',
+  '567 + 433 = ?':'Mira las unidades: 7+3=10, 6+3=9, 5+4=9. Se redondea perfecto a 1000.',
+  '199 + 1 = ?':'Cuando sumas 1 a un número acabado en 9, cambia la decena: 199+1=200.',
+  '1,25 + 2,75 = ?':'Suma los enteros (1+2=3) y los decimales (0,25+0,75=1). Total: 3+1=4.',
+  '15,8 + 4,2 = ?':'Las décimas 8+2=10 forman 1 entero. 15+4=19, más el 1 que llevamos = 20.',
+  '9,99 + 0,01 = ?':'Como 99 céntimos + 1 céntimo = 1 euro. 9,99 + 0,01 = 10 exacto.',
+  '(-3) + 5 = ?':'Imagina un termómetro: estás en -3 y subes 5 grados. Pasas por 0 y subes 2 más: llegas a 2.',
+  '(-7) + (-4) = ?':'Dos números negativos se suman como si fueran positivos, y guardan el signo menos. -7+(-4) = -11.',
+  '(-10) + 10 = ?':'Número y su opuesto siempre suman 0. Es como deber 10 y pagar 10: te quedas a cero.',
+  'Suma: 1/2 + 1/2 = ?':'Media tarta más media tarta forman una tarta entera. 1/2 + 1/2 = 1.',
+  '100 - 35 = ?':'Truco: piensa "¿qué le falta a 35 para llegar a 100?". 35+65=100, así que la respuesta es 65.',
+  '1000 - 1 = ?':'Restar 1 a un número redondo: baja el último 0 y deja todo 9. 1000-1 = 999.',
+  '2000 - 999 = ?':'Truco: en vez de restar 999, resta 1000 y suma 1. 2000-1000=1000, más 1 = 1001.',
+  '500 - 99 = ?':'Restar 99 = restar 100 y sumar 1. 500-100=400, +1 = 401.',
+  '(-3) - 4 = ?':'Bajar 4 desde -3 en el termómetro: -3, -4, -5, -6, -7. Resultado: -7.',
+  '(-5) - (-3) = ?':'Restar un negativo es como sumar: -5 - (-3) = -5 + 3 = -2.',
+  '10 - (-5) = ?':'Menos por menos da más: 10 - (-5) = 10 + 5 = 15.',
+  '9 × 6 = ?':'Truco del 9: multiplica por 10 y resta el otro número. 6×10=60, menos 6 = 54.',
+  '8 × 7 = ?':'Pista: las cifras 5,6,7,8 están en orden: 56 = 7×8. ¡Recuerda "cinco-seis igual a siete-ocho"!',
+  '7 × 8 = ?':'Recuérdalo así: 5-6-7-8 → 56 = 7×8. Cuatro números seguidos en una sola operación.',
+  '12 × 5 = ?':'Truco: ×5 es la mitad de ×10. 12×10=120, mitad = 60.',
+  '25 × 4 = ?':'25×4 siempre da 100, como 4 monedas de 25 céntimos forman 1 euro.',
+  '12 × 12 = ?':'La doble docena es famosa: 12×12=144. ¡Vale la pena memorizarla!',
+  '(-3) × 4 = ?':'Negativo por positivo da negativo. 3×4=12, así que (-3)×4 = -12.',
+  '(-5) × (-2) = ?':'Menos por menos da MÁS. 5×2=10, y los dos signos menos se cancelan: +10.',
+  '25 × 4 × 0 = ?':'Cualquier cosa multiplicada por 0 es 0. ¡No importa lo grandes que sean los otros números!',
+  '0,5 × 10 = ?':'Multiplicar por 10 mueve la coma una posición a la derecha: 0,5 → 5.',
+  '1000 ÷ 4 = ?':'Truco: divide entre 2 dos veces. 1000÷2=500, 500÷2=250.',
+  '10 ÷ 0,5 = ?':'"¿Cuántas medias caben en 10?" En cada unidad caben 2 medias, en 10 unidades caben 20.',
+  '¿Cuánto es 1/4 de 100?':'1/4 significa dividir entre 4. 100÷4 = 25. ¡Como un cuarto de hora son 15 minutos de 60!',
+  '30 ÷ 4 (resto y cociente):':'4×7=28, sobran 2. Así que 30÷4 = 7 con resto 2. La división no siempre es exacta.',
+  '(-20) ÷ (-5) = ?':'Menos entre menos da MÁS. 20÷5=4, signos se cancelan: +4.',
+  '¿Cuánto es 6/8 simplificado?':'Divide arriba y abajo entre 2: 6÷2=3, 8÷2=4. Queda 3/4.',
+  'Pagas con 10€ algo de 7,50€. ¿Vuelta?':'De 7,50 a 10 hay que subir: 0,50 hasta 8, y luego 2 hasta 10. Total: 2,50€.',
+  'Un tren sale a las 8:00 y llega a las 10:30. ¿Cuánto duró?':'De 8:00 a 10:00 son 2 horas, más 30 minutos = 2h 30min.',
+  'Un rectángulo mide 8 × 5 cm. ¿Área?':'Área de rectángulo = base × altura. 8×5 = 40 cm². Las unidades son cm² porque medimos superficie.',
+  '¿Cuánto es 25% de 80?':'25% es lo mismo que 1/4. 80÷4 = 20. ¡El 25% siempre es la cuarta parte!'
+};
+// Asigna q.explanation desde el diccionario si la pregunta no la trae ya inline
+function attachExplanation(q){
+  if(!q||q.explanation)return q;
+  if(MATH_EXPLANATIONS[q.q])q.explanation=MATH_EXPLANATIONS[q.q];
+  return q;
+}
+
 const QUESTIONS={
 math:[
 [ // SUMAS - banco de 30
@@ -1875,65 +1926,111 @@ math:[
 {q:'Resuelve: 3x + 2 = 11. x = ?',o:['2','3','4','5'],a:1,level:'6e'},
 {q:'Un coche va a 60 km/h. ¿Distancia en 2 horas?',o:['60 km','90 km','120 km','150 km'],a:2,level:'6e'},
 {q:'¿Cuánto es 10² (10 al cuadrado)?',o:['20','100','110','1000'],a:1,level:'6e'},
-{q:'¿Cuánto es 2³ (2 al cubo)?',o:['6','8','9','12'],a:1,level:'6e'}
+{q:'¿Cuánto es 2³ (2 al cubo)?',o:['6','8','9','12'],a:1,level:'6e'},
+// === SECCIONES NUEVAS (auditoría): geometría, %, medidas, tiempo, redondeo, divisores ===
+// GEOMETRÍA AVANZADA
+{q:'¿Cuántos lados tiene un pentágono?',o:['4','5','6','7'],a:1,level:'ce2'},
+{q:'¿Cuántos lados tiene un hexágono?',o:['5','6','7','8'],a:1,level:'ce2'},
+{q:'¿Cuántos lados tiene un octógono?',o:['6','7','8','10'],a:2,level:'cm1'},
+{q:'Área de un rectángulo de 5m x 3m (cohete)',o:['8 m²','15 m²','12 m²','18 m²'],a:1,level:'cm1'},
+{q:'Área de un cuadrado de 4cm de lado',o:['8 cm²','12 cm²','16 cm²','20 cm²'],a:2,level:'cm1'},
+{q:'Área de un triángulo: base 6, altura 4',o:['10','12','24','16'],a:1,level:'cm2'},
+{q:'Perímetro de un cuadrado de lado 7m',o:['14 m','21 m','28 m','49 m'],a:2,level:'ce2'},
+{q:'¿Cuántos ángulos rectos tiene un cuadrado?',o:['2','3','4','5'],a:2,level:'ce1'},
+{q:'Un ángulo de 120° es...',o:['agudo','recto','obtuso','llano'],a:2,level:'cm1'},
+{q:'¿Cuántos ejes de simetría tiene un cuadrado?',o:['2','3','4','6'],a:2,level:'cm2'},
+// PORCENTAJES
+{q:'¿Cuánto es el 50% de 80 monedas espaciales?',o:['20','30','40','50'],a:2,level:'cm1'},
+{q:'¿Cuánto es el 25% de 100 estrellas?',o:['10','25','50','75'],a:1,level:'cm1'},
+{q:'¿Cuánto es el 10% de 200 cristales?',o:['10','20','50','100'],a:1,level:'ce2'},
+{q:'¿Cuánto es el 75% de 40 cohetes?',o:['10','20','30','35'],a:2,level:'cm2'},
+{q:'¿Cuánto es el 20% de 50 alienígenas?',o:['5','10','15','20'],a:1,level:'cm1'},
+{q:'Un dragón cuesta 80€ con 25% descuento. Pagas:',o:['40€','50€','60€','70€'],a:2,level:'cm2'},
+{q:'¿Cuánto es el 50% de 30€?',o:['10€','15€','20€','25€'],a:1,level:'ce2'},
+{q:'10% de descuento en 150 monedas. Ahorras:',o:['10','15','20','25'],a:1,level:'cm2'},
+// MEDIDAS
+{q:'¿Cuántos gramos hay en 1 kg?',o:['10','100','1000','10000'],a:2,level:'ce2'},
+{q:'¿Cuántos mL hay en 1 litro de combustible?',o:['10','100','1000','500'],a:2,level:'ce2'},
+{q:'2 kg equivalen a...',o:['200 g','2000 g','20 g','20000 g'],a:1,level:'cm1'},
+{q:'Si 1 manzana pesa 200g, ¿cuánto pesan 5?',o:['500 g','800 g','1 kg','1.2 kg'],a:2,level:'cm1'},
+{q:'500 mL + 500 mL de oxígeno son...',o:['1 L','2 L','100 mL','5 L'],a:0,level:'ce2'},
+{q:'El agua hierve a...',o:['50°C','75°C','100°C','200°C'],a:2,level:'cm1'},
+{q:'1500 g equivalen a...',o:['1.5 kg','15 kg','150 kg','0.15 kg'],a:0,level:'cm2'},
+{q:'Un planeta helado está a...',o:['30°C','15°C','-20°C','100°C'],a:2,level:'cm1'},
+// TIEMPO Y CALENDARIO
+{q:'¿Cuántos días tiene una semana?',o:['5','6','7','8'],a:2,level:'cp'},
+{q:'¿Qué mes viene después de marzo?',o:['febrero','abril','mayo','junio'],a:1,level:'cp'},
+{q:'Si naciste en 2018 y es 2026, tienes...',o:['6 años','7 años','8 años','9 años'],a:2,level:'ce1'},
+{q:'El reloj marca 3:30. Son las...',o:['tres','tres y media','tres y cuarto','cuatro'],a:1,level:'ce1'},
+{q:'Una misión dura 90 minutos. ¿Cuántas horas?',o:['1h','1h 30min','2h','2h 30min'],a:1,level:'ce2'},
+// REDONDEO/ESTIMACIÓN
+{q:'Redondea 47 a la decena más cercana',o:['40','45','50','60'],a:2,level:'ce2'},
+{q:'Redondea 234 a la centena más cercana',o:['200','230','240','300'],a:0,level:'cm1'},
+{q:'Estima: 198 + 203 ≈',o:['300','400','500','600'],a:1,level:'cm1'},
+{q:'Redondea 85 a la decena más cercana',o:['70','80','90','100'],a:2,level:'ce2'},
+// PARES/IMPARES, MÚLTIPLOS, DIVISORES
+{q:'¿Cuál es un número par?',o:['7','13','24','31'],a:2,level:'ce1'},
+{q:'¿Cuál NO es múltiplo de 5?',o:['15','20','22','25'],a:2,level:'cm1'},
+{q:'¿Cuál es un divisor de 12?',o:['5','7','4','9'],a:2,level:'cm2'},
+{q:'¿Cuántos números pares hay entre 1 y 10?',o:['3','4','5','6'],a:2,level:'ce1'}
 ]
 ],
 logic:[
-[ // Secuencias
-{q:'2, 4, 6, 8, ?',o:['9','10','11','12'],a:1,easy:true},
-{q:'5, 10, 15, 20, ?',o:['22','25','30','35'],a:1},
-{q:'1, 3, 5, 7, ?',o:['8','9','10','11'],a:1,easy:true},
-{q:'10, 20, 40, 80, ?',o:['100','120','160','140'],a:2},
-{q:'100, 90, 80, ?',o:['60','70','75','85'],a:1,easy:true},
-{q:'1, 4, 9, 16, ?',o:['20','25','24','30'],a:1},
-{q:'3, 6, 9, 12, ?',o:['14','15','16','13'],a:1,easy:true},
-{q:'1, 1, 2, 3, 5, ?',o:['7','8','6','9'],a:1},
-{q:'A, C, E, G, ?',o:['H','I','J','K'],a:1,easy:true},
-{q:'2, 6, 18, 54, ?',o:['108','162','100','216'],a:1}
-],[ // Patrones
-{q:'🔴🔵🔴🔵🔴?',o:['🔴','🔵','🟢','🟡'],a:1,easy:true},
-{q:'⭐🌙⭐🌙⭐?',o:['⭐','🌙','☀️','🌟'],a:1,easy:true},
-{q:'🐱🐶🐱🐶?',o:['🐭','🐱','🐶','🐰'],a:1,easy:true},
-{q:'1A 2B 3C 4?',o:['D','E','F','C'],a:0},
-{q:'🔺🔵🔺🔺🔵🔺🔺🔺?',o:['🔵','🔺','🔴','🟢'],a:0},
-{q:'XY ZA BC ?',o:['DE','EF','FG','GH'],a:0},
-{q:'🌞☁️🌞☁️🌞?',o:['🌞','☁️','🌧️','⛈️'],a:1,easy:true},
-{q:'2-4-6-?-10',o:['7','8','9','11'],a:1,easy:true},
-{q:'🔵🔵🔴🔵🔵🔴🔵🔵?',o:['🔴','🔵','🟢','🟡'],a:0},
-{q:'A1 B2 C3 D?',o:['3','4','5','6'],a:1}
-],[ // Acertijos
-{q:'¿Qué tiene cabeza pero no piensa?',o:['Una mesa','Un alfiler','Un libro','Un perro'],a:1},
-{q:'¿Qué animal va siempre con su casa?',o:['Caracol','Tortuga','Ambos','Perro'],a:2},
-{q:'Cuanto más le quitas, más grande es. ¿Qué es?',o:['Un agujero','El sol','Un árbol','Una casa'],a:0},
-{q:'¿Qué se moja al secar?',o:['Una toalla','Un vaso','El sol','La nieve'],a:0},
-{q:'¿De qué color es el caballo blanco de Santiago?',o:['Negro','Blanco','Marrón','Gris'],a:1,easy:true},
-{q:'Tiene dientes pero no come. ¿Qué es?',o:['Un peine','Un tigre','Un perro','Un libro'],a:0},
-{q:'Va y viene pero no se mueve. ¿Qué es?',o:['El reloj','Un río','El camino','La luna'],a:2},
-{q:'¿Qué tiene 4 patas pero no camina?',o:['Una mesa','Un caballo','Un gato','Un pulpo'],a:0,easy:true},
-{q:'Sin él no podemos ver, pero está oscuro.',o:['El sol','El ojo','Una vela','La luz'],a:1},
-{q:'Cuesta más cuanto más vacía está. ¿Qué es?',o:['La cabeza','La barriga','La cartera','La casa'],a:1}
-],[ // Memoria
-{q:'Recuerda: 3-7-2. ¿Cuál es el segundo?',o:['3','7','2','5'],a:1,easy:true},
-{q:'¿Cuántas patas tiene un pulpo?',o:['6','7','8','10'],a:2,easy:true},
-{q:'Recuerda: rojo, azul, verde. ¿Cuál es el último?',o:['Rojo','Azul','Verde','Amarillo'],a:2,easy:true},
-{q:'¿Cuántos días tiene una semana?',o:['5','6','7','8'],a:2,easy:true},
-{q:'¿Cuántos planetas hay en el sistema solar?',o:['7','8','9','10'],a:1},
-{q:'Recuerda: A-B-C-D-E. ¿Cuál es la cuarta letra?',o:['B','C','D','E'],a:2,easy:true},
-{q:'¿Cuántos lados tiene un hexágono?',o:['5','6','7','8'],a:1},
-{q:'¿Cuántos meses tiene un año?',o:['10','11','12','13'],a:2,easy:true},
-{q:'Recuerda: gato-perro-loro. ¿Cuál está en medio?',o:['Gato','Perro','Loro','Pez'],a:1,easy:true},
-{q:'¿Cuántas horas tiene un día?',o:['12','24','36','48'],a:1,easy:true}
-],[ // Adivinanzas
-{q:'Vuela sin alas, llora sin ojos. ¿Qué es?',o:['Una nube','Un pájaro','La lluvia','El viento'],a:0},
-{q:'Soy redondo y de cristal, te ayudo a ver. ¿Qué soy?',o:['Una pelota','Un espejo','Las gafas','Una bola'],a:2},
-{q:'Tengo escamas y nado. ¿Qué soy?',o:['Pájaro','Pez','Conejo','Tigre'],a:1,easy:true},
-{q:'Tengo agujas pero no coso. ¿Qué soy?',o:['Un reloj','Un árbol','Un peine','Ambos a y b'],a:3},
-{q:'Crece y crece pero no es planta. ¿Qué es?',o:['Pelo','Sombra','Niño','Todas'],a:3},
-{q:'No habla pero dice todo. ¿Qué es?',o:['Un libro','Una foto','Un cartel','Todas'],a:3},
-{q:'Suena y suena pero no tiene boca. ¿Qué es?',o:['Una campana','Un tambor','Un reloj','Todos'],a:3},
-{q:'Brilla en la noche y nos guía. ¿Qué es?',o:['El sol','La luna','El humo','La sombra'],a:1,easy:true},
-{q:'Soy amarillo y doy luz de día. ¿Qué soy?',o:['Luna','Sol','Estrella','Vela'],a:1,easy:true},
-{q:'Cae pero no se rompe. ¿Qué es?',o:['La lluvia','La nieve','La noche','Todas'],a:3}
+[ // PLANETA 1 — Secuencias y Patrones
+{q:'¿Qué número sigue? 2, 4, 6, 8, ?',o:['9','10','11','12'],a:1,level:'cp'},
+{q:'Completa: 5, 10, 15, 20, ?',o:['22','24','25','30'],a:2,level:'ce1'},
+{q:'¿Qué número falta? 3, 6, ?, 12, 15',o:['7','8','9','10'],a:2,level:'ce1'},
+{q:'Patrón: 🔴🔵🔴🔵🔴? ¿Qué sigue?',o:['🔴','🔵','🟢','🟡'],a:1,level:'cp'},
+{q:'Secuencia: A, C, E, G, ?',o:['H','I','J','K'],a:1,level:'ce2'},
+{q:'¿Qué número falta? 1, 2, 4, 8, ?',o:['10','12','14','16'],a:3,level:'ce2'},
+{q:'Resta 5: 50, 45, 40, ?, 30',o:['33','35','37','38'],a:1,level:'ce1'},
+{q:'Completa: 100, 90, 80, ?, 60',o:['65','70','75','85'],a:1,level:'ce1'},
+{q:'Secuencia: 1, 4, 9, 16, ? (cuadrados)',o:['20','22','25','30'],a:2,level:'cm1'},
+{q:'Fibonacci: 1, 1, 2, 3, 5, ?',o:['6','7','8','9'],a:2,level:'cm2'}
+],[ // PLANETA 2 — Lógica deductiva
+{q:'Si todos los dragones tienen alas y Tora es un dragón, entonces Tora…',o:['no vuela','tiene alas','es pequeño','come fuego'],a:1,level:'ce1'},
+{q:'3 cabinas, 2 astronautas cada una, 1 mascota cada astronauta. ¿Cuántas mascotas?',o:['3','5','6','9'],a:2,level:'ce2'},
+{q:'Marte va antes que Júpiter, Júpiter antes que Saturno. ¿Cuál está más cerca del Sol?',o:['Saturno','Júpiter','Marte','Igual'],a:2,level:'ce1'},
+{q:'¿Cuál NO pertenece al grupo? 🐶🐱🐰🚗',o:['🐶','🐱','🐰','🚗'],a:3,level:'cp'},
+{q:'Si hoy es martes, ¿qué día será pasado mañana?',o:['miércoles','jueves','viernes','sábado'],a:1,level:'ce1'},
+{q:'Ana es más alta que Bea. Bea es más alta que Carla. ¿Quién es la más baja?',o:['Ana','Bea','Carla','Igual'],a:2,level:'ce2'},
+{q:'¿Cuál NO pertenece? 🍎🍌🍇🌻',o:['🍎','🍌','🍇','🌻'],a:3,level:'cp'},
+{q:'Todos los gatos maúllan. Misi maúlla. ¿Misi es gato seguro?',o:['Sí, seguro','No necesariamente','Imposible saber','Es un perro'],a:1,level:'cm1'},
+{q:'Si A>B y B>C, entonces…',o:['A=C','A<C','A>C','no se sabe'],a:2,level:'cm1'},
+{q:'5 nidos con 4 huevos cada uno. ¿Cuántos huevos hay?',o:['9','15','20','25'],a:2,level:'ce1'}
+],[ // PLANETA 3 — Acertijos y Enigmas
+{q:'Tengo agujas pero no coso, marco horas. ¿Qué soy?',o:['Aguja','Reloj','Costurera','Brújula'],a:1,level:'cp'},
+{q:'Cuanto más le quitas, más grande se hace. ¿Qué es?',o:['Globo','Agujero','Pastel','Río'],a:1,level:'ce2'},
+{q:'¿Qué pesa más: 1 kg de plumas o 1 kg de hierro?',o:['Plumas','Hierro','Igual','Depende'],a:2,level:'ce1'},
+{q:'Tiene dientes pero no muerde. ¿Qué es?',o:['Tiburón','Peine','León','Sierra eléctrica'],a:1,level:'cp'},
+{q:'¿Qué se moja secando?',o:['Esponja','Toalla','Trapo','Jabón'],a:1,level:'ce1'},
+{q:'Si en una caja hay 6 manzanas y sacas 4, ¿cuántas tienes tú?',o:['2','4','6','10'],a:1,level:'ce2'},
+{q:'Tres pájaros en un cable. Un cazador dispara y mata uno. ¿Cuántos quedan?',o:['0','1','2','3'],a:0,level:'cm1'},
+{q:'¿Cuántos meses tienen 28 días?',o:['1','2','6','12'],a:3,level:'ce2'},
+{q:'Vuela sin alas, llora sin ojos. ¿Qué es?',o:['Avión','Nube','Pájaro','Globo'],a:1,level:'ce2'},
+{q:'¿Qué animal va siempre con la casa a cuestas?',o:['Tortuga','Caracol','Cangrejo','Erizo'],a:1,level:'cp'}
+],[ // PLANETA 4 — Memoria REAL
+{q:'Memoriza: ROJO-AZUL-VERDE-AMARILLO. ¿Cuál era el TERCER color?',o:['Rojo','Azul','Verde','Amarillo'],a:2,level:'cp'},
+{q:'Recuerda: 3-7-2-9-5. ¿Cuál era el SEGUNDO número?',o:['3','7','2','9'],a:1,level:'ce1'},
+{q:'Lee: El gato de María se llama Luna. ¿Cómo se llama el gato?',o:['Sol','Luna','Estrella','Cometa'],a:1,level:'cp'},
+{q:'Memoriza: 🚀🌟🪐🌙. ¿Cuál era el SEGUNDO emoji?',o:['🚀','🌟','🪐','🌙'],a:1,level:'cp'},
+{q:'Historia: Tom tiene 8 años y vive en Marte con un perro. ¿Dónde vive Tom?',o:['Tierra','Luna','Marte','Júpiter'],a:2,level:'ce1'},
+{q:'Recuerda la lista: pan, leche, queso, huevo. ¿Cuál era el ÚLTIMO?',o:['Pan','Leche','Queso','Huevo'],a:3,level:'cp'},
+{q:'Memoriza: A-K-M-P-T. ¿Cuál era la PRIMERA letra?',o:['A','K','M','P'],a:0,level:'cp'},
+{q:'Lee: Lola compró 3 globos rojos y 2 azules. ¿Cuántos rojos compró?',o:['2','3','5','6'],a:1,level:'ce1'},
+{q:'Recuerda: lunes, jueves, sábado. ¿Cuál estaba en el medio?',o:['Lunes','Martes','Jueves','Sábado'],a:2,level:'ce1'},
+{q:'Memoriza: 12-45-78-23-56. ¿Cuál era el CUARTO número?',o:['12','45','23','56'],a:2,level:'cm1'}
+],[ // PLANETA 5 — Problemas de Ingenio
+{q:'En la nave hay 4 astronautas. Cada uno tiene 2 cascos. ¿Cuántos cascos en total?',o:['4','6','8','10'],a:2,level:'ce1'},
+{q:'Un cohete tarda 10 min en despegar. Si despega a las 14:50, ¿a qué hora estará en el aire?',o:['14:55','15:00','15:05','15:10'],a:1,level:'ce2'},
+{q:'Pistas: tengo anillos, soy gigante, soy gaseoso. ¿Quién soy?',o:['Tierra','Marte','Saturno','Mercurio'],a:2,level:'ce1'},
+{q:'En Marte pesas menos. Si en la Tierra pesas 30 kg, en Marte pesarías aproximadamente…',o:['más de 30','30','11','100'],a:2,level:'cm1'},
+{q:'2 alienígenas verdes pesan igual que 4 azules. ¿Cuántos azules pesan como 1 verde?',o:['1','2','3','4'],a:1,level:'cm1'},
+{q:'Vas al norte, giras a la derecha, luego al sur, luego a la derecha. ¿Hacia dónde miras?',o:['Norte','Sur','Este','Oeste'],a:3,level:'cm2'},
+{q:'Pistas: brillo en la noche, soy una estrella, calientas la Tierra. ¿Qué soy?',o:['Luna','Sol','Marte','Cometa'],a:1,level:'cp'},
+{q:'Una nave recorre 100 km en 2 horas. ¿Cuántos km recorre en 1 hora?',o:['25','50','100','200'],a:1,level:'ce2'},
+{q:'Si 3 robots montan 12 piezas en 1 hora, ¿cuántas monta 1 robot en 1 hora?',o:['2','3','4','6'],a:2,level:'ce2'},
+{q:'Una luna tarda 30 días en dar la vuelta a un planeta. ¿Cuántas vueltas da en 90 días?',o:['1','2','3','4'],a:2,level:'ce1'}
 ]
 ],
 fr:[
@@ -2067,7 +2164,18 @@ fr:[
 {q:'Pronombre relativo en "la maison OÙ j\'habite":',o:['qui','que','dont','où'],a:3,level:'6e'},
 {q:'Antónimo de "généreux":',o:['gentil','avare','poli','riche'],a:1,level:'6e'},
 {q:'Sinónimo de "intelligent":',o:['stupide','lent','malin','beau'],a:2,level:'6e'},
-{q:'¿Quién escribió "Le Petit Prince"?',o:['Victor Hugo','Saint-Exupéry','Molière','Voltaire'],a:1,level:'6e'}
+{q:'¿Quién escribió "Le Petit Prince"?',o:['Victor Hugo','Saint-Exupéry','Molière','Voltaire'],a:1,level:'6e'},
+// === FRANCÉS NUEVAS — Vida andorrana ===
+{q:'"Je ___ du ski à Grandvalira chaque hiver." Quel verbe?',o:['fais','fait','fasse','faire'],a:0,level:'ce1'},
+{q:'À la boulangerie: "Bonjour, je ___ un pain au chocolat."',o:['voudrais','voudrai','voulais','veux bien'],a:0,level:'cm1'},
+{q:'À la frontière: "___ votre passeport?"',o:['Avez-vous','Avez-tu','As-vous','Avoir-vous'],a:0,level:'cm1'},
+{q:'"Combien ___ ce souvenir d\'Andorre?"',o:['coûte','coute','couté','couter'],a:0,level:'ce1'},
+{q:'"Andorre ___ un petit pays des Pyrénées."',o:['est','es','ait','être'],a:0,level:'ce1'},
+{q:'"Sortez vos ___ de mathématiques."',o:['cahiers','cahier','cahies','cahieres'],a:0,level:'ce1'},
+{q:'Plural correcto de "le cheval pyrénéen":',o:['les chevaux pyrénéens','les chevals pyrénéens','les chevaux pyrénéen','les chevauxs'],a:0,level:'cm1'},
+{q:'"Il neige beaucoup en hiver." ¿Cuál es correcta?',o:['Il neige beaucoup en hiver','Il neig beaucoup en hivers','Il neige beaucoup en hivere','Il neiges beaucoup'],a:0,level:'cm1'},
+{q:'"La ___ enneigée est belle."',o:['montagne','montagnes','montagne mais','montagner'],a:0,level:'ce1'},
+{q:'"J\'habite à ___" — capital de Andorra:',o:['Andorre-la-Vieille','Andorre la Vella','Encamp','La Massana'],a:0,level:'cm1'}
 ]
 ],
 es:[
@@ -2125,7 +2233,18 @@ es:[
 {q:'Soy blanca y caigo del cielo. ¿Qué soy?',o:['Lluvia','Nieve','Granizo','Pluma'],a:1,easy:true},
 {q:'Tengo pelos pero no animal. ¿Qué soy?',o:['Pincel','Cabeza','Cepillo','Todas'],a:3},
 {q:'Doy fruto sin tener flor. ¿Qué soy?',o:['Pino','Higuera','Robles','Manzano'],a:1},
-{q:'En el cielo soy y no me alcanzas. ¿Qué soy?',o:['Luna','Sol','Nube','Estrella'],a:0}
+{q:'En el cielo soy y no me alcanzas. ¿Qué soy?',o:['Luna','Sol','Nube','Estrella'],a:0},
+// === ESPAÑOL NUEVAS — Frases con contexto Andorra/familia ===
+{q:'"Mañana vamos a esquiar a Pal-Arinsal." ¿Qué tiempo es "vamos a esquiar"?',o:['Futuro próximo','Pretérito','Condicional','Pluscuamperfecto'],a:0,level:'cm1'},
+{q:'"Mi casa ___ en La Massana, en Andorra."',o:['está','esta','estás','es'],a:0,level:'ce1'},
+{q:'"Los Pirineos ___ montañas muy altas."',o:['son','están','eres','somos'],a:0,level:'ce1'},
+{q:'"Si yo ___ rico, compraría una casa en Andorra."',o:['fui','fuera','sería','era'],a:1,level:'cm1'},
+{q:'"Cuando ___ pequeño, jugaba en la nieve."',o:['era','fui','sería','fuera'],a:0,level:'ce1'},
+{q:'Adivinanza: blanca, del cielo cae, en invierno cubre el monte.',o:['La nieve','La lluvia','La niebla','El granizo'],a:0,level:'ce1'},
+{q:'Plural correcto de "el esquí":',o:['los esquíes','los esquies','los esquí','los esquises'],a:0,level:'cm1'},
+{q:'"En la escuela francesa de Andorra ___ catalán, francés y español."',o:['aprendemos','aprendimos','aprenderíamos','aprendido'],a:0,level:'cm1'},
+{q:'¿Qué palabra lleva tilde correctamente?',o:['montaña','montana','móntaña','montańa'],a:0,level:'ce1'},
+{q:'"Los niños ___ a casa después de esquiar."',o:['vuelven','volvemos','volvéis','vuelvo'],a:0,level:'ce1'}
 ]
 ],
 en:[
@@ -2209,7 +2328,18 @@ en:[
 {q:'¿Cuál es el participio pasado de "see"?',o:['seed','saw','seen','seeing'],a:2,level:'6e'},
 {q:'Pronombre relativo: "The book ___ I read"',o:['who','which','where','whose'],a:1,level:'6e'},
 {q:'Sinónimo de "happy":',o:['sad','joyful','tired','angry'],a:1,level:'6e'},
-{q:'Antónimo de "expensive":',o:['rich','cheap','poor','high'],a:1,level:'6e'}
+{q:'Antónimo de "expensive":',o:['rich','cheap','poor','high'],a:1,level:'6e'},
+// === INGLÉS NUEVAS — Andorra + space ===
+{q:'How do you say "Vivo en Andorra" in English?',o:['I live in Andorra','I living in Andorra','I lives in Andorra','I am live in Andorra'],a:0,level:'ce1'},
+{q:'Complete: "Andorra is ___ France and Spain."',o:['between','among','beside','behind'],a:0,level:'cm1'},
+{q:'"In Andorra we ___ Catalan, Spanish and French."',o:['speak','speaks','spoke','speaking'],a:0,level:'ce1'},
+{q:'Which is the British spelling?',o:['colour','color','coler','culour'],a:0,level:'cm1'},
+{q:'How do you say "cohete" in English?',o:['rocket','rocked','roket','racket'],a:0,level:'ce1'},
+{q:'"What is your ___ planet?" (British)',o:['favourite','favorite','favorit','favourit'],a:0,level:'cm1'},
+{q:'Choose the correct sentence:',o:['There are eight planets in the Solar System.','There is eight planets.','There are eight planet.','There be eight planets.'],a:0,level:'cm1'},
+{q:'How do you say "estrella fugaz" in English?',o:['shooting star','running star','flying star','fast star'],a:0,level:'ce1'},
+{q:'Complete: "I ___ never been to the Moon."',o:['have','has','had','having'],a:0,level:'cm1'},
+{q:'A tourist asks: "Excuse me, ___ is the cathedral?"',o:['where','were','wear','whare'],a:0,level:'ce1'}
 ]
 ],
 ca:[
@@ -2327,7 +2457,18 @@ ca:[
 {q:'Sinònim de "bonic":',o:['lleig','formós','trist','vell'],a:1,level:'6e'},
 {q:'Article "el" + "home" → ?',o:['el home','l\'home','lo home','la home'],a:1,level:'6e'},
 {q:'Subjuntiu present de "ser", jo:',o:['sóc','sigui','seré','era'],a:1,level:'6e'},
-{q:'¿Quina és la muntanya més alta d\'Andorra?',o:['Pic de Coma Pedrosa','Pic d\'Estats','Mont Blanc','Pic Carlit'],a:0,level:'6e'}
+{q:'¿Quina és la muntanya més alta d\'Andorra?',o:['Pic de Coma Pedrosa','Pic d\'Estats','Mont Blanc','Pic Carlit'],a:0,level:'6e'},
+// === CATALÀ NUEVAS — Cultura i geografia andorrana ===
+{q:'Quin animal típic dels Pirineus és l\'isard?',o:['Una mena de cabra salvatge','Un ocell rapinyaire','Un peix de riu','Un rosegador'],a:0,level:'cm1'},
+{q:'L\'any 1278 es va signar un document important per a Andorra. Com es diu?',o:['Pareatges','Carta Magna','Tractat dels Pirineus','Concordat'],a:0,level:'cm1'},
+{q:'Quantes parròquies té Andorra?',o:['Set','Sis','Vuit','Nou'],a:0,level:'ce1'},
+{q:'El trinxat és un plat típic fet principalment amb...',o:['col i patata','arròs i peix','carn i ous','formatge i pa'],a:0,level:'ce1'},
+{q:'On se celebra l\'aplec de la Mare de Déu de Meritxell?',o:['A Canillo','A Encamp','A Ordino','A Sant Julià de Lòria'],a:0,level:'cm1'},
+{q:'Com s\'apostrofa correctament davant "escola"?',o:['l\'escola','la escola','le\'escola','l\'escòla'],a:0,level:'ce1'},
+{q:'El trencalós és...',o:['un ocell rapinyaire dels Pirineus','un peix de muntanya','una flor pirinenca','un mamífer petit'],a:0,level:'cm1'},
+{q:'L\'escudella és...',o:['una sopa tradicional catalana','un postre dolç','una beguda freda','un tipus de pa'],a:0,level:'ce1'},
+{q:'Quin riu travessa bona part d\'Andorra?',o:['La Valira','El Segre','El Ter','El Llobregat'],a:0,level:'cm1'},
+{q:'En quina parròquia està Caldea (aigües termals)?',o:['Escaldes-Engordany','Andorra la Vella','Encamp','Canillo'],a:0,level:'cm1'}
 ]
 ]
 };
@@ -2740,6 +2881,8 @@ function renderQuestion(){
     console.warn('Pregunta mal formada, saltando',q);
     game.qIdx++;renderQuestion();return;
   }
+  // Asignar explicación pedagógica si está en el diccionario
+  attachExplanation(q);
   // SHUFFLE: aleatoriza el orden de opciones para evitar sesgo de posición
   // Solo si no hay un orden ya generado para esta pregunta en esta partida
   if(!q._shuffled){
