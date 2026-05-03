@@ -780,7 +780,7 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
     <div class="hero-rocket">🚀</div>
     <p style="text-align:center;max-width:600px;line-height:1.5;font-size:14px;opacity:.9">
       Una aventura de matemáticas, lógica e idiomas para Emiliano y Emmanuel.<br>
-      ¡Conquista 6 galaxias, derrota a los jefes y rescata al Profesor Cosmos!
+      ¡Conquista 8 galaxias, derrota a los jefes y rescata al Profesor Cosmos!
     </p>
     <button class="btn" onclick="startGame()">▶ EMPEZAR</button>
     <button class="btn btn-purple" onclick="show('classic')">🎮 Juegos Clásicos</button>
@@ -908,7 +908,7 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
     <div class="hud-stat" id="hudGrade" title="Tu grado escolar">🎓 -</div>
     <div class="hud-stat">⭐ <span id="hudStars">0</span></div>
     <div class="hud-stat">💰 <span id="hudCoins">0</span></div>
-    <div class="hud-stat">🏆 <span id="hudPlanets">0</span>/30</div>
+    <div class="hud-stat">🏆 <span id="hudPlanets">0</span>/40</div>
   </div>
   <div class="xp-bar-wrap" title="Progreso al siguiente nivel">
     <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
@@ -1016,7 +1016,7 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
       <h1>🏆 ¡VICTORIA! 🏆</h1>
       <p>Por la presente se certifica que</p>
       <div class="name" id="certName">Astronauta</div>
-      <p>ha conquistado las 6 galaxias del saber, derrotado a todos los jefes y rescatado al <strong>Profesor Cosmos</strong>.</p>
+      <p>ha conquistado las 8 galaxias del saber, derrotado a todos los jefes y rescatado al <strong>Profesor Cosmos</strong>.</p>
       <div style="font-size:50px;margin:14px 0">🚀⭐🪐</div>
       <p><strong>Maestro Astronauta del Saber</strong></p>
       <p style="font-size:12px;margin-top:14px;opacity:.7">Andorra · 2026</p>
@@ -1543,24 +1543,30 @@ function addXP(amount){
 
 // ========== GALAXIES & QUESTIONS ==========
 const GALAXIES=[
-{id:'math',name:'Galaxia Matemática',emoji:'🔢',color:'#2196f3',lang:'es-ES',
+{id:'math',name:'Galaxia Matemática',emoji:'🔢',flag:'🌍',color:'#2196f3',lang:'es-ES',
   planets:['Sumas','Restas','Multiplicación','División','Problemas'],
   boss:{name:'Robot Calculador',emoji:'🤖'}},
-{id:'logic',name:'Galaxia Lógica',emoji:'🧩',color:'#9c27b0',lang:'es-ES',
+{id:'logic',name:'Galaxia Lógica',emoji:'🧩',flag:'🧠',color:'#9c27b0',lang:'es-ES',
   planets:['Secuencias','Patrones','Acertijos','Memoria','Adivinanzas'],
   boss:{name:'Esfinge Cósmica',emoji:'🦁'}},
-{id:'fr',name:'Galaxia Francesa',emoji:'🇫🇷',color:'#3f51b5',lang:'es-ES',
+{id:'fr',name:'Galaxia Francesa',emoji:'🇫🇷',flag:'🇫🇷',color:'#3f51b5',lang:'fr-FR',
   planets:['Couleurs','Animaux','Nombres','Famille','Phrases'],
   boss:{name:'Le Grand Méchant',emoji:'👹'}},
-{id:'es',name:'Galaxia Española',emoji:'🇪🇸',color:'#ff5722',lang:'es-ES',
+{id:'es',name:'Galaxia Española',emoji:'🇪🇸',flag:'🇪🇸',color:'#ff5722',lang:'es-ES',
   planets:['Ortografía','Sinónimos','Antónimos','Frases','Adivinanzas'],
   boss:{name:'Dragón de Letras',emoji:'🐲'}},
-{id:'en',name:'Galaxia Inglesa',emoji:'🇬🇧',color:'#f44336',lang:'es-ES',
+{id:'en',name:'Galaxia Inglesa',emoji:'🇬🇧',flag:'🇬🇧',color:'#f44336',lang:'en-GB',
   planets:['Colors','Animals','Numbers','Verbs','Phrases'],
   boss:{name:'The Word Wizard',emoji:'🧙'}},
-{id:'ca',name:'Galaxia Catalana',emoji:'🎗️',color:'#ffc107',lang:'ca-ES',
+{id:'ca',name:'Galaxia Catalana',emoji:'🎗️',flag:'🇦🇩',color:'#ffc107',lang:'ca-ES',
   planets:['Colors','Animals','Números','Família','Andorra'],
-  boss:{name:'El Drac dels Pirineus',emoji:'🐉'}}
+  boss:{name:'El Drac dels Pirineus',emoji:'🐉'}},
+{id:'ve',name:'Galaxia Venezolana',emoji:'🌴',flag:'🇻🇪',color:'#fdd835',lang:'es-ES',
+  planets:['Geografía','Historia','Cultura','Símbolos','Naturaleza'],
+  boss:{name:'El Tepuy Místico',emoji:'⛰️'}},
+{id:'co',name:'Galaxia Colombiana',emoji:'☕',flag:'🇨🇴',color:'#fbc02d',lang:'es-ES',
+  planets:['Geografía','Historia','Cultura','Comida','Lugares'],
+  boss:{name:'El Cóndor de los Andes',emoji:'🦅'}}
 ];
 
 // Questions per galaxy/planet (10 per planet for older, easier versions for younger)
@@ -2557,6 +2563,124 @@ ca:[
 {q:'Quin riu travessa bona part d\'Andorra?',o:['La Valira','El Segre','El Ter','El Llobregat'],a:0,level:'cm1'},
 {q:'En quina parròquia està Caldea (aigües termals)?',o:['Escaldes-Engordany','Andorra la Vella','Encamp','Canillo'],a:0,level:'cm1'}
 ]
+],
+// ============ GALAXIA VENEZOLANA 🇻🇪 ============
+ve:[
+[ // Planeta 1 — Geografía
+{q:'¿Cuál es la capital de Venezuela?',o:['Maracaibo','Caracas','Valencia','Mérida'],a:1,level:'cp'},
+{q:'¿Cuál es el río más grande de Venezuela?',o:['Orinoco','Amazonas','Caroní','Apure'],a:0,level:'ce1'},
+{q:'¿Cuál es la montaña más alta de Venezuela?',o:['Pico Bolívar','Pico Naiguatá','Pico Ávila','Roraima'],a:0,level:'ce2'},
+{q:'¿En qué estado está el Salto Ángel (catarata más alta del mundo)?',o:['Bolívar','Mérida','Zulia','Falcón'],a:0,level:'ce2'},
+{q:'¿Cuántos estados tiene Venezuela?',o:['20','22','23','25'],a:2,level:'cm1'},
+{q:'¿En qué continente está Venezuela?',o:['África','América del Sur','Europa','Asia'],a:1,level:'cp'},
+{q:'¿Qué mar baña la costa de Venezuela?',o:['Mar Mediterráneo','Mar Caribe','Mar Negro','Mar Báltico'],a:1,level:'ce1'},
+{q:'¿En qué estado está el Lago de Maracaibo?',o:['Mérida','Lara','Zulia','Falcón'],a:2,level:'ce2'},
+{q:'¿Qué tepuy es el más famoso de Venezuela?',o:['Roraima','Auyán-Tepui','Ambos','Ninguno'],a:2,level:'cm1'},
+{q:'¿Cuál es la isla más grande de Venezuela?',o:['Margarita','La Tortuga','Coche','Cubagua'],a:0,level:'ce2'}
+],[ // Planeta 2 — Historia
+{q:'¿Quién es "El Libertador" de Venezuela?',o:['Francisco de Miranda','Simón Bolívar','José Antonio Páez','Antonio José de Sucre'],a:1,level:'cp'},
+{q:'¿En qué año declaró Venezuela su independencia?',o:['1810','1811','1819','1821'],a:1,level:'ce2'},
+{q:'¿Qué se celebra el 5 de julio en Venezuela?',o:['Día del trabajador','Día de la independencia','Día de la madre','Día del niño'],a:1,level:'cp'},
+{q:'¿Quién escribió la primera bandera de Venezuela?',o:['Simón Bolívar','Francisco de Miranda','Antonio José de Sucre','José Félix Ribas'],a:1,level:'cm1'},
+{q:'¿Quién venció en la Batalla de Carabobo (1821)?',o:['España','Venezuela (Bolívar)','Francia','Empate'],a:1,level:'cm1'},
+{q:'¿Quién fue el principal estratega militar de Bolívar?',o:['Sucre','Páez','Miranda','Ribas'],a:0,level:'cm2'},
+{q:'¿En qué ciudad nació Simón Bolívar?',o:['Maracaibo','Caracas','Valencia','Mérida'],a:1,level:'ce1'},
+{q:'¿Qué países liberó Bolívar?',o:['Solo Venezuela','Venezuela y Colombia','Venezuela, Colombia, Ecuador, Perú y Bolivia','Ninguno'],a:2,level:'cm2'},
+{q:'¿Cómo se llama la "Casa Natal" de Bolívar?',o:['Casa Bolívar','Casa Natal del Libertador','Casa de la Independencia','Casa Roja'],a:1,level:'cm1'},
+{q:'¿Quién fue Manuela Sáenz?',o:['Esposa de Bolívar','Compañera y libertadora','Hermana de Bolívar','Una poeta'],a:1,level:'cm2'}
+],[ // Planeta 3 — Cultura
+{q:'¿Cuál es el plato típico de Venezuela?',o:['Pizza','Arepa','Sushi','Croissant'],a:1,level:'cp'},
+{q:'¿Qué baile es famoso en Venezuela (los llanos)?',o:['Tango','Joropo','Flamenco','Samba'],a:1,level:'ce1'},
+{q:'¿Qué se come en Navidad en Venezuela?',o:['Pavo','Hallaca','Pasta','Sopa'],a:1,level:'ce1'},
+{q:'El plato "pabellón criollo" lleva...',o:['Carne, arroz, frijoles y plátano','Solo carne','Pan y queso','Pizza'],a:0,level:'ce2'},
+{q:'¿Qué bebida típica se hace con maíz dulce?',o:['Café','Chicha venezolana','Leche','Té'],a:1,level:'ce2'},
+{q:'¿Qué instrumento típico del joropo es de cuerda?',o:['Cuatro','Guitarra eléctrica','Piano','Trompeta'],a:0,level:'cm1'},
+{q:'¿Cómo se llama el muñeco que se quema en fin de año?',o:['Año Viejo','Pepe','Don Quijote','Bolívar'],a:0,level:'ce2'},
+{q:'¿Quién es Hugo Chávez?',o:['Un cantante','Un expresidente de Venezuela','Un futbolista','Un poeta'],a:1,level:'cm2'},
+{q:'¿Cuál es la bebida nacional?',o:['Té','Café','Coca','Vino'],a:1,level:'ce1'},
+{q:'¿Qué fruta es muy típica de Venezuela?',o:['Mango','Manzana','Pera','Uva'],a:0,level:'cp'}
+],[ // Planeta 4 — Símbolos patrios
+{q:'¿De qué colores es la bandera venezolana?',o:['Rojo, blanco y azul','Amarillo, azul y rojo','Verde, blanco y rojo','Negro, rojo y amarillo'],a:1,level:'cp'},
+{q:'¿Cuántas estrellas tiene la bandera venezolana?',o:['5','7','8','10'],a:2,level:'ce1'},
+{q:'¿Qué representan las 8 estrellas?',o:['Las regiones','Las provincias que firmaron la independencia','Las playas','Los presidentes'],a:1,level:'cm1'},
+{q:'¿Cómo se llama el himno nacional de Venezuela?',o:['"La Marcha"','"Gloria al Bravo Pueblo"','"Patria Hermosa"','"Caballo Viejo"'],a:1,level:'ce2'},
+{q:'¿Cuál es el ave nacional?',o:['Águila','Turpial','Cóndor','Pelícano'],a:1,level:'ce1'},
+{q:'¿Cuál es la flor nacional?',o:['Rosa','Orquídea','Girasol','Tulipán'],a:1,level:'ce2'},
+{q:'¿Cuál es el árbol nacional?',o:['Palmera','Araguaney','Cedro','Pino'],a:1,level:'ce2'},
+{q:'¿Qué animal aparece en el escudo?',o:['León','Caballo blanco','Águila','Tigre'],a:1,level:'cm1'},
+{q:'¿De qué color son las ramas del escudo?',o:['Verde','Una de oliva (paz) y otra de palma (victoria)','Rojas','Azules'],a:1,level:'cm2'},
+{q:'¿Cuál es la moneda oficial?',o:['Peso','Bolívar','Dólar','Real'],a:1,level:'ce1'}
+],[ // Planeta 5 — Naturaleza
+{q:'¿Qué animal en peligro vive en los Andes venezolanos?',o:['Oso panda','Oso frontino (de anteojos)','Oso polar','Lobo'],a:1,level:'cm1'},
+{q:'¿Qué pájaro tiene el plumaje rojo y vive en los llanos?',o:['Águila','Garza','Ibis escarlata (corocoro)','Loro'],a:2,level:'cm1'},
+{q:'¿Cuántas cataratas más altas que el Niágara hay en Venezuela?',o:['1 (Salto Ángel)','varias','ninguna','5'],a:1,level:'cm2'},
+{q:'¿Qué reptil grande vive en el Orinoco?',o:['Caimán del Orinoco','Cocodrilo del Nilo','Tortuga','Boa'],a:0,level:'cm1'},
+{q:'¿Cómo se llama el delfín del río Orinoco?',o:['Delfín gris','Tonina (delfín rosado)','Delfín mular','Orca'],a:1,level:'cm2'},
+{q:'¿Qué flor es la nacional?',o:['Rosa de Pascua','Flor de Mayo (orquídea)','Tulipán','Cactus'],a:1,level:'ce2'},
+{q:'¿Qué fenómeno luminoso aparece en el Catatumbo?',o:['Auroras','Relámpagos del Catatumbo','Cometas','Eclipses'],a:1,level:'cm2'},
+{q:'¿Qué animal grande pasta en los llanos?',o:['Capibara','Vaca','Caballo salvaje','Todos'],a:3,level:'ce2'},
+{q:'¿Qué fauna típica se ve en el Salto Ángel?',o:['Pingüinos','Aves rapaces y monos aulladores','Osos polares','Camellos'],a:1,level:'cm1'},
+{q:'¿Qué planta da el cacao venezolano (chocolate)?',o:['Caña','Theobroma cacao','Café','Maíz'],a:1,level:'cm2'}
+]
+],
+// ============ GALAXIA COLOMBIANA 🇨🇴 ============
+co:[
+[ // Planeta 1 — Geografía
+{q:'¿Cuál es la capital de Colombia?',o:['Medellín','Bogotá','Cali','Cartagena'],a:1,level:'cp'},
+{q:'¿Cuántos departamentos tiene Colombia?',o:['25','30','32','35'],a:2,level:'cm1'},
+{q:'¿Qué cordillera atraviesa Colombia?',o:['Los Andes','Los Alpes','Los Pirineos','Los Apalaches'],a:0,level:'ce1'},
+{q:'¿Qué océanos baña Colombia?',o:['Solo Atlántico','Solo Pacífico','Atlántico y Pacífico','Ninguno'],a:2,level:'ce2'},
+{q:'¿Cuál es el río más largo de Colombia?',o:['Magdalena','Cauca','Amazonas','Orinoco'],a:0,level:'ce2'},
+{q:'¿Cuáles son las regiones naturales de Colombia?',o:['3','4','5','6'],a:3,level:'cm1'},
+{q:'¿En qué región está Bogotá?',o:['Caribe','Pacífica','Andina','Amazonía'],a:2,level:'ce1'},
+{q:'¿Qué archipiélago colombiano está en el Caribe?',o:['Galápagos','San Andrés y Providencia','Canarias','Baleares'],a:1,level:'cm1'},
+{q:'¿Cuál es la ciudad más grande del Caribe colombiano?',o:['Cartagena','Barranquilla','Santa Marta','Riohacha'],a:1,level:'cm1'},
+{q:'¿Qué nevado es el más alto de Colombia?',o:['Nevado del Ruiz','Pico Cristóbal Colón','Nevado del Tolima','Volcán Galeras'],a:1,level:'cm2'}
+],[ // Planeta 2 — Historia
+{q:'¿En qué año se independizó Colombia?',o:['1810','1819','1821','1825'],a:1,level:'ce2'},
+{q:'¿Qué se celebra el 20 de julio en Colombia?',o:['Día de la independencia','Día del trabajador','Día de la madre','Día del idioma'],a:0,level:'cp'},
+{q:'¿Quién fue el "Hombre de las Leyes" (vicepresidente con Bolívar)?',o:['Antonia Santos','Francisco de Paula Santander','Camilo Torres','Policarpa Salavarrieta'],a:1,level:'cm1'},
+{q:'¿Quién fue Policarpa Salavarrieta ("La Pola")?',o:['Una espía heroína de la independencia','Una reina','Una pintora','Una poeta'],a:0,level:'cm1'},
+{q:'¿Qué batalla decisiva ganó Bolívar en Colombia (1819)?',o:['Carabobo','Boyacá','Pichincha','Junín'],a:1,level:'cm1'},
+{q:'¿Cómo se llamaba Colombia en 1821 con Venezuela y Ecuador?',o:['Nueva Granada','Gran Colombia','Confederación','República Andina'],a:1,level:'cm2'},
+{q:'¿Quién fue Antonia Santos?',o:['Una líder guerrillera de la independencia','Una pintora','Una doctora','Una atleta'],a:0,level:'cm2'},
+{q:'¿Quién es el escritor colombiano premio Nobel?',o:['Gabriel García Márquez','Pablo Neruda','Mario Vargas Llosa','Octavio Paz'],a:0,level:'cm1'},
+{q:'¿Qué famoso libro escribió García Márquez?',o:['Don Quijote','Cien años de soledad','El Aleph','Pedro Páramo'],a:1,level:'cm2'},
+{q:'¿Quién fue Camilo Torres Tenorio?',o:['Un médico','Un abogado y prócer ("Memorial de agravios")','Un soldado','Un poeta'],a:1,level:'cm2'}
+],[ // Planeta 3 — Cultura
+{q:'¿Qué baile colombiano es famoso en todo el mundo?',o:['Tango','Cumbia','Flamenco','Samba'],a:1,level:'cp'},
+{q:'¿Qué otra música típica nació en la costa caribe?',o:['Vallenato','Bachata','Salsa','Reggaeton'],a:0,level:'ce1'},
+{q:'¿Qué instrumento es esencial en el vallenato?',o:['Piano','Acordeón','Trompeta','Violín'],a:1,level:'ce2'},
+{q:'¿Qué cantante colombiana es famosa mundialmente (Hips Don\'t Lie)?',o:['Jennifer Lopez','Shakira','Karol G','Beyoncé'],a:1,level:'ce1'},
+{q:'¿Qué deporte es muy popular en Colombia?',o:['Críquet','Fútbol','Baseball','Rugby'],a:1,level:'cp'},
+{q:'¿Quién es James Rodríguez?',o:['Un cantante','Un futbolista colombiano famoso','Un escritor','Un actor'],a:1,level:'ce2'},
+{q:'¿Qué pintor colombiano es famoso por sus figuras "gorditas"?',o:['Botero (Fernando)','Picasso','Dalí','Miró'],a:0,level:'cm1'},
+{q:'¿Qué es el "Carnaval de Barranquilla"?',o:['Una boda','Un festival enorme de música y baile','Un partido','Un concurso'],a:1,level:'ce2'},
+{q:'¿Qué cantante colombiana joven canta "Tusa"?',o:['Shakira','Karol G','Anitta','Rosalía'],a:1,level:'cm1'},
+{q:'¿Qué se celebra el 7 de diciembre (Día de las velitas)?',o:['Independencia','La Inmaculada Concepción (con velas y faroles)','Año nuevo','Día de la madre'],a:1,level:'cm1'}
+],[ // Planeta 4 — Comida típica
+{q:'¿Cuál es el plato más famoso de Colombia?',o:['Pizza','Bandeja paisa','Paella','Tacos'],a:1,level:'ce1'},
+{q:'¿Qué lleva la "bandeja paisa"?',o:['Frijol, arroz, carne, chorizo, huevo, plátano y aguacate','Solo carne','Pasta','Sopa'],a:0,level:'ce2'},
+{q:'¿Qué sopa típica de Bogotá lleva pollo y 3 papas?',o:['Sancocho','Ajiaco','Mondongo','Crema de tomate'],a:1,level:'cm1'},
+{q:'¿Qué se hace con maíz molido en Colombia?',o:['Pan','Arepa','Pizza','Tortilla'],a:1,level:'cp'},
+{q:'¿Cuál es el dulce típico colombiano hecho de leche?',o:['Arequipe (dulce de leche)','Chocolate','Helado','Torta'],a:0,level:'ce2'},
+{q:'¿Qué bebida caliente es típica con queso?',o:['Café','Chocolate caliente con queso','Té','Mate'],a:1,level:'cm1'},
+{q:'¿Qué fruta exótica colombiana es amarilla y dulce?',o:['Lulo','Maracuyá','Mangostino','Curuba'],a:1,level:'cm1'},
+{q:'¿Qué se sirve dentro de una arepa rellena?',o:['Solo queso','Carne, queso, huevo, aguacate (de todo)','Mermelada','Pasta'],a:1,level:'ce1'},
+{q:'¿Cuál es el plato típico de la costa caribe?',o:['Sancocho de pescado','Pizza','Sushi','Pasta'],a:0,level:'ce2'},
+{q:'¿Qué fruta tropical es el "rey" en Colombia?',o:['Manzana','Mango','Pera','Cereza'],a:1,level:'cp'}
+],[ // Planeta 5 — Lugares
+{q:'¿Qué ciudad colombiana es famosa por sus murallas y casco antiguo?',o:['Cali','Cartagena de Indias','Bogotá','Medellín'],a:1,level:'ce1'},
+{q:'¿Qué ciudad es la "ciudad de la eterna primavera"?',o:['Bogotá','Medellín','Cali','Cartagena'],a:1,level:'ce2'},
+{q:'¿Qué río colorido (5 colores) es famoso en Colombia?',o:['Magdalena','Caño Cristales','Amazonas','Cauca'],a:1,level:'cm1'},
+{q:'¿En qué región se cultiva el café colombiano?',o:['Costa','Eje cafetero (zona andina)','Amazonía','Llanos'],a:1,level:'ce2'},
+{q:'¿Qué isla colombiana es famosa por playas blancas?',o:['Margarita','San Andrés','Galápagos','Tortuga'],a:1,level:'cm1'},
+{q:'¿Qué desierto colombiano queda en La Guajira?',o:['Atacama','Tatacoa','Sahara','Gobi'],a:1,level:'cm2'},
+{q:'¿Qué ciudad es famosa por la salsa?',o:['Bogotá','Cali','Medellín','Cartagena'],a:1,level:'ce1'},
+{q:'¿Qué montaña sagrada está cerca de Santa Marta?',o:['Sierra Nevada de Santa Marta','Pico Bolívar','Nevado del Ruiz','Galeras'],a:0,level:'cm1'},
+{q:'¿Qué parque arqueológico es famoso por sus estatuas?',o:['Tikal','San Agustín','Machu Picchu','Tulum'],a:1,level:'cm2'},
+{q:'¿Qué deporte de aventura se practica mucho en San Gil?',o:['Surf','Rafting y deportes extremos','Esquí','Golf'],a:1,level:'cm1'}
+]
 ]
 };
 
@@ -2573,7 +2697,9 @@ const ACHIEVEMENTS=[
 {id:'gal4',emoji:'🇪🇸',name:'Hispanohablante',desc:'Conquista la Galaxia Española',cond:s=>s.bossesBeaten.includes('es')},
 {id:'gal5',emoji:'🇬🇧',name:'Anglófono',desc:'Conquista la Galaxia Inglesa',cond:s=>s.bossesBeaten.includes('en')},
 {id:'gal6',emoji:'🏔️',name:'Andorrano',desc:'Conquista la Galaxia Catalana',cond:s=>s.bossesBeaten.includes('ca')},
-{id:'master',emoji:'👑',name:'Maestro Astronauta',desc:'Conquista las 6 galaxias',cond:s=>s.bossesBeaten.length>=6},
+{id:'master',emoji:'👑',name:'Maestro Astronauta',desc:'Conquista las 8 galaxias',cond:s=>s.bossesBeaten.length>=8},
+{id:'venezolano',emoji:'🇻🇪',name:'Venezolano',desc:'Conquista la Galaxia Venezolana',cond:s=>s.bossesBeaten.includes('ve')},
+{id:'colombiano',emoji:'🇨🇴',name:'Colombiano',desc:'Conquista la Galaxia Colombiana',cond:s=>s.bossesBeaten.includes('co')},
 {id:'planets10',emoji:'🪐',name:'Explorador',desc:'Conquista 10 planetas',cond:s=>s.planetsBeaten.length>=10},
 {id:'planets20',emoji:'🚀',name:'Pionero',desc:'Conquista 20 planetas',cond:s=>s.planetsBeaten.length>=20},
 {id:'planets30',emoji:'🌌',name:'Conquistador',desc:'Conquista los 30 planetas',cond:s=>s.planetsBeaten.length>=30},
@@ -3337,7 +3463,8 @@ function renderMap(){
           const cls=done?(' done s'+stars):'';
           return `<div class="planet-dot${cls}" title="${pn}${done?' · '+stars+'⭐':''}">${done?'⭐'.repeat(stars)||'✓':pi+1}</div>`;
         }).join('')}
-      </div>`;
+      </div>
+      <div class="galaxy-flag" style="text-align:center;font-size:32px;margin-top:8px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))">${g.flag||g.emoji}</div>`;
     if(unlocked){
       card.onclick=()=>{
         if(bossReady){startBoss(gi)}
@@ -3765,7 +3892,9 @@ const COSMOS_BOSS_INTRO={
   fr:'Le Grand Méchant ne parle qu\'en français. ¡Dale una lección con tus palabras!',
   es:'El Dragón de Letras escupe palabras mal escritas. ¡Corrígelas todas!',
   en:'The Word Wizard speaks only in English. Show no fear, young hero!',
-  ca:'El Drac dels Pirineus protegeix Andorra. Parla-li en català per derrotar-lo!'
+  ca:'El Drac dels Pirineus protegeix Andorra. Parla-li en català per derrotar-lo!',
+  ve:'¡El Tepuy Místico guarda los secretos de Venezuela! Demuestra que conoces a Bolívar y al Salto Ángel.',
+  co:'¡El Cóndor de los Andes vigila Colombia! Dale lecciones de café, vallenato y libertad.'
 };
 
 function startBoss(galIdx){
@@ -3904,13 +4033,15 @@ function bossWin(){
     fr:'Magnifique! Le Grand Méchant est vaincu. Tu parles français comme un vrai!',
     es:'¡Bravo! El Dragón de Letras se rinde ante tu ortografía perfecta.',
     en:'Amazing! The Word Wizard bows before you. Your English is brilliant!',
-    ca:'Visca! Has alliberat els Pirineus. Andorra t\'està agraïda, jove heroi!'
+    ca:'Visca! Has alliberat els Pirineus. Andorra t\'està agraïda, jove heroi!',
+    ve:'¡Caramba! El Tepuy Místico se arrodilla. Bolívar estaría orgulloso de ti, joven libertador.',
+    co:'¡Qué chévere! El Cóndor de los Andes te saluda. Llevas café, salsa y leyenda en el corazón.'
   };
   const cosmos=winMsgs[g.id]||'¡Una galaxia más conquistada!';
   document.getElementById('resultText').innerHTML=`<div style="font-style:italic;color:#ffd700;margin-bottom:10px">🧙 Profesor Cosmos: "${cosmos}"</div>Has vencido a <b>${g.boss.name}</b>. <br>+10⭐ +100💰. ¡Galaxia conquistada!`;
   document.getElementById('nextBtn').style.display='none';
   checkAchievements();
-  if(p.bossesBeaten.length>=6&&!p.certShown){p.certShown=true;save();setTimeout(()=>show('cert'),2500)}
+  if(p.bossesBeaten.length>=GALAXIES.length&&!p.certShown){p.certShown=true;save();setTimeout(()=>show('cert'),2500)}
 }
 
 function bossLose(){
@@ -4033,7 +4164,7 @@ function renderStats(){
   const grid=document.getElementById('statsGrid');grid.innerHTML='';
   const stats=[
     {n:p.planetsBeaten.length,l:'Planetas'},
-    {n:p.bossesBeaten.length+'/6',l:'Jefes'},
+    {n:p.bossesBeaten.length+'/'+GALAXIES.length,l:'Jefes'},
     {n:p.stars,l:'Estrellas'},
     {n:p.coins,l:'Monedas'},
     {n:acc+'%',l:'Precisión'},
