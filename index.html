@@ -4947,11 +4947,21 @@ function tetrisStep(){
   tetrisRender();
 }
 function tetrisFreeze(){
+  if(!tetrisPiece||!tetrisPiece.shape)return;
+  let frozen=0;
   for(let r=0;r<tetrisPiece.shape.length;r++)for(let c=0;c<tetrisPiece.shape[r].length;c++){
     if(tetrisPiece.shape[r][c]){
       const ny=tetrisY+r,nx=tetrisX+c;
-      if(ny>=0&&ny<TETRIS_H)tetrisGrid[ny][nx]=tetrisPiece.color;
+      // Guard COMPLETO: ny Y nx en rango (antes faltaba nx, causaba freezes parciales/perdidos)
+      if(ny>=0&&ny<TETRIS_H&&nx>=0&&nx<TETRIS_W){
+        tetrisGrid[ny][nx]=tetrisPiece.color;
+        frozen++;
+      }
     }
+  }
+  if(frozen===0){
+    // Si no se congeló ninguna celda, es game over (pieza quedó fuera del tablero)
+    tetrisGameOver();return;
   }
   sndCoin();
 }
@@ -5809,26 +5819,33 @@ function marioPress(dir,on){
 // Para tablet usamos los handlers ontouch directamente (mantén = altura variable).
 function marioJump(){marioPress('jump',1);setTimeout(()=>marioPress('jump',0),200)}
 // Delta-time normalizado: skip frames si vamos a 120Hz, dobla updates si vamos a 30Hz.
-// Más seguro que reescribir toda la física a multiplicaciones por dt.
-let _marioLastT=0,_marioAcc=0;
+// Flag global para parar el bucle interno cuando marioFail/marioNextLevel pidan stop.
+let _marioLastT=0,_marioAcc=0,_marioStopRequest=false;
 function marioStep(){
-  if(game.screen!=='mario'){marioLoop=null;return}
+  if(game.screen!=='mario'){marioLoop=null;_marioStopRequest=false;return}
+  if(_marioStopRequest){
+    // Stop pedido (muerte/checkpoint/nivel): consumimos el flag y reanudamos el loop
+    // próximo frame, pero saltamos toda la física de este frame.
+    _marioStopRequest=false;_marioLastT=0;_marioAcc=0;
+    marioRender();
+    marioLoop=requestAnimationFrame(marioStep);
+    return;
+  }
   const W=marioWorld,p=marioPlayer;
   if(!p||!W){marioLoop=requestAnimationFrame(marioStep);return}
-  // Frame rate normalization: ejecuta lógica a ~60 FPS independientemente de pantalla
   const now=performance.now();
   if(_marioLastT===0)_marioLastT=now;
   const dt=Math.min(now-_marioLastT,100);_marioLastT=now;
   _marioAcc+=dt;
-  const STEP=1000/60; // 16.67ms = 60FPS
-  let stepsRun=0;const MAX_STEPS=3; // evita death-spiral si pestaña inactiva
-  // Si va MUY rápido (120Hz), saltamos frames; si va lento (30Hz), corremos 2 steps
+  const STEP=1000/60;
+  let stepsRun=0;const MAX_STEPS=3;
   while(_marioAcc>=STEP&&stepsRun<MAX_STEPS){
     marioPhysicsStep(p,W);
     _marioAcc-=STEP;stepsRun++;
-    if(game.screen!=='mario'){marioLoop=null;return}
+    // Si dentro del step el jugador murió o cambió de nivel, salir del while YA
+    if(_marioStopRequest||game.screen!=='mario')break;
   }
-  // Render solo una vez por frame (no por step)
+  if(game.screen!=='mario'){marioLoop=null;return}
   marioRender();
   marioLoop=requestAnimationFrame(marioStep);
 }
@@ -5905,6 +5922,9 @@ function marioPhysicsStep(p,W){
     const cpX=marioPlayer&&marioPlayer.checkpointX;
     marioLoadLevel();
     if(hadCheckpoint&&cpX&&marioPlayer){marioPlayer.x=cpX;marioPlayer.checkpointReached=true;marioPlayer.checkpointX=cpX;marioCam.x=Math.max(0,cpX-MARIO_VW/2)}
+    // CRÍTICO: pedir stop del while loop para que no decremente vidas otra vez con el `p` viejo
+    _marioStopRequest=true;
+    return; // sale de marioPhysicsStep, el siguiente RAF arrancará con el nuevo player
   }
   // Pickups
   for(const pk of marioPickups){
@@ -5980,6 +6000,7 @@ function marioPhysicsStep(p,W){
   // Render y RAF están en marioStep (antes era aquí, ahora movidos al wrapper con delta-time)
 }
 function marioNextLevel(){
+  _marioStopRequest=true; // detiene el while loop interno con el world viejo
   sndWin();confetti(40);
   marioScore+=100;
   document.getElementById('marioScore').textContent=marioScore;
@@ -5996,7 +6017,11 @@ function marioNextLevel(){
   marioLoadLevel();
 }
 function marioFail(){
+  _marioStopRequest=true; // detiene bucle interno YA, evitando -482 vidas
   if(marioLoop){cancelAnimationFrame(marioLoop);marioLoop=null}
+  // Asegurar que vidas no quede negativo en pantalla
+  if(marioLives<0)marioLives=0;
+  document.getElementById('marioLives').textContent=marioLives;
   sndLose();
   document.getElementById('marioStatus').textContent='💀 Sin vidas · Toca Reiniciar';
 }
