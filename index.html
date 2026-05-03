@@ -551,6 +551,19 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   .avatar-container{width:65px;height:65px}
 }
 
+/* === MODO PIJAMA: tema oscuro suave para antes de dormir === */
+body.pajama{background:#000;color:#c8c8d0}
+body.pajama::before{display:none} /* sin starfield */
+body.pajama .btn{filter:brightness(.7) saturate(.8)}
+body.pajama h1,body.pajama h2{color:#a890c8;text-shadow:0 0 6px rgba(168,144,200,.3)}
+body.pajama .galaxy-card,body.pajama .classic-card,body.pajama .player-card,body.pajama .question-box,body.pajama .answer-btn,body.pajama .shop-item,body.pajama .stat-box{filter:brightness(.6) saturate(.7);transition:filter .3s}
+body.pajama .answer-btn{font-size:18px!important;line-height:1.5} /* texto más grande */
+body.pajama .question-box{font-size:22px!important;line-height:1.5}
+body.pajama .toast,body.pajama .feedback{filter:brightness(.7)}
+body.pajama .crest,body.pajama .hud-stat{opacity:.6}
+body.pajama .confetti{display:none} /* confeti fuera, no excitar antes de dormir */
+body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!important;animation-timing-function:ease-in-out!important;transition-duration:.4s!important}
+
 /* Indicador de cambio de orientación: pequeño tip al rotar */
 .orientation-hint{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);border:2px solid #ffd700;color:#ffd700;padding:8px 16px;border-radius:18px;font-size:12px;z-index:1500;pointer-events:none;animation:fadeOut 3s ease-out forwards}
 @keyframes fadeOut{0%{opacity:0;transform:translateX(-50%) translateY(10px)}10%{opacity:1;transform:translateX(-50%) translateY(0)}80%{opacity:1}100%{opacity:0}}
@@ -587,6 +600,8 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 <body>
 
 <button class="sound-btn" id="soundBtn" onclick="toggleSound()" style="display:none">🔊</button>
+<button class="sound-btn" id="musicBtn" onclick="toggleMusic()" style="display:none;right:64px;background:linear-gradient(135deg,#9c27b0,#673ab7);border-color:#fff" title="Música de fondo">🎶</button>
+<button class="sound-btn" id="pajamaBtn" onclick="togglePajama()" style="display:none;right:114px;background:linear-gradient(135deg,#1a0033,#0a0020);border-color:#fff" title="Modo Pijama (oscuro suave)">🌙</button>
 <button class="back-btn" id="backBtn" onclick="goBack()" style="display:none">←</button>
 
 <div id="app">
@@ -1459,6 +1474,15 @@ function trackAnswer(galaxyId,planetIdx,correct,who){
   if(!state.analytics)return;
   state.analytics.questionsByGalaxy=state.analytics.questionsByGalaxy||{};
   state.analytics.questionsByPlanet=state.analytics.questionsByPlanet||{};
+  // === Histórico diario por niño (para gráfico semanal en modo padres) ===
+  state.analytics.dailyHistory=state.analytics.dailyHistory||{};
+  if(who){
+    const today=new Date().toISOString().slice(0,10);
+    if(!state.analytics.dailyHistory[who])state.analytics.dailyHistory[who]={};
+    if(!state.analytics.dailyHistory[who][today])state.analytics.dailyHistory[who][today]={correct:0,wrong:0};
+    if(correct)state.analytics.dailyHistory[who][today].correct++;
+    else state.analytics.dailyHistory[who][today].wrong++;
+  }
   // Por galaxia (totales + por niño)
   if(!state.analytics.questionsByGalaxy[galaxyId])state.analytics.questionsByGalaxy[galaxyId]={correct:0,wrong:0,em:{correct:0,wrong:0},el:{correct:0,wrong:0}};
   const g=state.analytics.questionsByGalaxy[galaxyId];
@@ -2708,7 +2732,96 @@ function sndStreak(){
 function sndPowerUp(){
   [330,440,550,660,880].forEach((f,i)=>setTimeout(()=>snd(f,.07,'sawtooth'),i*40));
 }
-function toggleSound(){state.soundOn=!state.soundOn;save();document.getElementById('soundBtn').textContent=state.soundOn?'🔊':'🔇'}
+function toggleSound(){state.soundOn=!state.soundOn;save();document.getElementById('soundBtn').textContent=state.soundOn?'🔊':'🔇';if(!state.soundOn)stopMusic()}
+
+// ============ MÚSICA DE FONDO (loops Web Audio sintetizados, muy ligeros) ============
+// Cada galaxia tiene su escala/tono. La música es ambient (no intrusiva), loops cortos.
+let musicCtx={osc:null,gain:null,timer:null,active:false,scaleIdx:0};
+const MUSIC_SCALES={
+  // Notas pentatónicas relajantes por galaxia (más agradables al oído)
+  math:[262,294,330,392,440,523,587,659], // C mayor pentatónica
+  logic:[294,330,370,440,494,587,659,740], // D
+  fr:[330,370,415,494,554,659,740,831], // E
+  es:[349,392,440,523,587,698,784,880], // F
+  en:[392,440,494,587,659,784,880,988], // G
+  ca:[440,494,554,659,740,880,988,1109], // A
+  default:[262,330,392,523,659,784] // C menor
+};
+function startMusic(galaxyId){
+  if(!state.musicOn||!state.soundOn)return;
+  stopMusic();
+  if(!audioCtx)return;
+  const scale=MUSIC_SCALES[galaxyId]||MUSIC_SCALES.default;
+  // Master gain bajo (música ambient, no intrusiva)
+  const master=audioCtx.createGain();
+  master.gain.value=0.04; // muy bajito (4% del volumen máximo)
+  master.connect(audioCtx.destination);
+  musicCtx.gain=master;
+  musicCtx.active=true;
+  musicCtx.scaleIdx=0;
+  // Genera notas largas tipo pad cada 2.5s
+  function playNote(){
+    if(!musicCtx.active)return;
+    try{
+      const o=audioCtx.createOscillator();
+      const g=audioCtx.createGain();
+      o.type='sine';
+      // Acorde aleatorio dentro de la escala (3 notas)
+      const noteIdx=Math.floor(Math.random()*scale.length);
+      const freq=scale[noteIdx];
+      o.frequency.value=freq;
+      // ADSR ambient: sube lento, mantiene, baja lento
+      const now=audioCtx.currentTime;
+      g.gain.setValueAtTime(0,now);
+      g.gain.linearRampToValueAtTime(0.6,now+0.4);
+      g.gain.linearRampToValueAtTime(0.4,now+1.5);
+      g.gain.linearRampToValueAtTime(0,now+2.5);
+      o.connect(g);g.connect(master);
+      o.start(now);o.stop(now+2.6);
+      // Voz armónica suave (octava arriba, quinto)
+      const o2=audioCtx.createOscillator();
+      const g2=audioCtx.createGain();
+      o2.type='triangle';
+      o2.frequency.value=freq*1.5; // quinta
+      g2.gain.setValueAtTime(0,now);
+      g2.gain.linearRampToValueAtTime(0.2,now+0.6);
+      g2.gain.linearRampToValueAtTime(0,now+2.5);
+      o2.connect(g2);g2.connect(master);
+      o2.start(now+0.3);o2.stop(now+2.6);
+    }catch(e){}
+    musicCtx.timer=setTimeout(playNote,2200+Math.random()*800);
+  }
+  playNote();
+}
+function stopMusic(){
+  musicCtx.active=false;
+  if(musicCtx.timer){clearTimeout(musicCtx.timer);musicCtx.timer=null}
+  if(musicCtx.gain){
+    try{musicCtx.gain.disconnect()}catch(e){}
+    musicCtx.gain=null;
+  }
+}
+// Modo Pijama: tema oscuro suave para jugar antes de dormir
+function togglePajama(){
+  state.pajamaOn=!state.pajamaOn;save();
+  document.body.classList.toggle('pajama',state.pajamaOn);
+  const b=document.getElementById('pajamaBtn');if(b)b.textContent=state.pajamaOn?'☀️':'🌙';
+  toast(state.pajamaOn?'🌙 Modo Pijama ON · descansa los ojos':'☀️ Modo Pijama OFF',2500);
+}
+
+function toggleMusic(){
+  state.musicOn=!state.musicOn;save();
+  const b=document.getElementById('musicBtn');if(b)b.textContent=state.musicOn?'🎵':'🎶';
+  if(state.musicOn){
+    // Empezar con la galaxia actual o math por defecto
+    const gid=GALAXIES[game.galaxy]&&GALAXIES[game.galaxy].id||'math';
+    startMusic(gid);
+    toast('🎵 Música de fondo activada',2000);
+  }else{
+    stopMusic();
+    toast('🔇 Música desactivada',2000);
+  }
+}
 
 // ========== TEXT-TO-SPEECH ==========
 // Lee la pregunta en voz alta. Útil sobre todo para Emiliano (7) que aún lee con esfuerzo.
@@ -2748,8 +2861,24 @@ function show(id){
   game.screen=id;
   if(id!==game.history[game.history.length-1])game.history.push(id);
   document.getElementById('soundBtn').style.display=id==='intro'?'none':'flex';
-  // Botón de volver visible en TODAS las pantallas excepto la intro (incluye question, boss, result, map, etc.)
+  // Botón de volver visible en TODAS las pantallas excepto la intro
   document.getElementById('backBtn').style.display=id==='intro'?'none':'flex';
+  // Botones de música y pijama: visibles excepto en intro
+  const mbtn=document.getElementById('musicBtn');if(mbtn){mbtn.style.display=id==='intro'?'none':'flex';mbtn.textContent=state.musicOn?'🎵':'🎶'}
+  const pbtn=document.getElementById('pajamaBtn');if(pbtn)pbtn.style.display=id==='intro'?'none':'flex';
+  // Cambiar música de fondo según pantalla (galaxia activa)
+  if(state.musicOn&&state.soundOn){
+    if(id==='question'||id==='boss'){
+      const gid=GALAXIES[game.galaxy]&&GALAXIES[game.galaxy].id;
+      if(gid&&musicCtx.lastGalaxy!==gid){musicCtx.lastGalaxy=gid;startMusic(gid)}
+    }else if(id==='map'){
+      // En el mapa: música suave neutra
+      if(musicCtx.lastGalaxy!=='default'){musicCtx.lastGalaxy='default';startMusic('default')}
+    }else{
+      // Otras pantallas: parar música para no molestar
+      stopMusic();musicCtx.lastGalaxy=null;
+    }
+  }
   // Tracking de juego clásico (lista de IDs que cuentan como "juego")
   const trackedGames=['snake','tictac','memo','c4','g2048','mines','tetris','chess','mario','dino'];
   if(trackedGames.includes(id))trackGame(id);
@@ -7430,13 +7559,59 @@ function parentsRender(){
   }
   const emmRec=recommendationsFor('emmanuel');
   const emiRec=recommendationsFor('emiliano');
+  // ===== GRÁFICO SVG semanal de últimos 7 días =====
+  function weeklyChart(who){
+    const hist=(a.dailyHistory||{})[who]||{};
+    const days=[];
+    for(let i=6;i>=0;i--){
+      const d=new Date(Date.now()-i*86400000);
+      const key=d.toISOString().slice(0,10);
+      const data=hist[key]||{correct:0,wrong:0};
+      days.push({label:['D','L','M','X','J','V','S'][d.getDay()],date:key,correct:data.correct,wrong:data.wrong,total:data.correct+data.wrong});
+    }
+    const maxVal=Math.max(...days.map(d=>d.total),5);
+    const W=480,H=140,pad=24;
+    const barW=(W-pad*2)/7-4;
+    let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:480px;height:auto;display:block;margin:8px auto">`;
+    // Líneas guía horizontales
+    for(let i=1;i<=4;i++){
+      const y=H-pad-((H-pad*2)*(i/4));
+      svg+=`<line x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}" stroke="rgba(255,215,0,.15)" stroke-width="1"/>`;
+    }
+    days.forEach((d,i)=>{
+      const x=pad+i*((W-pad*2)/7);
+      const correctH=d.total>0?(d.correct/maxVal)*(H-pad*2):0;
+      const wrongH=d.total>0?(d.wrong/maxVal)*(H-pad*2):0;
+      const totalH=correctH+wrongH;
+      // Barra fallos abajo (rojo)
+      if(wrongH>0)svg+=`<rect x="${x}" y="${H-pad-wrongH}" width="${barW}" height="${wrongH}" fill="#f44336" rx="3"/>`;
+      // Barra aciertos arriba (verde)
+      if(correctH>0)svg+=`<rect x="${x}" y="${H-pad-totalH}" width="${barW}" height="${correctH}" fill="#4caf50" rx="3"/>`;
+      // Etiqueta día
+      svg+=`<text x="${x+barW/2}" y="${H-6}" font-size="11" fill="#fff" text-anchor="middle">${d.label}</text>`;
+      // Total encima
+      if(d.total>0)svg+=`<text x="${x+barW/2}" y="${H-pad-totalH-4}" font-size="10" fill="#ffd700" text-anchor="middle" font-weight="bold">${d.total}</text>`;
+    });
+    svg+=`<text x="${pad}" y="14" font-size="11" fill="#ffd700">🟢 aciertos · 🔴 fallos · últimos 7 días</text>`;
+    svg+='</svg>';
+    return svg;
+  }
+
   document.getElementById('parentsContent').innerHTML=`
     ${renderChild('emmanuel')}
+    <div class="parents-section">
+      <h3>📈 Progreso semanal de Emmanuel</h3>
+      ${weeklyChart('emmanuel')}
+    </div>
     <div class="parents-section">
       <h3>🎯 Recomendaciones para Emmanuel</h3>
       ${emmRec.map(t=>`<div class="parents-row" style="display:block;padding:8px 4px;line-height:1.5">${t}</div>`).join('')}
     </div>
     ${renderChild('emiliano')}
+    <div class="parents-section">
+      <h3>📈 Progreso semanal de Emiliano</h3>
+      ${weeklyChart('emiliano')}
+    </div>
     <div class="parents-section">
       <h3>🎯 Recomendaciones para Emiliano</h3>
       ${emiRec.map(t=>`<div class="parents-row" style="display:block;padding:8px 4px;line-height:1.5">${t}</div>`).join('')}
@@ -7636,6 +7811,9 @@ function init(){
     window.speechSynthesis.getVoices();
     window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();
   }
+  // Aplica preferencias visuales/audio guardadas
+  if(state.pajamaOn)document.body.classList.add('pajama');
+  if(state.musicOn===undefined)state.musicOn=false; // off por defecto (ambient)
   // Carga asíncrona de datos offline (diccionario expandido + mini-enciclopedia)
   loadOfflineData();
   // Listeners online/offline para actualizar banner en tiempo real
