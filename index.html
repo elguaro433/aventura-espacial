@@ -786,7 +786,6 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
     <button class="btn btn-purple" onclick="show('classic')">🎮 Juegos Clásicos</button>
     <button class="btn btn-blue" onclick="show('dict')">📖 Diccionario</button>
     <button class="btn btn-green" onclick="show('wiki')">🌐 Enciclopedia</button>
-    <button class="btn btn-blue" onclick="show('duel')">⚔️ Duelo entre Hermanos</button>
   </div>
   <!-- Firma familiar -->
   <div class="family-signature">
@@ -873,14 +872,6 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
   <div class="center">
     <h1>⚡ Reto Diario</h1>
     <div id="dailyChallengeContent" style="text-align:center;width:100%;max-width:600px"></div>
-  </div>
-</div>
-
-<!-- DUEL MODE -->
-<div class="screen" id="duel">
-  <div class="center">
-    <h1>⚔️ Duelo entre Hermanos</h1>
-    <div id="duelContent" style="text-align:center;width:100%;max-width:700px"></div>
   </div>
 </div>
 
@@ -2602,7 +2593,7 @@ const ACHIEVEMENTS=[
 {id:'dailyStreak7',emoji:'🗓️',name:'Habitual',desc:'7 días seguidos jugando',cond:s=>s.dailyStreak>=7},
 {id:'dailyStreak30',emoji:'🏅',name:'Disciplinado',desc:'30 días seguidos jugando',cond:s=>s.dailyStreak>=30},
 {id:'firstChallenge',emoji:'⚡',name:'Reto aceptado',desc:'Completa tu primer Reto Diario',cond:s=>!!s.dailyChallengeDate},
-{id:'duelWinner',emoji:'⚔️',name:'Duelista',desc:'Gana 3 duelos entre hermanos',cond:s=>s.duelWins>=3},
+// (logro Duelista eliminado al quitarse el modo)
 {id:'noHints',emoji:'🧠',name:'Mente brillante',desc:'Conquista una galaxia entera sin pistas',cond:s=>{
   for(const g of (typeof GALAXIES!=='undefined'?GALAXIES:[])){
     if(s.bossesBeaten.includes(g.id)&&!(s.usedHintsInGalaxy||{})[g.id])return true;
@@ -2897,7 +2888,6 @@ function show(id){
   if(id==='parents')parentsRender();
   if(id==='admin')adminRender();
   if(id==='dailyChallenge')dailyChallengeRender();
-  if(id==='duel'){if(!game.duel)game.duel=null;duelRender()}
   // stop minigames if leaving
   if(id!=='snake'&&snakeLoop){clearInterval(snakeLoop);snakeLoop=null}
   if(id!=='memo'&&memTimer){clearTimeout(memTimer);memTimer=null}
@@ -5779,14 +5769,14 @@ const MARIO_LEVELS=[
     goal:{x:6960,y:MARIO_GROUND_Y-50}
   }
 ];
-let marioPlayer,marioLevel,marioLives,marioScore,marioWorld,marioCam,marioPickups,marioEnemies,marioMovePlats=[],marioBoxes=[];
+let marioPlayer,marioLevel,marioLives,marioScore,marioWorld,marioCam,marioPickups,marioEnemies,marioMovePlats=[],marioBoxes=[],marioGameOver=false;
 let marioLoop=null,marioKeys={left:0,right:0,jump:0,jumpEdge:0},marioBgStars=[];
 function marioStart(){
   setupHiDPI(document.getElementById('mario-canvas'),MARIO_VW,MARIO_VH);
   if(!marioBgStars.length){for(let i=0;i<70;i++)marioBgStars.push({x:Math.random()*MARIO_VW*2,y:Math.random()*(MARIO_GROUND_Y-20),s:Math.random()*1.5+.3})}
-  marioLevel=0;marioScore=0;marioLives=3;
+  marioLevel=0;marioScore=0;marioLives=3;marioGameOver=false;
   marioKeys={left:0,right:0,jump:0,jumpEdge:0}; // reset siempre
-  _marioLastT=0;_marioAcc=0; // reset delta-time
+  _marioLastT=0;_marioAcc=0;_marioStopRequest=false; // reset delta-time
   marioLoadLevel();
   if(marioLoop)cancelAnimationFrame(marioLoop);
   marioLoop=requestAnimationFrame(marioStep);
@@ -6019,11 +6009,30 @@ function marioNextLevel(){
 function marioFail(){
   _marioStopRequest=true; // detiene bucle interno YA, evitando -482 vidas
   if(marioLoop){cancelAnimationFrame(marioLoop);marioLoop=null}
+  marioGameOver=true;
   // Asegurar que vidas no quede negativo en pantalla
   if(marioLives<0)marioLives=0;
   document.getElementById('marioLives').textContent=marioLives;
   sndLose();
-  document.getElementById('marioStatus').textContent='💀 Sin vidas · Toca Reiniciar';
+  document.getElementById('marioStatus').textContent='💀 Sin vidas · Toca el canvas o "Reiniciar"';
+  // Render overlay grande "TOCA PARA REINICIAR" sobre el canvas
+  drawMarioGameOver();
+  // Recompensa parcial si llegó lejos
+  if(marioScore>=100){addXP(Math.floor(marioScore/20));getPlayer().coins+=Math.floor(marioScore/30);save()}
+}
+function drawMarioGameOver(){
+  const c=document.getElementById('mario-canvas');if(!c)return;
+  const ctx=c.getContext('2d');
+  ctx.save();
+  ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(0,0,MARIO_VW,MARIO_VH);
+  ctx.fillStyle='#fff';ctx.textAlign='center';
+  ctx.font='bold 48px sans-serif';ctx.fillText('💀 GAME OVER',MARIO_VW/2,MARIO_VH/2-30);
+  ctx.font='bold 24px sans-serif';ctx.fillStyle='#ffd700';
+  ctx.fillText('Score: '+marioScore,MARIO_VW/2,MARIO_VH/2+8);
+  ctx.font='18px sans-serif';ctx.fillStyle='#fff';
+  ctx.fillText('🔄 Toca aquí o "Reiniciar" para jugar otra vez',MARIO_VW/2,MARIO_VH/2+44);
+  ctx.textAlign='left';
+  ctx.restore();
 }
 // ===== Render =====
 function marioRender(){
@@ -8231,6 +8240,8 @@ function init(){
     }
     marioCanvas.addEventListener('touchstart',e=>{
       e.preventDefault();
+      // Si está en game over, cualquier tap reinicia
+      if(marioGameOver){marioStart();return}
       for(const t of e.changedTouches){
         const zone=getZone(t);
         activeTouches.set(t.identifier,zone);
@@ -8257,6 +8268,10 @@ function init(){
         activeTouches.delete(t.identifier);
       }
     },{passive:true});
+    // Click con ratón para reiniciar tras game over
+    marioCanvas.addEventListener('click',e=>{
+      if(marioGameOver&&game.screen==='mario')marioStart();
+    });
   }
 
   // === TETRIS: gestos en canvas ===
