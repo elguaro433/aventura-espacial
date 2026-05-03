@@ -70,14 +70,19 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .hud{display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,.5);border:2px solid rgba(255,215,0,.4);border-radius:16px;padding:10px 14px;margin-bottom:14px;flex-wrap:wrap;gap:10px}
 .hud-info{display:flex;align-items:center;gap:6px;font-size:14px}
 .hud-stat{background:rgba(255,255,255,.1);border-radius:10px;padding:4px 10px;font-size:14px;font-weight:bold}
-.galaxy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:10px;width:100%;max-width:900px;margin:0 auto}
-.galaxy-card{background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:2px solid rgba(255,215,0,.3);border-radius:18px;padding:14px;text-align:center;cursor:pointer;transition:all .3s;position:relative;min-height:160px;display:flex;flex-direction:column;justify-content:space-between;align-items:center}
+.galaxy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:12px;width:100%;max-width:960px;margin:0 auto}
+.galaxy-card{background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.02));border:2px solid rgba(255,215,0,.3);border-radius:20px;padding:14px 14px 12px;text-align:center;cursor:pointer;transition:transform .25s,box-shadow .25s,border-color .25s;position:relative;min-height:200px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07)}
+.galaxy-card::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,transparent,var(--galaxy-color,#ffd700),transparent);opacity:.85}
+.galaxy-card::after{content:"";position:absolute;inset:0;border-radius:20px;pointer-events:none;background:radial-gradient(circle at 50% -10%,var(--galaxy-color,#ffd700)22,transparent 60%)}
+.galaxy-card:hover{transform:translateY(-2px);border-color:var(--galaxy-color,#ffd700);box-shadow:0 10px 26px rgba(0,0,0,.5),0 0 24px var(--galaxy-color,#ffd700)55}
 .galaxy-card:active{transform:scale(.96)}
-.galaxy-card.locked{opacity:.4;cursor:not-allowed;filter:grayscale(70%)}
-.galaxy-card .emoji{font-size:50px;margin:6px 0;filter:drop-shadow(0 0 10px rgba(255,215,0,.6))}
-.galaxy-card .name{font-size:14px;font-weight:bold;color:#ffd700}
-.galaxy-card .progress{font-size:11px;opacity:.85;margin-top:4px}
-.galaxy-card .boss-mark{position:absolute;top:6px;right:6px;font-size:18px;filter:drop-shadow(0 0 8px red)}
+.galaxy-card.locked{opacity:.45;cursor:not-allowed;filter:grayscale(70%)}
+.galaxy-card .emoji{font-size:48px;margin:10px 0 4px;filter:drop-shadow(0 0 12px var(--galaxy-color,#ffd700));position:relative;z-index:1}
+.galaxy-card .name{font-size:14px;font-weight:bold;color:#ffd700;letter-spacing:.3px;position:relative;z-index:1;text-shadow:0 2px 4px rgba(0,0,0,.6)}
+.galaxy-card .progress{font-size:11px;opacity:.85;margin-top:4px;position:relative;z-index:1}
+.galaxy-card .boss-mark{position:absolute;top:8px;left:8px;font-size:20px;filter:drop-shadow(0 0 8px red);z-index:6}
+.galaxy-card .galaxy-flag-svg{width:64%;max-width:120px;height:auto;margin:8px auto 2px;border-radius:4px;box-shadow:0 3px 10px rgba(0,0,0,.6),0 0 0 1px rgba(255,215,0,.3);display:block;position:relative;z-index:1;aspect-ratio:3/2;object-fit:cover}
+.galaxy-card .galaxy-flag-emoji{font-size:34px;margin-top:6px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));position:relative;z-index:1}
 .planet-row{display:flex;justify-content:space-around;width:100%;flex-wrap:wrap;gap:8px;margin-top:8px}
 .planet-dot{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,215,0,.4);display:flex;align-items:center;justify-content:center;font-size:11px}
 .planet-dot.done{background:#4caf50;border-color:#2e7d32;box-shadow:0 0 10px #4caf50}
@@ -328,9 +333,10 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   h1{font-size:clamp(24px,5.5vw,42px)}
   .hero-rocket{font-size:clamp(60px,12vw,90px)}
   .galaxy-grid{max-width:100%;gap:10px}
-  .galaxy-card{min-height:140px;padding:10px}
-  .galaxy-card .emoji{font-size:42px;margin:4px 0}
+  .galaxy-card{min-height:185px;padding:12px}
+  .galaxy-card .emoji{font-size:42px;margin:6px 0 2px}
   .galaxy-card .name{font-size:13px}
+  .galaxy-card .galaxy-flag-svg{max-width:100px;width:65%}
   .classic-grid{grid-template-columns:repeat(3,1fr);gap:10px;max-width:100%}
   .classic-card{padding:14px}
   .classic-card .emoji{font-size:44px;margin-bottom:6px}
@@ -365,11 +371,13 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   .hero-rocket{font-size:clamp(50px,16vw,80px);margin:8px auto}
   .btn{padding:11px 16px;font-size:14px;min-width:100px;border-radius:14px}
   .btn-small{padding:7px 12px;font-size:12px}
-  .galaxy-grid{grid-template-columns:repeat(2,1fr);gap:8px;padding:6px}
-  .galaxy-card{min-height:130px;padding:8px}
-  .galaxy-card .emoji{font-size:36px;margin:3px 0}
+  .galaxy-grid{grid-template-columns:repeat(2,1fr);gap:10px;padding:6px}
+  .galaxy-card{min-height:170px;padding:10px}
+  .galaxy-card .emoji{font-size:36px;margin:6px 0 2px}
   .galaxy-card .name{font-size:12px}
   .galaxy-card .progress,.galaxy-card .stars-row{font-size:10px}
+  .galaxy-card .galaxy-flag-svg{max-width:90px;width:70%;margin-top:6px}
+  .galaxy-card .info-btn{width:26px;height:26px;font-size:12px}
   .planet-dot{width:18px;height:18px;font-size:9px;border-width:1.5px}
   .classic-grid{grid-template-columns:repeat(2,1fr);gap:8px;padding:6px}
   .classic-card{padding:10px}
@@ -597,18 +605,24 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
 }
 
 /* ===== Modal de País (mapa + bandera + datos) ===== */
-.country-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:3000;display:none;align-items:center;justify-content:center;padding:14px;overflow-y:auto}
+.country-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);z-index:3000;display:none;align-items:center;justify-content:center;padding:14px;overflow-y:auto;animation:fadeIn .25s ease-out}
 .country-modal.show{display:flex}
-.country-card{background:linear-gradient(135deg,#1a1a3e,#0a0a25);border:3px solid #ffd700;border-radius:22px;padding:20px;max-width:560px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 0 40px rgba(255,215,0,.4);position:relative}
-.country-card h2{margin:0 0 6px;text-align:center;color:#ffd700;font-size:22px}
-.country-card .country-sub{text-align:center;font-size:13px;opacity:.85;margin-bottom:14px}
-.country-card .country-flag{display:block;width:100%;max-width:280px;height:auto;margin:0 auto 14px;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.6);border:1px solid rgba(255,215,0,.3)}
-.country-card .country-map{display:block;width:100%;max-width:340px;height:auto;margin:0 auto 14px;background:#fff;border-radius:10px;padding:6px;box-shadow:0 4px 14px rgba(0,0,0,.6)}
-.country-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px}
-.country-fact{background:rgba(255,255,255,.07);border:1px solid rgba(255,215,0,.25);border-radius:10px;padding:8px 10px;font-size:13px}
-.country-fact b{display:block;color:#ffd700;font-size:11px;margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px}
-.country-close{position:absolute;top:8px;right:10px;background:rgba(0,0,0,.6);border:2px solid #ffd700;color:#ffd700;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.galaxy-card .info-btn{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.55);border:2px solid #ffd700;color:#ffd700;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.country-card{background:linear-gradient(160deg,#1e1e4a 0%,#0f0f2e 60%,#080820 100%);border:3px solid #ffd700;border-radius:24px;padding:24px 22px 22px;max-width:580px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 0 60px rgba(255,215,0,.45),0 20px 60px rgba(0,0,0,.7);position:relative;animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
+.country-card h2{margin:0 0 4px;text-align:center;color:#ffd700;font-size:24px;letter-spacing:.5px;text-shadow:0 2px 8px rgba(255,215,0,.3)}
+.country-card .country-sub{text-align:center;font-size:13px;opacity:.75;margin-bottom:18px;font-style:italic}
+.country-card .country-flag{display:block;width:100%;max-width:320px;height:auto;margin:0 auto 16px;border-radius:8px;box-shadow:0 6px 22px rgba(0,0,0,.7),0 0 0 2px rgba(255,215,0,.45);aspect-ratio:3/2;background:#000}
+.country-card .country-flag svg{width:100%;height:100%;display:block;border-radius:6px}
+.country-card .country-map{display:block;width:100%;max-width:300px;height:auto;margin:0 auto 16px;background:radial-gradient(circle at 50% 40%,#fff,#e8eef5);border-radius:14px;padding:8px;box-shadow:0 6px 22px rgba(0,0,0,.7),0 0 0 2px rgba(255,215,0,.3)}
+.country-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.country-fact{background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,255,255,.04));border:1px solid rgba(255,215,0,.3);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.3}
+.country-fact b{display:block;color:#ffd700;font-size:10.5px;margin-bottom:3px;text-transform:uppercase;letter-spacing:.7px;opacity:.85}
+.country-card .country-note{font-size:13.5px;line-height:1.55;margin:0;text-align:center;color:#ffe88a;background:rgba(255,215,0,.07);border:1px dashed rgba(255,215,0,.35);border-radius:12px;padding:10px 14px}
+.country-close{position:absolute;top:10px;right:12px;background:linear-gradient(135deg,#9c27b0,#673ab7);border:2px solid #ffd700;color:#fff;width:38px;height:38px;border-radius:50%;font-size:18px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.5);transition:transform .15s}
+.country-close:hover{transform:rotate(90deg) scale(1.1)}
+.galaxy-card .info-btn{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2196f3,#1565c0);border:2px solid #ffd700;color:#fff;font-size:14px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:6;box-shadow:0 3px 10px rgba(0,0,0,.5),0 0 12px rgba(33,150,243,.5);transition:transform .2s,box-shadow .2s;animation:infoPulse 2.5s ease-in-out infinite}
+.galaxy-card .info-btn:hover{transform:scale(1.15);box-shadow:0 4px 14px rgba(0,0,0,.6),0 0 20px rgba(33,150,243,.8)}
+@keyframes infoPulse{0%,100%{box-shadow:0 3px 10px rgba(0,0,0,.5),0 0 12px rgba(33,150,243,.5)}50%{box-shadow:0 3px 10px rgba(0,0,0,.5),0 0 22px rgba(33,150,243,.95)}}
 .galaxy-card{position:relative}
 </style>
 </head>
@@ -1572,13 +1586,13 @@ const GALAXIES=[
 {id:'logic',name:'Galaxia Lógica',emoji:'🧩',flag:'🧠',color:'#9c27b0',lang:'es-ES',
   planets:['Secuencias','Patrones','Acertijos','Memoria','Adivinanzas'],
   boss:{name:'Esfinge Cósmica',emoji:'🦁'}},
-{id:'fr',name:'Galaxia Francesa',emoji:'🇫🇷',flag:'🇫🇷',color:'#3f51b5',lang:'fr-FR',
+{id:'fr',name:'Galaxia Francesa',emoji:'🥐',flag:'🇫🇷',color:'#3f51b5',lang:'fr-FR',
   planets:['Couleurs','Animaux','Nombres','Famille','Phrases'],
   boss:{name:'Le Grand Méchant',emoji:'👹'}},
-{id:'es',name:'Galaxia Española',emoji:'🇪🇸',flag:'🇪🇸',color:'#ff5722',lang:'es-ES',
+{id:'es',name:'Galaxia Española',emoji:'🥘',flag:'🇪🇸',color:'#ff5722',lang:'es-ES',
   planets:['Ortografía','Sinónimos','Antónimos','Frases','Adivinanzas'],
   boss:{name:'Dragón de Letras',emoji:'🐲'}},
-{id:'en',name:'Galaxia Inglesa',emoji:'🇬🇧',flag:'🇬🇧',color:'#f44336',lang:'en-GB',
+{id:'en',name:'Galaxia Inglesa',emoji:'🎩',flag:'🇬🇧',color:'#f44336',lang:'en-GB',
   planets:['Colors','Animals','Numbers','Verbs','Phrases'],
   boss:{name:'The Word Wizard',emoji:'🧙'}},
 {id:'ca',name:'Galaxia Catalana',emoji:'🎗️',flag:'🇦🇩',color:'#ffc107',lang:'ca-ES',
@@ -1619,7 +1633,7 @@ const COUNTRY_INFO = {
   },
   en:{
     name:'Reino Unido 🇬🇧',sub:'United Kingdom',
-    flagSvg:`<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="30" fill="#012169"/><path d="M0,0 60,30 M60,0 0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 60,30 M60,0 0,30" stroke="#C8102E" stroke-width="2" clip-path="url(#cl)"/><path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/><path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6"/></svg>`,
+    flagSvg:`<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg"><clipPath id="ukcl"><path d="M30,15 h30 v15 z M30,15 v15 h-30 z M30,15 h-30 v-15 z M30,15 v-15 h30 z"/></clipPath><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="4" clip-path="url(#ukcl)"/><path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/><path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6"/></svg>`,
     mapUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/EU-United_Kingdom_%28orthographic_projection%29.svg/320px-EU-United_Kingdom_%28orthographic_projection%29.svg.png',
     facts:[
       ['Capital','Londres'],['Idioma','Inglés'],['Moneda','Libra £'],
@@ -1672,7 +1686,7 @@ function showCountryInfo(galId){
     <img class="country-map" src="${info.mapUrl}" alt="Mapa de ${info.name}" loading="lazy"
          onerror="this.style.display='none'">
     <div class="country-facts">${factsHtml}</div>
-    <p style="font-size:13px;line-height:1.5;margin:0;text-align:center;color:#ffd700cc">${info.note}</p>
+    <p class="country-note">${info.note}</p>
   `;
   document.getElementById('countryModal').classList.add('show');
 }
@@ -3704,6 +3718,11 @@ function renderMap(){
     const card=document.createElement('div');
     card.className='galaxy-card'+(unlocked?'':' locked');
     const hasInfo = !!COUNTRY_INFO[g.id];
+    // Bandera: SVG inline si hay COUNTRY_INFO (siempre se ve, en cualquier OS), si no, sin bandera (Mate/Lógica)
+    const flagHtml = hasInfo
+      ? `<div class="galaxy-flag-svg" aria-label="Bandera">${COUNTRY_INFO[g.id].flagSvg}</div>`
+      : '';
+    card.style.setProperty('--galaxy-color', g.color || '#ffd700');
     card.innerHTML=`
       ${hasInfo?`<button class="info-btn" title="Ver mapa y bandera" onclick="event.stopPropagation();showCountryInfo('${g.id}')">ℹ️</button>`:''}
       ${bossReady?'<div class="boss-mark">👹</div>':p.bossesBeaten.includes(g.id)?'<div class="boss-mark">✅</div>':''}
@@ -3720,7 +3739,7 @@ function renderMap(){
           return `<div class="planet-dot${cls}" title="${pn}${done?' · '+stars+'⭐':''}">${done?'⭐'.repeat(stars)||'✓':pi+1}</div>`;
         }).join('')}
       </div>
-      <div class="galaxy-flag" style="text-align:center;font-size:32px;margin-top:8px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))">${g.flag||g.emoji}</div>`;
+      ${flagHtml}`;
     if(unlocked){
       card.onclick=()=>{
         if(bossReady){startBoss(gi)}
