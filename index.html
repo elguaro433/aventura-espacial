@@ -133,12 +133,26 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .health-label{font-size:12px;text-align:center;margin-bottom:2px}
 .confetti{position:fixed;width:10px;height:10px;pointer-events:none;z-index:1500;animation:fall 2.5s linear forwards}
 @keyframes fall{from{transform:translateY(-30px) rotate(0)}to{transform:translateY(110vh) rotate(720deg)}}
-.classic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;padding:10px;max-width:700px;margin:0 auto}
-.classic-card{background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.04));border:3px solid rgba(255,215,0,.4);border-radius:18px;padding:18px;text-align:center;cursor:pointer;transition:all .2s}
+.classic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;padding:10px;max-width:780px;margin:0 auto}
+.classic-card{position:relative;background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.04));border:3px solid rgba(255,215,0,.5);border-radius:20px;padding:20px 14px;text-align:center;cursor:pointer;transition:transform .25s,box-shadow .25s,border-color .25s;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.35)}
+.classic-card::before{content:'';position:absolute;inset:-2px;border-radius:20px;background:radial-gradient(circle at top,var(--card-glow,rgba(255,215,0,.25)) 0%,transparent 70%);opacity:.7;pointer-events:none;z-index:0}
+.classic-card>*{position:relative;z-index:1}
+.classic-card:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 22px var(--card-glow,rgba(255,215,0,.5));border-color:#ffd700}
 .classic-card:active{transform:scale(.96)}
-.classic-card .emoji{font-size:54px;margin-bottom:8px;filter:drop-shadow(0 0 10px rgba(255,215,0,.5))}
-.classic-card .title{font-size:15px;font-weight:bold;color:#ffd700}
-.classic-card .desc{font-size:11px;opacity:.8;margin-top:4px}
+.classic-card .emoji{font-size:64px;margin-bottom:8px;filter:drop-shadow(0 0 14px var(--card-glow,rgba(255,215,0,.6))) drop-shadow(0 4px 6px rgba(0,0,0,.5));display:inline-block;transition:transform .35s}
+.classic-card:hover .emoji{transform:scale(1.12) rotate(-4deg)}
+.classic-card .title{font-size:16px;font-weight:bold;color:#ffd700;text-shadow:0 2px 4px rgba(0,0,0,.6),0 0 12px var(--card-glow,rgba(255,215,0,.5));letter-spacing:.3px}
+.classic-card .desc{font-size:11px;opacity:.85;margin-top:5px}
+/* Color temático por juego — usado por --card-glow + acento de borde inferior */
+.classic-card.game-snake{--card-glow:rgba(76,175,80,.55);background:linear-gradient(135deg,rgba(76,175,80,.18),rgba(46,125,50,.08))}
+.classic-card.game-tictac{--card-glow:rgba(244,67,54,.5);background:linear-gradient(135deg,rgba(244,67,54,.18),rgba(183,28,28,.08))}
+.classic-card.game-memo{--card-glow:rgba(156,39,176,.55);background:linear-gradient(135deg,rgba(156,39,176,.2),rgba(74,20,140,.08))}
+.classic-card.game-c4{--card-glow:rgba(33,150,243,.55);background:linear-gradient(135deg,rgba(33,150,243,.2),rgba(13,71,161,.08))}
+.classic-card.game-mines{--card-glow:rgba(255,152,0,.55);background:linear-gradient(135deg,rgba(255,152,0,.2),rgba(230,81,0,.08))}
+.classic-card.game-tetris{--card-glow:rgba(0,212,255,.6);background:linear-gradient(135deg,rgba(0,212,255,.2),rgba(13,71,161,.08))}
+.classic-card.game-chess{--card-glow:rgba(189,189,189,.45);background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(0,0,0,.18))}
+.classic-card.game-mario{--card-glow:rgba(255,107,107,.55);background:linear-gradient(135deg,rgba(255,107,107,.2),rgba(156,39,176,.1))}
+.classic-card.game-dino{--card-glow:rgba(139,195,74,.6);background:linear-gradient(135deg,rgba(139,195,74,.22),rgba(46,125,50,.08))}
 #snake-canvas,#memory-canvas{display:block;margin:10px auto;background:rgba(0,0,0,.5);border:3px solid #ffd700;border-radius:14px;max-width:100%;touch-action:none}
 .tictac-board{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:min(300px,80vw);height:min(300px,80vw);margin:14px auto;background:rgba(255,215,0,.2);border-radius:14px;padding:6px}
 .tictac-cell{background:rgba(255,255,255,.08);border:2px solid rgba(255,215,0,.4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:60px;font-weight:bold;cursor:pointer;transition:all .2s;color:#fff}
@@ -147,7 +161,8 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .tictac-cell.o{color:#f44336;text-shadow:0 0 15px #f44336}
 .tictac-cell.win{background:rgba(255,215,0,.3);border-color:#ffd700;animation:pulse 1s infinite}
 .memory-grid{display:grid;gap:6px;margin:10px auto;width:min(95vw,500px);perspective:1000px}
-.mem-card{aspect-ratio:1;background:linear-gradient(135deg,#9c27b0,#673ab7);border:3px solid #ffd700;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:clamp(20px,5vw,32px);cursor:pointer;transition:transform .35s ease-out,background .25s,box-shadow .25s;color:transparent;font-weight:bold;will-change:transform;position:relative}
+/* font-size base alto para que el emoji se VEA en cualquier tamaño de carta */
+.mem-card{aspect-ratio:1;background:linear-gradient(135deg,#9c27b0,#673ab7);border:3px solid #ffd700;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:clamp(28px,8vw,48px);cursor:pointer;transition:transform .35s ease-out,background .25s,box-shadow .25s;color:transparent;font-weight:bold;will-change:transform;position:relative;line-height:1}
 .mem-card.flipped{background:linear-gradient(135deg,#fff,#e0e0e0);color:#1a0033;transform:scale(1.05);box-shadow:0 0 18px rgba(255,215,0,.65)}
 .mem-card.matched{background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;animation:correctPulse .5s ease-out;box-shadow:0 0 14px rgba(76,175,80,.7)}
 .controls{display:flex;justify-content:center;gap:20px;margin:14px 0;flex-wrap:wrap}
@@ -388,7 +403,8 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   .tictac-board{width:min(85vw,260px);height:min(85vw,260px);gap:4px;padding:4px}
   .tictac-cell{font-size:48px}
   .memory-grid{width:96vw;gap:4px}
-  .mem-card{font-size:clamp(16px,4.5vw,26px)}
+  /* En móvil el emoji debe seguir siendo MUY visible */
+  .mem-card{font-size:clamp(26px,9vw,42px)}
   .c4-board{width:min(95vw,360px);gap:3px;padding:6px}
   .g2048-board{width:min(95vw,340px);gap:6px;padding:8px}
   .g2048-cell{font-size:clamp(15px,4.5vw,26px)}
@@ -536,6 +552,30 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 /* Indicador de cambio de orientación: pequeño tip al rotar */
 .orientation-hint{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);border:2px solid #ffd700;color:#ffd700;padding:8px 16px;border-radius:18px;font-size:12px;z-index:1500;pointer-events:none;animation:fadeOut 3s ease-out forwards}
 @keyframes fadeOut{0%{opacity:0;transform:translateX(-50%) translateY(10px)}10%{opacity:1;transform:translateX(-50%) translateY(0)}80%{opacity:1}100%{opacity:0}}
+
+/* === ESCUDOS HERÁLDICOS + FIRMA FAMILIAR === */
+.crest{position:absolute;width:90px;height:auto;max-height:120px;z-index:5;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5)) drop-shadow(0 0 12px rgba(255,215,0,.35));transition:transform .3s}
+.crest-img{object-fit:contain;background:transparent}
+.crest:hover{transform:scale(1.08) rotate(-3deg)}
+.crest-tl{top:14px;left:14px}
+.crest-tr{top:14px;right:14px}
+.family-signature{margin:30px auto 12px;text-align:center;padding:14px 20px;border-top:1px solid rgba(255,215,0,.2);max-width:600px}
+.signature-line{height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.5),transparent);margin:0 0 12px}
+.signature-text{color:#ffd700;font-size:14px;font-family:'Trebuchet MS',serif;letter-spacing:.5px;text-shadow:0 0 8px rgba(255,215,0,.5)}
+.signature-text strong{font-size:15px;background:linear-gradient(135deg,#ffd700,#ffe082,#ffd700);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:bold}
+.signature-text .sig-emoji{margin:0 8px;font-size:14px;filter:drop-shadow(0 0 4px rgba(255,215,0,.7))}
+.signature-sub{font-size:11px;opacity:.65;margin-top:6px;font-style:italic;color:#fff}
+@media (max-width:640px){
+  .crest{width:55px;height:70px}
+  .crest-tl{top:8px;left:8px}
+  .crest-tr{top:8px;right:8px}
+  .signature-text{font-size:12px}
+  .signature-text strong{font-size:13px}
+  .signature-sub{font-size:10px}
+}
+@media (max-width:380px){
+  .crest{width:42px;height:55px}
+}
 </style>
 </head>
 <body>
@@ -547,6 +587,172 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 
 <!-- INTRO -->
 <div class="screen active" id="intro">
+  <!-- Escudos heráldicos oficiales en las esquinas superiores.
+       Si existen los archivos escudo-diaz.png / escudo-gonzalez.png, se usan esos.
+       Si no, se ven los SVG fallback (mis aproximaciones). -->
+  <img class="crest crest-tl crest-img" src="escudo-diaz.png" alt="Escudo familia Díaz"
+       onerror="this.style.display='none';const s=this.nextElementSibling;if(s)s.style.display='block'">
+  <svg id="diazSvgFallback" class="crest crest-tl" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" aria-label="Escudo Díaz" style="display:block">
+    <defs>
+      <linearGradient id="diazRed" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0" stop-color="#e53935"/><stop offset="1" stop-color="#8b0000"/>
+      </linearGradient>
+      <linearGradient id="diazGold" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0" stop-color="#ffd700"/><stop offset="1" stop-color="#b8860b"/>
+      </linearGradient>
+    </defs>
+    <!-- Espadas cruzadas detrás del escudo -->
+    <g stroke="#9e9e9e" stroke-width="1.5" fill="#bdbdbd">
+      <line x1="20" y1="20" x2="100" y2="115" stroke="#757575" stroke-width="2"/>
+      <line x1="100" y1="20" x2="20" y2="115" stroke="#757575" stroke-width="2"/>
+      <!-- Empuñaduras doradas -->
+      <rect x="17" y="17" width="6" height="6" fill="url(#diazGold)" stroke="#7f5500" stroke-width=".5"/>
+      <rect x="97" y="17" width="6" height="6" fill="url(#diazGold)" stroke="#7f5500" stroke-width=".5"/>
+    </g>
+    <!-- Mantling (adorno) lateral rojo a la izquierda -->
+    <path d="M14 30 Q4 50 8 70 Q12 85 18 95 Q14 80 18 60 Q22 45 14 30 Z" fill="#d32f2f" opacity=".85"/>
+    <!-- Mantling (adorno) lateral dorado a la derecha -->
+    <path d="M106 30 Q116 50 112 70 Q108 85 102 95 Q106 80 102 60 Q98 45 106 30 Z" fill="url(#diazGold)" opacity=".85"/>
+    <!-- Borde rojo del escudo -->
+    <path d="M22 28 L98 28 L98 72 Q98 108 60 122 Q22 108 22 72 Z" fill="url(#diazRed)" stroke="#5c0000" stroke-width="1.5"/>
+    <!-- Centro plata (blanco) -->
+    <path d="M30 36 L90 36 L90 70 Q90 100 60 113 Q30 100 30 70 Z" fill="#f5f5f5"/>
+    <!-- 4 flores de lis doradas (esquinas) -->
+    <g fill="url(#diazGold)" font-family="serif" font-size="10" font-weight="bold" stroke="#7f5500" stroke-width=".3">
+      <text x="38" y="48" text-anchor="middle">⚜</text>
+      <text x="82" y="48" text-anchor="middle">⚜</text>
+      <text x="38" y="92" text-anchor="middle">⚜</text>
+      <text x="82" y="92" text-anchor="middle">⚜</text>
+      <!-- Flor de lis abajo centro -->
+      <text x="60" y="106" text-anchor="middle" font-size="9">⚜</text>
+    </g>
+    <!-- LEÓN RAMPANTE rojo central (silueta más reconocible) -->
+    <g fill="#c62828" stroke="#5c0000" stroke-width=".5">
+      <!-- Cabeza con melena (círculo grande) -->
+      <circle cx="58" cy="56" r="6.5"/>
+      <!-- Picos de la melena -->
+      <path d="M52 56 L49 53 L52 53 Z M52 60 L49 61 L52 58 Z M64 56 L67 53 L64 53 Z M64 60 L67 61 L64 58 Z M58 49 L56 46 L60 46 Z"/>
+      <!-- Cuello -->
+      <path d="M55 62 L55 70 L62 70 L62 62 Z"/>
+      <!-- Cuerpo (forma curvada hacia atrás) -->
+      <path d="M55 70 Q50 72 50 80 L50 88 L62 88 L62 80 Q62 72 62 70 Z"/>
+      <!-- Pata delantera arriba alzada con garra -->
+      <path d="M62 64 L70 60 L73 58 L74 60 L70 63 L63 67 Z"/>
+      <!-- Pata delantera baja -->
+      <path d="M55 70 L52 76 L54 76 L57 72 Z"/>
+      <!-- Patas traseras -->
+      <path d="M50 88 L48 95 L52 95 L53 88 Z M59 88 L60 95 L64 95 L62 88 Z"/>
+      <!-- Cola larga con borla -->
+      <path d="M62 75 Q70 73 73 68 Q76 62 73 58 L75 58 Q78 64 75 70 Q72 76 64 78 Z"/>
+      <!-- Borla de la cola -->
+      <circle cx="74" cy="58" r="1.8"/>
+    </g>
+    <!-- Ojo y detalles cara del león -->
+    <circle cx="60" cy="55" r=".7" fill="#fff"/>
+    <circle cx="56" cy="55" r=".7" fill="#fff"/>
+    <!-- Casco gris con plumacho rojo encima -->
+    <g>
+      <ellipse cx="60" cy="22" rx="11" ry="7" fill="#9e9e9e" stroke="#424242" stroke-width=".8"/>
+      <rect x="53" y="22" width="14" height="6" fill="#757575"/>
+      <!-- Visor con líneas -->
+      <line x1="55" y1="24" x2="65" y2="24" stroke="#424242" stroke-width=".5"/>
+      <line x1="55" y1="26" x2="65" y2="26" stroke="#424242" stroke-width=".5"/>
+      <!-- Plumacho rojo grande (estilo romano) -->
+      <path d="M55 14 Q52 4 60 0 Q68 4 65 14 Q62 12 60 14 Q58 12 55 14 Z" fill="#d32f2f" stroke="#7f0000" stroke-width=".5"/>
+      <path d="M58 12 Q57 6 60 4 Q63 6 62 12 Z" fill="#b71c1c"/>
+    </g>
+    <!-- Pergamino con apellido -->
+    <path d="M16 122 Q60 132 104 122 L104 134 Q60 142 16 134 Z" fill="#fff5d4" stroke="#8d6e63" stroke-width=".8"/>
+    <text x="60" y="132" font-size="10" fill="#5d4037" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-weight="bold">Díaz</text>
+  </svg>
+  <img class="crest crest-tr crest-img" src="escudo-gonzalez.png" alt="Escudo familia González"
+       onerror="this.style.display='none';const s=this.nextElementSibling;if(s)s.style.display='block'">
+  <svg id="gonzSvgFallback" class="crest crest-tr" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" aria-label="Escudo González" style="display:block">
+    <defs>
+      <linearGradient id="gonzRed" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0" stop-color="#e53935"/><stop offset="1" stop-color="#8b0000"/>
+      </linearGradient>
+      <linearGradient id="gonzGold" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0" stop-color="#ffd700"/><stop offset="1" stop-color="#b8860b"/>
+      </linearGradient>
+    </defs>
+    <!-- MANTLING DORADO arriba envolviendo el casco (hojas de acanto) -->
+    <g fill="url(#gonzGold)" stroke="#7f5500" stroke-width=".5">
+      <!-- Hojas izquierda arriba -->
+      <path d="M30 18 Q22 10 18 18 Q22 22 26 24 Q22 28 24 32 Q30 28 34 24 Q36 18 30 18 Z"/>
+      <path d="M22 22 Q14 22 12 30 Q18 32 22 28 Z"/>
+      <!-- Hojas derecha arriba -->
+      <path d="M90 18 Q98 10 102 18 Q98 22 94 24 Q98 28 96 32 Q90 28 86 24 Q84 18 90 18 Z"/>
+      <path d="M98 22 Q106 22 108 30 Q102 32 98 28 Z"/>
+      <!-- Hojas centrales sobre el casco -->
+      <path d="M50 18 Q58 8 60 4 Q62 8 70 18 Q66 22 60 22 Q54 22 50 18 Z"/>
+    </g>
+    <!-- MANTLING ROJO lateral fluyendo hacia abajo (lazos rojos) -->
+    <g fill="#d32f2f" stroke="#7f0000" stroke-width=".5">
+      <!-- Lazo izquierdo -->
+      <path d="M16 38 Q8 50 12 65 Q16 78 20 88 Q14 80 12 65 Q14 50 16 38 Z"/>
+      <path d="M14 60 Q6 68 10 78 Q16 74 18 70 Z"/>
+      <!-- Lazo derecho -->
+      <path d="M104 38 Q112 50 108 65 Q104 78 100 88 Q106 80 108 65 Q106 50 104 38 Z"/>
+      <path d="M106 60 Q114 68 110 78 Q104 74 102 70 Z"/>
+    </g>
+    <!-- Cuerpo del escudo -->
+    <path d="M22 32 L98 32 L98 72 Q98 108 60 122 Q22 108 22 72 Z" fill="url(#gonzRed)" stroke="#5c0000" stroke-width="1.5"/>
+    <!-- CASTILLO DORADO con 3 torres detalladas -->
+    <g fill="url(#gonzGold)" stroke="#7f5500" stroke-width=".5">
+      <!-- Base del castillo -->
+      <rect x="36" y="68" width="48" height="38"/>
+      <!-- Torre central (más alta) -->
+      <rect x="52" y="48" width="16" height="22"/>
+      <!-- Torres laterales -->
+      <rect x="34" y="56" width="12" height="14"/>
+      <rect x="74" y="56" width="12" height="14"/>
+      <!-- Almenas torre izquierda -->
+      <rect x="34" y="52" width="3" height="5"/>
+      <rect x="38.5" y="52" width="3" height="5"/>
+      <rect x="43" y="52" width="3" height="5"/>
+      <!-- Almenas torre central -->
+      <rect x="52" y="44" width="3" height="5"/>
+      <rect x="56" y="44" width="3" height="5"/>
+      <rect x="60" y="44" width="3" height="5"/>
+      <rect x="64" y="44" width="3" height="5"/>
+      <!-- Almenas torre derecha -->
+      <rect x="74" y="52" width="3" height="5"/>
+      <rect x="78.5" y="52" width="3" height="5"/>
+      <rect x="83" y="52" width="3" height="5"/>
+      <!-- Almenas base -->
+      <rect x="36" y="64" width="3" height="4"/>
+      <rect x="40.5" y="64" width="3" height="4"/>
+      <rect x="45" y="64" width="3" height="4"/>
+      <rect x="73" y="64" width="3" height="4"/>
+      <rect x="77.5" y="64" width="3" height="4"/>
+      <rect x="82" y="64" width="3" height="4"/>
+    </g>
+    <!-- PUERTA arqueada del castillo (oscura) -->
+    <path d="M54 106 L54 86 Q60 79 66 86 L66 106 Z" fill="#3e2723" stroke="#5d4037" stroke-width=".5"/>
+    <!-- Ventanas en torres laterales -->
+    <rect x="38" y="60" width="3" height="5" fill="#3e2723"/>
+    <rect x="79" y="60" width="3" height="5" fill="#3e2723"/>
+    <!-- Ventana torre central (cruz) -->
+    <rect x="58" y="54" width="4" height="8" fill="#3e2723"/>
+    <!-- Casco gris con corona dorada encima -->
+    <g>
+      <ellipse cx="60" cy="26" rx="11" ry="7" fill="#bdbdbd" stroke="#424242" stroke-width=".8"/>
+      <rect x="53" y="26" width="14" height="6" fill="#9e9e9e"/>
+      <!-- Líneas del visor -->
+      <line x1="55" y1="28" x2="65" y2="28" stroke="#424242" stroke-width=".5"/>
+      <line x1="55" y1="30" x2="65" y2="30" stroke="#424242" stroke-width=".5"/>
+      <!-- Corona dorada encima del casco -->
+      <rect x="52" y="18" width="16" height="3" fill="url(#gonzGold)" stroke="#7f5500" stroke-width=".4"/>
+      <path d="M52 18 L54 14 L56 18 M58 18 L60 14 L62 18 M64 18 L66 14 L68 18" fill="none" stroke="#7f5500" stroke-width=".5"/>
+      <circle cx="54" cy="14" r="1" fill="#d32f2f"/>
+      <circle cx="60" cy="14" r="1" fill="#d32f2f"/>
+      <circle cx="66" cy="14" r="1" fill="#d32f2f"/>
+    </g>
+    <!-- Pergamino BLANCO con apellido en cursiva -->
+    <path d="M14 122 Q60 132 106 122 L106 134 Q60 142 14 134 Z" fill="#fff" stroke="#9e9e9e" stroke-width=".8"/>
+    <text x="60" y="132" font-size="10" fill="#5d4037" text-anchor="middle" font-family="Georgia,'Brush Script MT',serif" font-style="italic" font-weight="bold">González</text>
+  </svg>
   <div class="center">
     <h1><span class="emoji">🚀</span> LA GRAN AVENTURA ESPACIAL</h1>
     <h2>De los Hermanos Díaz</h2>
@@ -560,47 +766,39 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
     <button class="btn btn-blue" onclick="show('dict')">📖 Diccionario</button>
     <button class="btn btn-green" onclick="show('wiki')">🌐 Enciclopedia</button>
   </div>
+  <!-- Firma familiar -->
+  <div class="family-signature">
+    <div class="signature-line"></div>
+    <div class="signature-text">
+      <span class="sig-emoji">⚜️</span>
+      Propiedad de la <strong>Familia Díaz González</strong>
+      <span class="sig-emoji">⚜️</span>
+    </div>
+    <div class="signature-sub">Hecho con cariño para Emiliano y Emmanuel</div>
+  </div>
 </div>
 
 <!-- ENCICLOPEDIA (Mini offline + Wikipedia online) -->
 <div class="screen" id="wiki">
   <div class="center">
     <h1><span class="emoji">🌐</span> Enciclopedia</h1>
-    <div id="offlineBanner" class="offline-banner" style="display:none">📡 Sin conexión · Solo Mini‑Enciclopedia disponible</div>
-    <div class="tabs" id="wikiTabs">
-      <div class="tab active" id="wikiTabMini" onclick="wikiSwitchTab('mini')">📚 Mini‑Enciclopedia (offline)</div>
-      <div class="tab" id="wikiTabOnline" onclick="wikiSwitchTab('online')">🌐 Wikipedia (online)</div>
+    <div id="offlineBanner" class="offline-banner" style="display:none">📡 Sin conexión · Solo contenido offline disponible</div>
+    <p style="text-align:center;font-size:13px;opacity:.85;max-width:600px;margin:0 auto 6px">Escribe cualquier tema. Buscamos primero offline (rápido y para niños) y si no, en Wikipedia.</p>
+    <div class="wiki-langs">
+      <button class="wiki-lang-btn active" data-unifiedlang="es" onclick="wikiSetUnifiedLang('es')">🇪🇸 Español</button>
+      <button class="wiki-lang-btn" data-unifiedlang="fr" onclick="wikiSetUnifiedLang('fr')">🇫🇷 Français</button>
+      <button class="wiki-lang-btn" data-unifiedlang="en" onclick="wikiSetUnifiedLang('en')">🇬🇧 English</button>
+      <button class="wiki-lang-btn" data-unifiedlang="ca" onclick="wikiSetUnifiedLang('ca')">🎗️ Català</button>
     </div>
-    <div id="wikiPaneMini" class="tab-content active">
-      <p style="text-align:center;font-size:13px;opacity:.85;max-width:600px;margin:0 auto 10px">Enciclopedia interna escrita para niños 6‑12 años. Funciona sin internet en los 4 idiomas.</p>
-      <div class="wiki-langs">
-        <button class="wiki-lang-btn active" data-mlang="es" onclick="miniSetLang('es')">🇪🇸 Español</button>
-        <button class="wiki-lang-btn" data-mlang="fr" onclick="miniSetLang('fr')">🇫🇷 Français</button>
-        <button class="wiki-lang-btn" data-mlang="en" onclick="miniSetLang('en')">🇬🇧 English</button>
-        <button class="wiki-lang-btn" data-mlang="ca" onclick="miniSetLang('ca')">🎗️ Català</button>
-      </div>
-      <div class="dict-search-row">
-        <input type="text" id="miniInput" class="dict-input" placeholder="Sol, dinosaurios, Andorra, Marte..." autocomplete="off" autocapitalize="off">
-        <button class="btn btn-green" onclick="miniSearch()">🔍 Buscar</button>
-      </div>
-      <div id="miniCats" class="dict-cats"></div>
-      <div id="miniResult" class="dict-result"></div>
+    <div class="dict-search-row">
+      <input type="text" id="wikiInput" class="dict-input" placeholder="Sol, dinosaurios, Andorra, Marte..." autocomplete="off" autocapitalize="off">
+      <button class="btn btn-green" onclick="wikiUnifiedSearch()">🔍 Buscar</button>
     </div>
-    <div id="wikiPaneOnline" class="tab-content">
-      <p style="text-align:center;font-size:13px;opacity:.85;max-width:600px;margin:0 auto 10px">Wikipedia en vivo en 4 idiomas. Para temas que no estén en la mini‑enciclopedia. Necesita internet.</p>
-      <div class="wiki-langs">
-        <button class="wiki-lang-btn active" data-lang="es" onclick="wikiSetLang('es')">🇪🇸 Español</button>
-        <button class="wiki-lang-btn" data-lang="fr" onclick="wikiSetLang('fr')">🇫🇷 Français</button>
-        <button class="wiki-lang-btn" data-lang="en" onclick="wikiSetLang('en')">🇬🇧 English</button>
-        <button class="wiki-lang-btn" data-lang="ca" onclick="wikiSetLang('ca')">🎗️ Català</button>
-      </div>
-      <div class="dict-search-row">
-        <input type="text" id="wikiInput" class="dict-input" placeholder="Cualquier tema..." autocomplete="off" autocapitalize="off">
-        <button class="btn btn-green" onclick="wikiDoSearch()">🔍 Buscar</button>
-      </div>
-      <div id="wikiResult" class="dict-result"></div>
-      <div id="wikiSuggestions" class="dict-suggestions"></div>
-    </div>
+    <div id="wikiResult" class="dict-result"></div>
+    <div id="miniCats" class="dict-cats"></div>
+    <div id="wikiSuggestions" class="dict-suggestions"></div>
+    <!-- Contenedor oculto para compatibilidad con miniSearch (que escribe en miniResult) -->
+    <div id="miniResult" style="display:none"></div>
     <button class="btn btn-purple" onclick="show('intro')">← Volver</button>
   </div>
 </div>
@@ -800,16 +998,15 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   <div class="center">
     <h1><span class="emoji">🎮</span> Juegos Clásicos</h1>
     <div class="classic-grid">
-      <div class="classic-card" onclick="show('snake')"><div class="emoji">🐍</div><div class="title">Snake</div><div class="desc">Culebrita clásica</div></div>
-      <div class="classic-card" onclick="show('tictac')"><div class="emoji">⭕</div><div class="title">3 en Raya</div><div class="desc">vs Computadora</div></div>
-      <div class="classic-card" onclick="show('memo')"><div class="emoji">🃏</div><div class="title">Memorama</div><div class="desc">12 parejas</div></div>
-      <div class="classic-card" onclick="show('c4')"><div class="emoji">🔴</div><div class="title">Conecta 4</div><div class="desc">vs Computadora</div></div>
-      <div class="classic-card" onclick="show('g2048')"><div class="emoji">🧮</div><div class="title">2048</div><div class="desc">¡Llega a la ficha 2048!</div></div>
-      <div class="classic-card" onclick="show('mines')"><div class="emoji">💣</div><div class="title">Buscaminas</div><div class="desc">Encuentra las minas</div></div>
-      <div class="classic-card" onclick="show('tetris')"><div class="emoji">🧱</div><div class="title">Tetris</div><div class="desc">Bloques cayendo</div></div>
-      <div class="classic-card" onclick="show('chess')"><div class="emoji">♟️</div><div class="title">Ajedrez</div><div class="desc">vs Computadora</div></div>
-      <div class="classic-card" onclick="show('mario')"><div class="emoji">🚀</div><div class="title">Astro Bros</div><div class="desc">Plataformas espaciales</div></div>
-      <div class="classic-card" onclick="show('dino')"><div class="emoji">🦖</div><div class="title">Dino Runner</div><div class="desc">Esquiva cactus y aves</div></div>
+      <div class="classic-card game-snake" onclick="show('snake')"><div class="emoji">🐍</div><div class="title">Snake</div><div class="desc">Culebrita clásica</div></div>
+      <div class="classic-card game-tictac" onclick="show('tictac')"><div class="emoji">⭕</div><div class="title">3 en Raya</div><div class="desc">vs Computadora</div></div>
+      <div class="classic-card game-memo" onclick="show('memo')"><div class="emoji">🃏</div><div class="title">Memorama</div><div class="desc">12 parejas</div></div>
+      <div class="classic-card game-c4" onclick="show('c4')"><div class="emoji">🔴</div><div class="title">Conecta 4</div><div class="desc">vs Computadora</div></div>
+      <div class="classic-card game-mines" onclick="show('mines')"><div class="emoji">💣</div><div class="title">Buscaminas</div><div class="desc">Encuentra las minas</div></div>
+      <div class="classic-card game-tetris" onclick="show('tetris')"><div class="emoji">🧱</div><div class="title">Tetris</div><div class="desc">Bloques cayendo</div></div>
+      <div class="classic-card game-chess" onclick="show('chess')"><div class="emoji">♟️</div><div class="title">Ajedrez</div><div class="desc">vs Computadora</div></div>
+      <div class="classic-card game-mario" onclick="show('mario')"><div class="emoji">🚀</div><div class="title">Astro Bros</div><div class="desc">Plataformas espaciales</div></div>
+      <div class="classic-card game-dino" onclick="show('dino')"><div class="emoji">🦖</div><div class="title">Dino Runner</div><div class="desc">Esquiva cactus y aves</div></div>
     </div>
     <button class="btn btn-purple" onclick="show('intro')">← Volver</button>
   </div>
@@ -3275,27 +3472,48 @@ function c4Start(){
 function c4CycleDifficulty(){const order=['easy','medium','hard'];const i=order.indexOf(c4Difficulty);c4SetDifficulty(order[(i+1)%3])}
 function c4Render(){
   const b=document.getElementById('c4Board');b.innerHTML='';
-  // Fila pre-cabecera con ghost piece + hover de columna
-  const ghostRow=c4HoverCol>=0?c4LowestEmpty(c4Board,c4HoverCol):-1;
   for(let r=0;r<C4_R;r++)for(let c=0;c<C4_C;c++){
     const cell=document.createElement('div');
     cell.className='c4-cell';
+    cell.dataset.col=c;cell.dataset.row=r;
     const v=c4Board[r][c];
     if(v==='r')cell.classList.add('r');
     else if(v==='y')cell.classList.add('y');
     if(c4WinCells&&c4WinCells.some(([wr,wc])=>wr===r&&wc===c))cell.classList.add('win');
-    // Ghost piece: muestra dónde caerá la ficha si haces clic
-    if(!c4Done&&c4Turn==='r'&&c===c4HoverCol&&r===ghostRow&&v===0){
-      cell.classList.add('ghost');cell.classList.add('r');
-    }
-    // Resalta toda la columna en hover
-    if(c===c4HoverCol&&!c4Done)cell.classList.add('col-hover');
-    cell.dataset.col=c;
     cell.onclick=()=>c4Drop(c);
-    cell.onmouseenter=()=>{c4HoverCol=c;c4Render()};
-    cell.onmouseleave=()=>{if(c4HoverCol===c){c4HoverCol=-1;c4Render()}};
     b.appendChild(cell);
   }
+  // El hover de columna y la ficha fantasma se actualizan SIN re-renderizar
+  // (toggle de clases en celdas existentes) — así el onclick nunca se mata mid-click.
+  c4UpdateHover();
+  // Listeners de hover en el tablero (no en celdas) usando event delegation
+  if(!b.dataset.hoverBound){
+    b.addEventListener('mousemove',e=>{
+      const cell=e.target.closest('.c4-cell');
+      const col=cell?parseInt(cell.dataset.col,10):-1;
+      if(col!==c4HoverCol){c4HoverCol=col;c4UpdateHover()}
+    });
+    b.addEventListener('mouseleave',()=>{if(c4HoverCol!==-1){c4HoverCol=-1;c4UpdateHover()}});
+    b.dataset.hoverBound='1';
+  }
+}
+function c4UpdateHover(){
+  // Toggle clases sin destruir celdas (mantiene onclick vivo)
+  const b=document.getElementById('c4Board');if(!b)return;
+  const cells=b.querySelectorAll('.c4-cell');
+  const ghostRow=(c4HoverCol>=0&&!c4Done&&c4Turn==='r')?c4LowestEmpty(c4Board,c4HoverCol):-1;
+  cells.forEach(cell=>{
+    const r=parseInt(cell.dataset.row,10);
+    const c=parseInt(cell.dataset.col,10);
+    cell.classList.toggle('col-hover',c===c4HoverCol&&!c4Done);
+    // Limpia ghost previo
+    const wasGhost=cell.classList.contains('ghost');
+    if(wasGhost){cell.classList.remove('ghost');if(c4Board[r][c]!=='r')cell.classList.remove('r')}
+    // Aplica ghost si toca
+    if(c===c4HoverCol&&r===ghostRow&&c4Board[r][c]===0&&!c4Done&&c4Turn==='r'){
+      cell.classList.add('ghost');cell.classList.add('r');
+    }
+  });
 }
 function c4Drop(col){
   if(c4Done||c4Turn!=='r')return;
@@ -4959,12 +5177,12 @@ function dinoRender(){
   ctx.textAlign='left';
 }
 function drawDino(ctx,p){
-  // T-Rex realista con curvas, gradientes, escamas y sombras volumétricas
+  // T-Rex limpio y reconocible: silueta clara, animación natural de carrera
   const x=p.x,y=p.y;
   const t=performance.now();
   ctx.save();
-  // Paleta verde T-Rex
-  const C={dark:'#2e5c1c',main:'#4a8a2a',light:'#7cb342',belly:'#c5e1a5',accent:'#1b3d0f',scale:'#5d9b3a'};
+  // Paleta verde
+  const C={dark:'#2e5c1c',main:'#558b2f',light:'#8bc34a',belly:'#dcedc8',accent:'#1b3d0f'};
   // Sombra elíptica suave en el suelo
   if(p.onGround){
     const sg=ctx.createRadialGradient(x+(p.crouch?34:24),DINO_GROUND+2,2,x+(p.crouch?34:24),DINO_GROUND+2,p.crouch?34:24);
@@ -4974,230 +5192,289 @@ function drawDino(ctx,p){
   }
 
   if(p.crouch&&p.onGround){
-    // === AGACHADO (perfil estirado, hocico delante) ===
-    // Cola estirada hacia atrás
+    // ============ AGACHADO ============
+    // Bobbing sutil al correr agachado
+    const bob=Math.sin(t/100)*1;
+    const off=Math.floor(t/100)%2;
+
+    // COLA - estirada hacia atrás (perfil bajo)
     ctx.fillStyle=C.main;
     ctx.beginPath();
-    ctx.moveTo(x-4,y+24);
-    ctx.quadraticCurveTo(x-18,y+18,x-26,y+22);
-    ctx.lineTo(x-28,y+30);
-    ctx.quadraticCurveTo(x-14,y+34,x-2,y+34);
+    ctx.moveTo(x+8,y+22+bob);
+    ctx.quadraticCurveTo(x-12,y+16+bob,x-26,y+22+bob);
+    ctx.quadraticCurveTo(x-12,y+30+bob,x+8,y+34+bob);
     ctx.closePath();ctx.fill();
-    // Punta cola más oscura
-    ctx.fillStyle=C.dark;
-    ctx.beginPath();ctx.moveTo(x-22,y+22);ctx.lineTo(x-28,y+25);ctx.lineTo(x-22,y+30);ctx.closePath();ctx.fill();
 
-    // Cuerpo (ovalado horizontal)
-    const bodyG=ctx.createLinearGradient(x,y+14,x,y+40);
-    bodyG.addColorStop(0,C.light);bodyG.addColorStop(.5,C.main);bodyG.addColorStop(1,C.dark);
-    ctx.fillStyle=bodyG;
-    ctx.beginPath();ctx.ellipse(x+28,y+28,32,15,0,0,Math.PI*2);ctx.fill();
-    // Vientre claro
+    // CUERPO horizontal alargado
+    ctx.fillStyle=C.main;
+    ctx.beginPath();
+    ctx.ellipse(x+26,y+28+bob,26,12,0,0,Math.PI*2);
+    ctx.fill();
+    // Vientre
     ctx.fillStyle=C.belly;
-    ctx.beginPath();ctx.ellipse(x+30,y+34,22,7,0,0,Math.PI);ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(x+28,y+34+bob,18,5,0,0,Math.PI*2);
+    ctx.fill();
 
-    // Cabeza alargada con hocico
+    // CUELLO + CABEZA (un solo bloque alargado, hocico hacia delante)
     ctx.fillStyle=C.main;
     ctx.beginPath();
-    ctx.moveTo(x+44,y+12);
-    ctx.quadraticCurveTo(x+62,y+6,x+74,y+14);
-    ctx.quadraticCurveTo(x+78,y+22,x+72,y+28);
-    ctx.lineTo(x+44,y+28);
+    ctx.moveTo(x+44,y+18+bob);
+    ctx.quadraticCurveTo(x+62,y+12+bob,x+76,y+18+bob);
+    ctx.quadraticCurveTo(x+80,y+24+bob,x+74,y+30+bob);
+    ctx.lineTo(x+44,y+30+bob);
     ctx.closePath();ctx.fill();
-    // Mandíbula inferior
+    // Mandíbula
     ctx.fillStyle=C.dark;
-    ctx.beginPath();
-    ctx.moveTo(x+50,y+25);
-    ctx.quadraticCurveTo(x+64,y+30,x+72,y+27);
-    ctx.lineTo(x+72,y+30);
-    ctx.quadraticCurveTo(x+62,y+33,x+50,y+30);
-    ctx.closePath();ctx.fill();
-    // Línea boca
-    ctx.strokeStyle=C.accent;ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(x+50,y+27);ctx.lineTo(x+72,y+27);ctx.stroke();
-    // Dientes
+    ctx.fillRect(x+50,y+28+bob,24,3);
+
+    // OJO grande, claro, con pupila
     ctx.fillStyle='#fff';
-    ctx.beginPath();ctx.moveTo(x+58,y+27);ctx.lineTo(x+59,y+30);ctx.lineTo(x+60,y+27);ctx.fill();
-    ctx.beginPath();ctx.moveTo(x+63,y+27);ctx.lineTo(x+64,y+31);ctx.lineTo(x+65,y+27);ctx.fill();
-    ctx.beginPath();ctx.moveTo(x+68,y+27);ctx.lineTo(x+69,y+30);ctx.lineTo(x+70,y+27);ctx.fill();
+    ctx.beginPath();ctx.arc(x+62,y+19+bob,3.5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#000';
+    ctx.beginPath();ctx.arc(x+63,y+19+bob,2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.arc(x+63.5,y+18.5+bob,.7,0,Math.PI*2);ctx.fill();
+
     // Fosa nasal
     ctx.fillStyle=C.accent;
-    ctx.beginPath();ctx.arc(x+72,y+18,1.5,0,Math.PI*2);ctx.fill();
-    // Ojo redondo con iris ámbar
-    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x+58,y+15,3.5,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#ff9800';ctx.beginPath();ctx.arc(x+59,y+15,2.5,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#000';ctx.beginPath();ctx.arc(x+60,y+15,1.4,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x+60.5,y+14.5,.6,0,Math.PI*2);ctx.fill();
-    // Ceja agresiva
-    ctx.strokeStyle=C.accent;ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(x+53,y+10);ctx.lineTo(x+62,y+12);ctx.stroke();
+    ctx.beginPath();ctx.arc(x+74,y+22+bob,1.2,0,Math.PI*2);ctx.fill();
 
-    // Escamas espalda (pequeños picos)
+    // Dientes pequeños
+    ctx.fillStyle='#fff';
+    [60,65,70].forEach(dx=>{
+      ctx.fillRect(x+dx,y+28+bob,1.5,2.5);
+    });
+
+    // Cresta dorsal (3 picos pequeños)
     ctx.fillStyle=C.dark;
-    for(let i=0;i<5;i++){
-      const sx=x+8+i*8;
-      ctx.beginPath();ctx.moveTo(sx,y+15);ctx.lineTo(sx+2,y+12);ctx.lineTo(sx+4,y+15);ctx.fill();
-    }
-    // Patas (con animación)
-    const legAlt=Math.floor(t/80)%2;
+    [12,22,32].forEach(dx=>{
+      ctx.beginPath();
+      ctx.moveTo(x+dx,y+18+bob);
+      ctx.lineTo(x+dx+3,y+14+bob);
+      ctx.lineTo(x+dx+6,y+18+bob);
+      ctx.fill();
+    });
+
+    // Patas con animación de carrera
     ctx.fillStyle=C.dark;
-    // Pata 1
-    ctx.beginPath();ctx.moveTo(x+18,y+38);ctx.lineTo(x+22,y+38);ctx.lineTo(x+24,y+44+legAlt*2);ctx.lineTo(x+16,y+44+legAlt*2);ctx.closePath();ctx.fill();
-    // Pata 2
-    ctx.beginPath();ctx.moveTo(x+38,y+38);ctx.lineTo(x+42,y+38);ctx.lineTo(x+44,y+44+(1-legAlt)*2);ctx.lineTo(x+36,y+44+(1-legAlt)*2);ctx.closePath();ctx.fill();
+    // Pata trasera
+    ctx.fillRect(x+14,y+38+bob,7,5+off*3);
+    // Pata delantera (alterna)
+    ctx.fillRect(x+34,y+38+bob,7,5+(1-off)*3);
     // Garras
     ctx.fillStyle='#fff';
-    [16,20,36,40].forEach((cx,i)=>{
-      const off=(i<2?legAlt:1-legAlt)*2;
-      ctx.beginPath();ctx.moveTo(x+cx,y+44+off);ctx.lineTo(x+cx+2,y+47+off);ctx.lineTo(x+cx+1,y+44+off);ctx.fill();
-    });
+    ctx.fillRect(x+15,y+42+bob+off*3,1.5,1.5);
+    ctx.fillRect(x+18,y+42+bob+off*3,1.5,1.5);
+    ctx.fillRect(x+35,y+42+bob+(1-off)*3,1.5,1.5);
+    ctx.fillRect(x+38,y+42+bob+(1-off)*3,1.5,1.5);
+
   }else{
-    // === DE PIE (postura erguida T-Rex) ===
-    // Cola larga y curva
+    // ============ DE PIE / SALTANDO ============
+    // Bobbing al correr (no en el aire)
+    const bob=p.onGround?Math.sin(t/90)*1.5:0;
+
+    // === COLA larga curva ===
     ctx.fillStyle=C.main;
     ctx.beginPath();
-    ctx.moveTo(x+4,y+34);
-    ctx.quadraticCurveTo(x-10,y+22,x-22,y+18);
-    ctx.lineTo(x-24,y+24);
-    ctx.quadraticCurveTo(x-12,y+32,x+4,y+44);
+    ctx.moveTo(x+12,y+30+bob);
+    ctx.quadraticCurveTo(x-8,y+18+bob,x-22,y+12+bob);
+    ctx.quadraticCurveTo(x-14,y+22+bob,x+0,y+30+bob);
+    ctx.quadraticCurveTo(x-10,y+34+bob,x-18,y+42+bob);
+    ctx.quadraticCurveTo(x-2,y+42+bob,x+12,y+44+bob);
     ctx.closePath();ctx.fill();
-    // Punta cola oscura
+    // Sombra cola
     ctx.fillStyle=C.dark;
-    ctx.beginPath();ctx.moveTo(x-18,y+18);ctx.lineTo(x-24,y+22);ctx.lineTo(x-18,y+26);ctx.closePath();ctx.fill();
-    // Sombra debajo de la cola
-    ctx.fillStyle='rgba(0,0,0,.15)';
-    ctx.beginPath();ctx.moveTo(x-10,y+34);ctx.quadraticCurveTo(x,y+38,x+6,y+44);ctx.lineTo(x-2,y+44);ctx.closePath();ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x-22,y+12+bob);
+    ctx.quadraticCurveTo(x-14,y+22+bob,x+0,y+30+bob);
+    ctx.lineTo(x-2,y+34+bob);
+    ctx.quadraticCurveTo(x-18,y+24+bob,x-24,y+16+bob);
+    ctx.closePath();ctx.fill();
 
-    // CUERPO ovalado vertical con gradiente
-    const bodyG=ctx.createLinearGradient(x,y+18,x,y+60);
-    bodyG.addColorStop(0,C.light);bodyG.addColorStop(.4,C.main);bodyG.addColorStop(1,C.dark);
-    ctx.fillStyle=bodyG;
-    ctx.beginPath();ctx.ellipse(x+20,y+40,18,22,0,0,Math.PI*2);ctx.fill();
-    // Vientre claro
+    // === CUERPO (forma de pera / huevo invertido) ===
+    ctx.fillStyle=C.main;
+    ctx.beginPath();
+    // Lado izquierdo del cuerpo
+    ctx.moveTo(x+8,y+28+bob);
+    ctx.quadraticCurveTo(x+4,y+44+bob,x+8,y+56+bob);
+    // Base
+    ctx.quadraticCurveTo(x+22,y+62+bob,x+36,y+56+bob);
+    // Lado derecho (sube hacia el cuello)
+    ctx.quadraticCurveTo(x+42,y+44+bob,x+38,y+30+bob);
+    // Cuello fluyendo desde el cuerpo
+    ctx.quadraticCurveTo(x+44,y+18+bob,x+50,y+12+bob);
+    ctx.lineTo(x+50,y+22+bob);
+    ctx.quadraticCurveTo(x+38,y+24+bob,x+30,y+28+bob);
+    ctx.closePath();ctx.fill();
+
+    // === VIENTRE (zona clara) ===
     ctx.fillStyle=C.belly;
-    ctx.beginPath();ctx.ellipse(x+22,y+48,11,13,0,0,Math.PI*2);ctx.fill();
-    // Sombra lateral del cuerpo
-    ctx.fillStyle='rgba(0,0,0,.18)';
-    ctx.beginPath();ctx.ellipse(x+10,y+42,5,18,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(x+22,y+48+bob,12,11,0,0,Math.PI*2);
+    ctx.fill();
 
-    // CUELLO grueso
+    // === CABEZA (cuadrada con hocico marcado) ===
     ctx.fillStyle=C.main;
     ctx.beginPath();
-    ctx.moveTo(x+22,y+22);
-    ctx.quadraticCurveTo(x+36,y+12,x+42,y+10);
-    ctx.lineTo(x+44,y+22);
-    ctx.quadraticCurveTo(x+34,y+26,x+24,y+30);
+    // Top
+    ctx.moveTo(x+44,y+8+bob);
+    ctx.quadraticCurveTo(x+58,y+0+bob,x+76,y+6+bob);
+    // Hocico (lado derecho)
+    ctx.lineTo(x+78,y+18+bob);
+    ctx.lineTo(x+74,y+22+bob);
+    // Mandíbula inferior
+    ctx.lineTo(x+50,y+22+bob);
+    // Cierra al cuello
+    ctx.lineTo(x+44,y+16+bob);
     ctx.closePath();ctx.fill();
 
-    // CABEZA grande con hocico definido
-    ctx.fillStyle=C.main;
-    ctx.beginPath();
-    ctx.moveTo(x+38,y);
-    ctx.quadraticCurveTo(x+58,y-4,x+70,y+4);
-    ctx.quadraticCurveTo(x+76,y+12,x+72,y+20);
-    ctx.lineTo(x+58,y+22);
-    ctx.quadraticCurveTo(x+42,y+22,x+38,y+18);
-    ctx.closePath();ctx.fill();
-    // Sombra inferior cabeza (volumen)
-    ctx.fillStyle='rgba(0,0,0,.18)';
-    ctx.beginPath();
-    ctx.moveTo(x+42,y+18);ctx.lineTo(x+72,y+18);ctx.lineTo(x+70,y+22);ctx.lineTo(x+44,y+22);ctx.closePath();ctx.fill();
-    // Mandíbula inferior protruding
+    // === MANDÍBULA inferior ===
     ctx.fillStyle=C.dark;
     ctx.beginPath();
-    ctx.moveTo(x+48,y+18);
-    ctx.quadraticCurveTo(x+62,y+24,x+72,y+20);
-    ctx.lineTo(x+72,y+22);
-    ctx.quadraticCurveTo(x+62,y+27,x+48,y+22);
+    ctx.moveTo(x+50,y+20+bob);
+    ctx.lineTo(x+76,y+20+bob);
+    ctx.lineTo(x+74,y+24+bob);
+    ctx.lineTo(x+50,y+24+bob);
     ctx.closePath();ctx.fill();
-    // Línea de la boca
-    ctx.strokeStyle=C.accent;ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(x+48,y+20);ctx.lineTo(x+72,y+20);ctx.stroke();
-    // DIENTES afilados (triángulos)
+
+    // Línea boca (interior)
+    ctx.strokeStyle=C.accent;ctx.lineWidth=1.2;
+    ctx.beginPath();
+    ctx.moveTo(x+50,y+20+bob);ctx.lineTo(x+76,y+20+bob);
+    ctx.stroke();
+
+    // === DIENTES afilados (claros, visibles) ===
     ctx.fillStyle='#fff';
-    [54,60,66].forEach(dx=>{
-      ctx.beginPath();ctx.moveTo(x+dx,y+20);ctx.lineTo(x+dx+1.5,y+24);ctx.lineTo(x+dx+3,y+20);ctx.fill();
+    [54,60,66,72].forEach(dx=>{
+      ctx.beginPath();
+      ctx.moveTo(x+dx,y+20+bob);
+      ctx.lineTo(x+dx+1.5,y+23.5+bob);
+      ctx.lineTo(x+dx+3,y+20+bob);
+      ctx.fill();
     });
+
+    // === OJO grande con iris ámbar y brillo (muy visible) ===
+    ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.arc(x+62,y+11+bob,4.5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#ff9800';
+    ctx.beginPath();ctx.arc(x+63,y+11+bob,3.2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#000';
+    ctx.beginPath();ctx.arc(x+63.5,y+11+bob,1.8,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.arc(x+64,y+10.4+bob,.8,0,Math.PI*2);ctx.fill();
+
+    // Ceja agresiva
+    ctx.fillStyle=C.dark;
+    ctx.beginPath();
+    ctx.moveTo(x+56,y+5+bob);
+    ctx.lineTo(x+68,y+7+bob);
+    ctx.lineTo(x+66,y+9+bob);
+    ctx.lineTo(x+56,y+8+bob);
+    ctx.closePath();ctx.fill();
+
     // Fosa nasal
     ctx.fillStyle=C.accent;
-    ctx.beginPath();ctx.ellipse(x+70,y+8,1.5,2,0,0,Math.PI*2);ctx.fill();
-    // OJO con iris ámbar y brillo
-    ctx.fillStyle='#fff';
-    ctx.beginPath();ctx.arc(x+54,y+8,4,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#ff9800';
-    ctx.beginPath();ctx.arc(x+55,y+8,3,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#000';
-    ctx.beginPath();ctx.arc(x+56,y+8,1.6,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#fff';
-    ctx.beginPath();ctx.arc(x+56.6,y+7.4,.7,0,Math.PI*2);ctx.fill();
-    // Ceja agresiva
-    ctx.strokeStyle=C.accent;ctx.lineWidth=2.5;
-    ctx.beginPath();ctx.moveTo(x+48,y+2);ctx.quadraticCurveTo(x+54,y+1,x+60,y+4);ctx.stroke();
+    ctx.beginPath();ctx.ellipse(x+74,y+12+bob,1.4,2,0,0,Math.PI*2);ctx.fill();
 
-    // ESCAMAS dorso (cresta de picos)
+    // === CRESTA DORSAL (picos pequeños siguiendo la espalda) ===
     ctx.fillStyle=C.dark;
-    for(let i=0;i<6;i++){
-      const sx=x+10+i*5,sy=y+22+(i<3?-i*1.5:(5-i)*1.5);
-      ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx+2.5,sy-3);ctx.lineTo(sx+5,sy);ctx.fill();
-    }
-    // Escamas decorativas en el cuerpo
-    ctx.fillStyle=C.scale;
-    [[14,32],[20,36],[26,32],[14,42],[22,46],[28,42],[20,52]].forEach(([dx,dy])=>{
-      ctx.beginPath();ctx.arc(x+dx,y+dy,1.5,0,Math.PI*2);ctx.fill();
+    const crest=[[14,30],[20,26],[26,24],[32,26],[38,30]];
+    crest.forEach(([dx,dy])=>{
+      ctx.beginPath();
+      ctx.moveTo(x+dx,y+dy+bob);
+      ctx.lineTo(x+dx+3,y+dy-4+bob);
+      ctx.lineTo(x+dx+6,y+dy+bob);
+      ctx.fill();
     });
 
-    // BRAZOS pequeños T-Rex (con garras)
-    ctx.fillStyle=C.main;
+    // === BRAZOS T-Rex pequeños (curvados hacia el pecho) ===
+    ctx.fillStyle=C.dark;
     ctx.beginPath();
-    ctx.moveTo(x+24,y+34);
-    ctx.quadraticCurveTo(x+30,y+38,x+30,y+44);
-    ctx.lineTo(x+26,y+44);
-    ctx.quadraticCurveTo(x+24,y+38,x+22,y+34);
+    ctx.moveTo(x+30,y+38+bob);
+    ctx.quadraticCurveTo(x+34,y+42+bob,x+33,y+47+bob);
+    ctx.lineTo(x+30,y+47+bob);
+    ctx.quadraticCurveTo(x+28,y+42+bob,x+27,y+38+bob);
     ctx.closePath();ctx.fill();
     // Garras del brazo
     ctx.fillStyle='#fff';
-    ctx.beginPath();ctx.moveTo(x+27,y+44);ctx.lineTo(x+28,y+47);ctx.lineTo(x+29,y+44);ctx.fill();
-    ctx.beginPath();ctx.moveTo(x+24,y+44);ctx.lineTo(x+25,y+47);ctx.lineTo(x+26,y+44);ctx.fill();
+    ctx.beginPath();ctx.moveTo(x+30,y+47+bob);ctx.lineTo(x+31,y+50+bob);ctx.lineTo(x+32,y+47+bob);ctx.fill();
 
-    // PATAS musculosas con animación
+    // === PATAS musculosas con CICLO DE CARRERA NATURAL ===
     if(p.onGround){
-      const legAlt=Math.floor(t/80)%2;
+      // Ciclo de carrera: 4 frames (delante extendida → trasera extendida)
+      const cycle=Math.floor(t/110)%4;
+      // Pata 1 (izquierda visible) y Pata 2 (derecha) en oposición
+      // Cada frame tiene una posición distinta para las patas
+      const leg1Y=[0,3,6,3][cycle]; // levantada/abajo
+      const leg2Y=[6,3,0,3][cycle]; // opuesto
+      const leg1X=[-2,0,2,0][cycle]; // adelante/atrás
+      const leg2X=[2,0,-2,0][cycle];
+
+      // PATA 1 (izquierda)
       // Muslo
       ctx.fillStyle=C.main;
-      ctx.beginPath();ctx.ellipse(x+14,y+54,5,8,0,0,Math.PI*2);ctx.fill();
-      ctx.beginPath();ctx.ellipse(x+28,y+54,5,8,0,0,Math.PI*2);ctx.fill();
-      // Pantorrilla + pie
+      ctx.beginPath();
+      ctx.ellipse(x+15+leg1X,y+54+bob,5,9,0,0,Math.PI*2);
+      ctx.fill();
+      // Pantorrilla doblada
       ctx.fillStyle=C.dark;
       ctx.beginPath();
-      ctx.moveTo(x+10,y+58);ctx.lineTo(x+18,y+58);
-      ctx.lineTo(x+19,y+62+legAlt*3);ctx.lineTo(x+9,y+62+legAlt*3);
+      ctx.moveTo(x+12+leg1X,y+58+bob);
+      ctx.lineTo(x+19+leg1X,y+58+bob);
+      ctx.lineTo(x+20+leg1X,y+64+bob-leg1Y);
+      ctx.lineTo(x+11+leg1X,y+64+bob-leg1Y);
       ctx.closePath();ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(x+24,y+58);ctx.lineTo(x+32,y+58);
-      ctx.lineTo(x+33,y+62+(1-legAlt)*3);ctx.lineTo(x+23,y+62+(1-legAlt)*3);
-      ctx.closePath();ctx.fill();
-      // Garras grandes (3 dedos)
+      // Pie con 3 garras
+      ctx.fillStyle=C.main;
+      ctx.fillRect(x+10+leg1X,y+64+bob-leg1Y,11,3);
       ctx.fillStyle='#fff';
-      [9,12,15].forEach(dx=>{
-        ctx.beginPath();ctx.moveTo(x+dx,y+62+legAlt*3);ctx.lineTo(x+dx+1.5,y+65+legAlt*3);ctx.lineTo(x+dx+3,y+62+legAlt*3);ctx.fill();
+      [11,14,17].forEach(dx=>{
+        ctx.beginPath();
+        ctx.moveTo(x+dx+leg1X,y+67+bob-leg1Y);
+        ctx.lineTo(x+dx+1.5+leg1X,y+70+bob-leg1Y);
+        ctx.lineTo(x+dx+3+leg1X,y+67+bob-leg1Y);
+        ctx.fill();
       });
-      [23,26,29].forEach(dx=>{
-        ctx.beginPath();ctx.moveTo(x+dx,y+62+(1-legAlt)*3);ctx.lineTo(x+dx+1.5,y+65+(1-legAlt)*3);ctx.lineTo(x+dx+3,y+62+(1-legAlt)*3);ctx.fill();
+
+      // PATA 2 (derecha, ligeramente atrás)
+      ctx.fillStyle=C.main;
+      ctx.beginPath();
+      ctx.ellipse(x+28+leg2X,y+54+bob,5,9,0,0,Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle=C.dark;
+      ctx.beginPath();
+      ctx.moveTo(x+25+leg2X,y+58+bob);
+      ctx.lineTo(x+32+leg2X,y+58+bob);
+      ctx.lineTo(x+33+leg2X,y+64+bob-leg2Y);
+      ctx.lineTo(x+24+leg2X,y+64+bob-leg2Y);
+      ctx.closePath();ctx.fill();
+      ctx.fillStyle=C.main;
+      ctx.fillRect(x+23+leg2X,y+64+bob-leg2Y,11,3);
+      ctx.fillStyle='#fff';
+      [24,27,30].forEach(dx=>{
+        ctx.beginPath();
+        ctx.moveTo(x+dx+leg2X,y+67+bob-leg2Y);
+        ctx.lineTo(x+dx+1.5+leg2X,y+70+bob-leg2Y);
+        ctx.lineTo(x+dx+3+leg2X,y+67+bob-leg2Y);
+        ctx.fill();
       });
     }else{
-      // En el aire: patas recogidas
+      // EN EL AIRE: patas recogidas, simétricas
       ctx.fillStyle=C.main;
-      ctx.beginPath();ctx.ellipse(x+14,y+54,5,8,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.ellipse(x+15,y+54,5,8,0,0,Math.PI*2);ctx.fill();
       ctx.beginPath();ctx.ellipse(x+28,y+54,5,8,0,0,Math.PI*2);ctx.fill();
+      // Pies recogidos
       ctx.fillStyle=C.dark;
-      ctx.beginPath();ctx.ellipse(x+14,y+62,4,4,0,0,Math.PI*2);ctx.fill();
-      ctx.beginPath();ctx.ellipse(x+28,y+62,4,4,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.ellipse(x+15,y+60,5,3,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.ellipse(x+28,y+60,5,3,0,0,Math.PI*2);ctx.fill();
+      // Garras recogidas
       ctx.fillStyle='#fff';
-      [12,14,16].forEach(dx=>{
-        ctx.beginPath();ctx.moveTo(x+dx,y+64);ctx.lineTo(x+dx+1,y+66);ctx.lineTo(x+dx+2,y+64);ctx.fill();
+      [12,15,18].forEach(dx=>{
+        ctx.beginPath();ctx.moveTo(x+dx,y+62);ctx.lineTo(x+dx+1.2,y+64);ctx.lineTo(x+dx+2.4,y+62);ctx.fill();
       });
-      [26,28,30].forEach(dx=>{
-        ctx.beginPath();ctx.moveTo(x+dx,y+64);ctx.lineTo(x+dx+1,y+66);ctx.lineTo(x+dx+2,y+64);ctx.fill();
+      [25,28,31].forEach(dx=>{
+        ctx.beginPath();ctx.moveTo(x+dx,y+62);ctx.lineTo(x+dx+1.2,y+64);ctx.lineTo(x+dx+2.4,y+62);ctx.fill();
       });
     }
   }
@@ -5532,8 +5809,13 @@ function dictAll(){
   // Combina diccionario inline + diccionario expandido (offline) + custom del usuario
   return DICT.concat(DICT_EXTRA).concat(state.customDict||[]);
 }
-function dictSearch(){
-  const q=dictNorm(document.getElementById('dictInput').value);
+// Cache de traducciones online (sesión actual + localStorage 24h)
+let DICT_ONLINE_CACHE={};
+try{DICT_ONLINE_CACHE=JSON.parse(localStorage.getItem('dict_online_cache')||'{}')}catch(e){DICT_ONLINE_CACHE={}}
+
+async function dictSearch(){
+  const raw=document.getElementById('dictInput').value.trim();
+  const q=dictNorm(raw);
   const result=document.getElementById('dictResult');
   if(!q){result.innerHTML='<div class="dict-empty">Escribe una palabra arriba o toca una sugerencia.</div>';return}
   const all=dictAll();
@@ -5542,9 +5824,102 @@ function dictSearch(){
   if(!entry)entry=all.find(w=>['es','fr','en','ca'].some(l=>dictNorm(w[l]).startsWith(q)));
   if(!entry)entry=all.find(w=>['es','fr','en','ca'].some(l=>dictNorm(w[l]).includes(q)));
   if(entry){dictRenderEntry(entry);return}
-  // No encontrada: ofrecer búsqueda online
-  result.innerHTML=`<div class="dict-card"><div class="dict-empty">No encontré "<b>${document.getElementById('dictInput').value}</b>" en el diccionario interno.<br><br>Puedes buscarla en línea (necesita internet):</div><div style="text-align:center"><button class="dict-online-btn" onclick="dictOnline()">🌐 Buscar online (Google Translate)</button></div></div>`;
+  // === AUTO FALLBACK ONLINE ===
+  // Cache hit?
+  const cacheKey='auto_'+q;
+  const cached=DICT_ONLINE_CACHE[cacheKey];
+  if(cached&&Date.now()-cached.ts<86400000*7){ // 7 días
+    dictRenderEntry(cached.entry);return;
+  }
+  if(!navigator.onLine){
+    result.innerHTML=`<div class="dict-card"><div class="dict-empty">📡 Sin internet y "<b>${escapeHtml(raw)}</b>" no está en el diccionario interno.<br>Conéctate a internet y vuelve a buscar.</div></div>`;
+    return;
+  }
+  // Mostrar loader
+  result.innerHTML='<div class="dict-card" style="text-align:center"><div class="dict-empty">🔄 Traduciendo "<b>'+escapeHtml(raw)+'</b>" online...</div></div>';
+  try{
+    const fetched=await dictTranslateOnline(raw);
+    if(fetched){
+      // Guardar en cache (sesión + localStorage)
+      DICT_ONLINE_CACHE[cacheKey]={entry:fetched,ts:Date.now()};
+      try{
+        // Mantener cache acotada (máx 200 entradas)
+        const keys=Object.keys(DICT_ONLINE_CACHE);
+        if(keys.length>200){
+          const sorted=keys.sort((a,b)=>DICT_ONLINE_CACHE[a].ts-DICT_ONLINE_CACHE[b].ts);
+          for(let i=0;i<keys.length-200;i++)delete DICT_ONLINE_CACHE[sorted[i]];
+        }
+        localStorage.setItem('dict_online_cache',JSON.stringify(DICT_ONLINE_CACHE));
+      }catch(e){}
+      dictRenderEntry(fetched);
+    }else{
+      result.innerHTML=`<div class="dict-card"><div class="dict-empty">❌ No pude traducir "<b>${escapeHtml(raw)}</b>".<br>Prueba con otra palabra.</div><div style="text-align:center"><button class="dict-online-btn" onclick="dictOnline()">🌐 Abrir Google Translate</button></div></div>`;
+    }
+  }catch(e){
+    result.innerHTML=`<div class="dict-card"><div class="dict-empty">⏱ Error de conexión al traducir.<br>Prueba más tarde.</div><div style="text-align:center"><button class="dict-online-btn" onclick="dictOnline()">🌐 Abrir Google Translate</button></div></div>`;
+  }
 }
+
+// Detecta el idioma de la palabra escrita (heurística simple por terminaciones/letras)
+function dictDetectLang(word){
+  const w=word.toLowerCase();
+  // Catalán: terminaciones típicas
+  if(/(ny|tx|·l|llà|isme|ció)$/.test(w)||/(parròq|català|nyam|xarxa|hivern)/.test(w))return 'ca';
+  // Francés: acentos circunflejos, terminaciones, palabras comunes
+  if(/[âêîôûœæ]/.test(w)||/(eux|oux|oir|ière|ment|tion)$/.test(w))return 'fr';
+  // Inglés: combinaciones típicas
+  if(/^(the |a |an |is |are |you )|(ing|tion|ough)$/.test(w))return 'en';
+  // Español por defecto (con tildes ñ típicas)
+  if(/[ñáéíóú¿¡]/.test(w))return 'es';
+  return 'es'; // default
+}
+
+// Traduce una palabra usando MyMemory API (gratis, CORS-enabled, sin clave)
+async function dictTranslateOnline(word){
+  const src=dictDetectLang(word);
+  const targets=['es','fr','en','ca'].filter(l=>l!==src);
+  // Mapeo de códigos a códigos MyMemory (es-ES, fr-FR, en-GB, ca-ES)
+  const code={es:'es-ES',fr:'fr-FR',en:'en-GB',ca:'ca-ES'};
+  // Categoría: intentamos detectar (animal, color, etc.) con keywords; sino dejamos vacía
+  const cat=dictGuessCategory(word);
+  // Lanza fetches en paralelo con timeout
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),6000);
+  const fetches=targets.map(t=>{
+    const url='https://api.mymemory.translated.net/get?q='+encodeURIComponent(word)+'&langpair='+encodeURIComponent(code[src]+'|'+code[t]);
+    return fetch(url,{signal:ctrl.signal}).then(r=>r.ok?r.json():null).catch(()=>null);
+  });
+  let results;
+  try{results=await Promise.all(fetches);clearTimeout(timer)}
+  catch(e){clearTimeout(timer);return null}
+  const entry={cat,ex:{}};
+  entry[src]=word;
+  targets.forEach((t,i)=>{
+    const data=results[i];
+    if(data&&data.responseData&&data.responseData.translatedText){
+      entry[t]=data.responseData.translatedText.split(/[,;]/)[0].trim();
+    }else{
+      entry[t]=word; // fallback: usa la original
+    }
+  });
+  // Asegurar las 4 lenguas presentes
+  ['es','fr','en','ca'].forEach(l=>{if(!entry[l])entry[l]=word});
+  // Ejemplos: dejamos placeholders simples que el TTS puede leer
+  ['es','fr','en','ca'].forEach(l=>{entry.ex[l]=entry[l]+'.'});
+  return entry;
+}
+
+// Heurística simple para categoría (mejora la presentación, no es crítica)
+function dictGuessCategory(word){
+  const w=word.toLowerCase();
+  if(/(perro|gato|cat|chat|chien|dog|bird|pájaro)/.test(w))return 'animales';
+  if(/(rojo|azul|verde|red|blue|green|jaune|rouge)/.test(w))return 'colores';
+  if(/(uno|dos|three|four|cinq|seven)/.test(w))return 'numeros';
+  if(/(madre|padre|mère|père|mother|father)/.test(w))return 'familia';
+  if(/(comer|beber|dormir|jouer|play)/.test(w))return 'verbos';
+  return 'frases';
+}
+
 function dictOnline(){
   const q=encodeURIComponent(document.getElementById('dictInput').value.trim());
   if(!q)return;
@@ -5626,10 +6001,13 @@ const WIKI_SUGG={
 function wikiInit(){
   document.getElementById('wikiInput').value='';
   document.getElementById('wikiResult').innerHTML='<div class="dict-empty">Escribe un tema arriba (animal, planeta, país, persona...) o toca una sugerencia.</div>';
+  // Sincroniza idioma offline + online al entrar
+  if(typeof miniLang==='string')miniLang=wikiLang;
   wikiRenderSuggestions();
   const inp=document.getElementById('wikiInput');
   if(inp&&!inp.dataset.bound){
-    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();wikiDoSearch()}});
+    // Enter dispara la búsqueda UNIFICADA (offline → online)
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();wikiUnifiedSearch()}});
     inp.dataset.bound='1';
   }
 }
@@ -5837,19 +6215,65 @@ function miniSpeakNow(text,lang){
     window.speechSynthesis.speak(u);
   }catch(e){}
 }
-// Tabs entre Mini-Enciclopedia y Wikipedia online
-function wikiSwitchTab(which){
-  const isOnline=which==='online';
-  document.getElementById('wikiTabMini').classList.toggle('active',!isOnline);
-  document.getElementById('wikiTabOnline').classList.toggle('active',isOnline);
-  document.getElementById('wikiPaneMini').classList.toggle('active',!isOnline);
-  document.getElementById('wikiPaneOnline').classList.toggle('active',isOnline);
-  if(isOnline&&!navigator.onLine){
-    document.getElementById('wikiResult').innerHTML='<div class="wiki-card"><div class="dict-empty">📡 Sin conexión. Wikipedia online no disponible.<br>Prueba la <b>Mini‑Enciclopedia</b> que sí funciona offline.</div></div>';
-  }
-  if(isOnline)wikiInit();
-  else miniInit();
+// === ENCICLOPEDIA UNIFICADA ===
+// Un solo idioma compartido entre offline y online
+function wikiSetUnifiedLang(l){
+  wikiLang=l;miniLang=l;
+  document.querySelectorAll('[data-unifiedlang]').forEach(b=>b.classList.toggle('active',b.dataset.unifiedlang===l));
+  // Refrescar categorías mini con el nuevo idioma
+  miniRenderCats();miniFilterCat(miniActiveCat||'all');
+  // Refrescar sugerencias de Wikipedia para el nuevo idioma
+  wikiRenderSuggestions();
 }
+// Búsqueda unificada: prueba primero en mini-enciclopedia, si no encuentra va a Wikipedia
+async function wikiUnifiedSearch(){
+  const q=(document.getElementById('wikiInput').value||'').trim();
+  const result=document.getElementById('wikiResult');
+  if(!q){result.innerHTML='<div class="dict-empty">Escribe un tema arriba o toca una sugerencia.</div>';return}
+  // 1) Intento offline (mini-enciclopedia) — instantáneo
+  const lq=q.toLowerCase();
+  const offlineHits=ENCYCLOPEDIA.filter(e=>{
+    const titles=[e.title.es,e.title.fr,e.title.en,e.title.ca].filter(Boolean).join(' ').toLowerCase();
+    return titles.includes(lq)||(e.id&&e.id.includes(lq));
+  });
+  if(offlineHits.length===1){
+    miniLang=wikiLang;
+    miniShowInPanel(offlineHits[0],'wikiResult');
+    return;
+  }
+  if(offlineHits.length>1){
+    miniLang=wikiLang;
+    result.innerHTML='<div class="dict-suggestion-title">📚 '+offlineHits.length+' resultados offline:</div><div class="dict-sugg-list">'+
+      offlineHits.map(e=>`<span class="dict-sugg" onclick="miniShowInPanel(ENCYCLOPEDIA.find(x=>x.id==='${escapeAttr(e.id)}'),'wikiResult')">${e.emoji||'📖'} ${escapeHtml(e.title[wikiLang]||e.title.es)}</span>`).join('')+
+    '</div>';
+    return;
+  }
+  // 2) No hay offline → Wikipedia online (si hay internet)
+  if(!navigator.onLine){
+    result.innerHTML='<div class="wiki-card"><div class="dict-empty">📡 Sin internet y "<b>'+escapeHtml(q)+'</b>" no está en la enciclopedia offline.<br><br>Prueba con uno de los temas de las categorías de abajo.</div></div>';
+    return;
+  }
+  await wikiDoSearch(); // delega al buscador Wikipedia con AbortController + cache
+}
+// Helper: mostrar entrada de mini-enciclopedia en cualquier panel
+function miniShowInPanel(entry,panelId){
+  if(!entry)return;
+  const t=entry.title[wikiLang]||entry.title.es;
+  const txt=entry.text[wikiLang]||entry.text.es;
+  const cat=MINI_CATS.find(c=>c.id===entry.cat);
+  const result=document.getElementById(panelId);
+  result.innerHTML='<div class="wiki-card">'+
+    '<div style="text-align:center;font-size:60px;margin-bottom:10px">'+(entry.emoji||'📖')+'</div>'+
+    '<div class="wiki-title">'+escapeHtml(t)+' <span style="font-size:11px;opacity:.6">📚 offline</span></div>'+
+    (cat?'<div class="wiki-desc">'+cat.emoji+' '+escapeHtml(cat.name)+'</div>':'')+
+    '<div class="wiki-extract">'+escapeHtml(txt)+'</div>'+
+    '<div class="wiki-actions">'+
+      '<button class="dict-tts" style="width:auto;padding:0 14px" onclick="miniSpeakNow('+JSON.stringify(t+'. '+txt)+','+JSON.stringify(MINI_TTSLANGS[wikiLang])+')">🔊 Escuchar</button>'+
+    '</div>'+
+  '</div>';
+}
+// Compatibilidad: wikiSwitchTab obsoleto pero por si se llama de algún sitio
+function wikiSwitchTab(){/* obsoleto: ahora todo es unificado */}
 function updateOfflineBanner(){
   const banner=document.getElementById('offlineBanner');
   if(!banner)return;
