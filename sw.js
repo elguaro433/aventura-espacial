@@ -1,12 +1,12 @@
-﻿// Service Worker - Permite que el juego funcione sin internet (offline)
+// Service Worker - Permite que el juego funcione sin internet (offline)
 // Estrategia: network-first con timeout para HTML, cache-first para assets locales,
 // nada de cachear cross-origin (Wikipedia, etc.) para evitar que la cache crezca infinito.
-// 1777808655487 se reemplaza automÃ¡ticamente en cada push con el timestamp UTC actual.
-// Si el script de push no se ejecuta, fallback al timestamp de instalaciÃ³n del SW.
-const RAW_BUILD_TIME = '1777820852525';
+// __BUILD_TIME__ se reemplaza automáticamente en cada push con el timestamp UTC actual.
+// Si el script de push no se ejecuta, fallback al timestamp de instalación del SW.
+const RAW_BUILD_TIME = '1778716800000';
 const BUILD_TIME = RAW_BUILD_TIME.indexOf('BUILD_TIME') !== -1 ? String(Date.now()) : RAW_BUILD_TIME;
 const CACHE_NAME = 'aventura-espacial-' + BUILD_TIME;
-const NETWORK_TIMEOUT_MS = 3000; // si tarda mÃ¡s, va a cache
+const NETWORK_TIMEOUT_MS = 3000; // si tarda más, va a cache
 const urlsToCache = [
   './',
   './index.html',
@@ -26,7 +26,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        // Pre-cachea por archivo (allSettled) para que un asset faltante no rompa toda la instalaciÃ³n
+        // Pre-cachea por archivo (allSettled) para que un asset faltante no rompa toda la instalación
         return Promise.allSettled(urlsToCache.map(url => cache.add(url)));
       })
       .then(() => self.skipWaiting())
@@ -45,7 +45,7 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Permite que la pÃ¡gina fuerce la activaciÃ³n inmediata del nuevo SW
+// Permite que la página fuerce la activación inmediata del nuevo SW
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
@@ -62,14 +62,14 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   const sameOrigin = url.origin === self.location.origin;
   // No interferir con peticiones cross-origin (Wikipedia, fonts CDN, etc.).
-  // El navegador las hace directamente; asÃ­ la cache del SW no crece infinito.
+  // El navegador las hace directamente; así la cache del SW no crece infinito.
   if (!sameOrigin) return;
 
   const isHTML = event.request.mode === 'navigate' ||
     (event.request.headers.get('accept') || '').includes('text/html');
 
   if (isHTML) {
-    // Network-first con timeout: siempre intentamos la Ãºltima versiÃ³n, pero si tarda >3s vamos a cache.
+    // Network-first con timeout: siempre intentamos la última versión, pero si tarda >3s vamos a cache.
     event.respondWith(
       fetchWithTimeout(event.request, NETWORK_TIMEOUT_MS).then(response => {
         const copy = response.clone();
@@ -90,7 +90,7 @@ self.addEventListener('fetch', event => {
         caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
         return response;
       }).catch(() => {
-        // Para assets fallidos NO devolver index.html (romperÃ­a <img>); devolver respuesta de error.
+        // Para assets fallidos NO devolver index.html (rompería <img>); devolver respuesta de error.
         return new Response('', { status: 504, statusText: 'Offline' });
       });
     })

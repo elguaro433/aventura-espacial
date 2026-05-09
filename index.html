@@ -1329,8 +1329,39 @@ function setupHiDPI(canvas, cssW, cssH){
 
 // ========== STORAGE ==========
 const STORAGE_KEY = 'aventura_espacial_v1';
-function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){}}
+function save(){
+  try{
+    if(typeof state!=='undefined'&&state){
+      state.lastSavedAt=Date.now();
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+    }
+  }catch(e){}
+}
 function load(){try{const d=localStorage.getItem(STORAGE_KEY);if(d)return JSON.parse(d)}catch(e){}return null}
+
+// === AUTO-GUARDADO REFORZADO ===
+// Garantiza que el avance de cada niño se persista incluso si:
+//  - se cierra la pestaña / la PWA,
+//  - la tablet se bloquea o pasa la app a segundo plano,
+//  - se recarga la página de golpe.
+// Como `state` contiene tanto `em` (Emmanuel) como `el` (Emiliano), guardar
+// el state completo guarda el progreso de los dos niños a la vez.
+(function setupAutoSave(){
+  // 1) Guardado periódico cada 15 s como red de seguridad.
+  try{setInterval(save,15000)}catch(_){}
+  // 2) Cuando la app se va a segundo plano (muy común en tablets).
+  try{
+    document.addEventListener('visibilitychange',function(){
+      if(document.visibilityState==='hidden')save();
+    });
+  }catch(_){}
+  // 3) Antes de cerrar/recargar.
+  try{window.addEventListener('beforeunload',save)}catch(_){}
+  // 4) iOS/Safari prefiere `pagehide`.
+  try{window.addEventListener('pagehide',save)}catch(_){}
+  // 5) Al perder foco la ventana (tablet bloqueada, otra app encima).
+  try{window.addEventListener('blur',save)}catch(_){}
+})();
 
 // ========== GRADOS ESCOLARES (sistema francés - aplica en escuela de Andorra) ==========
 // Cada nivel mapea a una edad típica. El juego pickea preguntas dentro de ±1 grado del jugador,
@@ -3602,8 +3633,8 @@ function renderMap(){
 
   const grid=document.getElementById('galaxyGrid');grid.innerHTML='';
   GALAXIES.forEach((g,gi)=>{
-    const alwaysUnlocked=g.id==='ve'||g.id==='co';
-    const unlocked=gi===0||alwaysUnlocked||p.bossesBeaten.includes(GALAXIES[gi-1].id);
+    // Todas las galaxias están desbloqueadas — los niños pueden elegir libremente.
+    const unlocked=true;
     const beatenInGal=g.planets.filter((_,pi)=>p.planetsBeaten.includes(g.id+'-'+pi)).length;
     const totalPlanets=g.planets.length;
     const starsInGal=g.planets.reduce((acc,_,pi)=>acc+(p.planetStars[g.id+'-'+pi]||0),0);
