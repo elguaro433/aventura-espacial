@@ -1329,12 +1329,37 @@ function setupHiDPI(canvas, cssW, cssH){
 
 // ========== STORAGE ==========
 const STORAGE_KEY = 'aventura_espacial_v1';
+function _hasPlayerProgress(p){
+  if(!p)return false;
+  return (Array.isArray(p.planetsBeaten)&&p.planetsBeaten.length>0)
+    || (Array.isArray(p.bossesBeaten)&&p.bossesBeaten.length>0)
+    || ((p.xp||0)>0)
+    || ((p.coins||0)>0)
+    || ((p.totalAnswered||0)>0)
+    || ((p.stars||0)>0);
+}
 function save(){
   try{
-    if(typeof state!=='undefined'&&state){
-      state.lastSavedAt=Date.now();
-      localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+    if(typeof state==='undefined'||!state)return;
+    // RED DE SEGURIDAD: si lo que vamos a guardar tiene 0 progreso en AMBOS niños
+    // pero el guardado anterior tenía progreso real, NO sobrescribimos: hacemos
+    // un backup automático para no perder nada y abortamos el save vacío.
+    const incomingEmpty = !_hasPlayerProgress(state.emmanuel) && !_hasPlayerProgress(state.emiliano);
+    if(incomingEmpty){
+      try{
+        const prevRaw=localStorage.getItem(STORAGE_KEY);
+        if(prevRaw){
+          const prev=JSON.parse(prevRaw);
+          if(prev&&(_hasPlayerProgress(prev.emmanuel)||_hasPlayerProgress(prev.emiliano))){
+            try{localStorage.setItem('aventura_espacial_backup_'+Date.now(),prevRaw)}catch(_){}
+            if(typeof console!=='undefined')console.warn('[save] estado vacío descartado, se conserva el progreso anterior');
+            return;
+          }
+        }
+      }catch(_){}
     }
+    state.lastSavedAt=Date.now();
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
   }catch(e){}
 }
 function load(){try{const d=localStorage.getItem(STORAGE_KEY);if(d)return JSON.parse(d)}catch(e){}return null}
@@ -8510,7 +8535,128 @@ function parentsRender(){
       ${gamesHtml}
     </div>
     ${recent?`<div class="parents-section"><h3>⏱ Últimas 7 sesiones</h3>${recent}</div>`:''}
+    <div class="parents-section">
+      <h3>🛟 Recuperar / Restablecer progreso</h3>
+      <p style="font-size:12px;opacity:.8;margin-bottom:10px;text-align:left;line-height:1.5">
+        Si por algún motivo se ve perdido el avance, aquí puedes recuperarlo desde una copia automática
+        o re-marcar manualmente las galaxias que cada niño ya había conquistado.
+      </p>
+      <div id="backupRecoveryList"></div>
+      <div style="margin-top:14px">
+        <h4 style="color:#ffd700;text-align:left;font-size:14px;margin-bottom:8px">⚡ Marcar galaxia como conquistada</h4>
+        <p style="font-size:11px;opacity:.65;margin-bottom:8px;text-align:left">Esto otorga 3⭐ en TODOS los planetas de la galaxia y marca al jefe como vencido para ese niño.</p>
+        <div id="manualSetGrid"></div>
+      </div>
+      <div style="margin-top:14px;padding-top:10px;border-top:1px dashed rgba(255,255,255,.15);font-size:11px;opacity:.7;text-align:left">
+        ${state.lastSavedAt?'💾 Última vez guardado: '+new Date(state.lastSavedAt).toLocaleString():'💾 Aún no se ha registrado un guardado en esta sesión.'}
+      </div>
+    </div>
   `;
+  parentsRenderRecovery();
+}
+
+// === Recuperación: lista backups + botones manuales ===
+function parentsRenderRecovery(){
+  const listEl=document.getElementById('backupRecoveryList');
+  if(listEl){
+    const backups=[];
+    try{
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(k&&k.indexOf('aventura_espacial_backup_')===0){
+          const ts=parseInt(k.replace('aventura_espacial_backup_',''),10);
+          let summary='';
+          try{
+            const d=JSON.parse(localStorage.getItem(k));
+            const em=d&&d.emmanuel||{},el=d&&d.emiliano||{};
+            summary=`⚡ ${(em.planetsBeaten||[]).length}🪐 / ${(em.bossesBeaten||[]).length}👹 · ⛏️ ${(el.planetsBeaten||[]).length}🪐 / ${(el.bossesBeaten||[]).length}👹`;
+          }catch(_){summary='(no se pudo leer)'}
+          backups.push({key:k,ts:isFinite(ts)?ts:0,summary});
+        }
+      }
+    }catch(_){}
+    backups.sort((a,b)=>b.ts-a.ts);
+    if(backups.length===0){
+      listEl.innerHTML='<div class="parents-row" style="display:block;padding:8px 0;font-size:12px;opacity:.7;text-align:left">No hay copias automáticas guardadas. (Las copias se generan solas si el sistema detecta riesgo de pérdida.)</div>';
+    }else{
+      listEl.innerHTML='<h4 style="color:#ffd700;text-align:left;font-size:14px;margin-bottom:8px">📦 Copias automáticas disponibles</h4>'+backups.slice(0,8).map(b=>`
+        <div class="parents-row" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 0">
+          <span class="parents-key" style="flex:1;text-align:left;min-width:170px">
+            <b>${b.ts?new Date(b.ts).toLocaleString():'(sin fecha)'}</b><br>
+            <span style="font-size:11px;opacity:.8">${b.summary}</span>
+          </span>
+          <button class="btn btn-green btn-small" onclick="parentsRestoreBackup('${b.key}')">📥 Restaurar</button>
+        </div>
+      `).join('');
+    }
+  }
+  const grid=document.getElementById('manualSetGrid');
+  if(grid){
+    const childRow=(who)=>{
+      const p=state[who]||{};
+      const beaten=p.bossesBeaten||[];
+      const label=who==='emmanuel'?'⚡ Emmanuel':'⛏️ Emiliano';
+      const btns=GALAXIES.map(g=>{
+        const done=beaten.indexOf(g.id)>=0;
+        return `<button class="btn ${done?'btn-blue':'btn-green'} btn-small" style="margin:3px;font-size:11px" title="${g.name}" onclick="parentsCompleteGalaxy('${who}','${g.id}')">${g.emoji} ${done?'✓':'+'}</button>`;
+      }).join('');
+      return `
+        <div style="margin-bottom:10px;padding:8px;background:rgba(255,255,255,.04);border-radius:10px;text-align:left">
+          <div style="font-weight:bold;color:#ffd700;margin-bottom:6px">${label}</div>
+          <div>${btns}</div>
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-green btn-small" style="font-size:11px" onclick="parentsCompleteAll('${who}')">✅ Todas las galaxias</button>
+            <button class="btn btn-red btn-small" style="font-size:11px" onclick="parentsClearChild('${who}')">🗑 Reiniciar este niño</button>
+          </div>
+        </div>`;
+    };
+    grid.innerHTML=childRow('emmanuel')+childRow('emiliano');
+  }
+}
+function parentsRestoreBackup(key){
+  if(!confirm('¿Restaurar este progreso? Se reemplazará el actual. (Se hará primero una copia del actual por seguridad.)'))return;
+  try{
+    // Backup del actual antes de restaurar
+    const currRaw=localStorage.getItem(STORAGE_KEY);
+    if(currRaw)localStorage.setItem('aventura_espacial_backup_'+Date.now(),currRaw);
+    const data=localStorage.getItem(key);
+    if(!data){toast('No se pudo leer la copia');return}
+    localStorage.setItem(STORAGE_KEY,data);
+    toast('✅ Progreso restaurado, recargando...',1500);
+    setTimeout(()=>location.reload(),1200);
+  }catch(e){toast('Error al restaurar')}
+}
+function parentsCompleteGalaxy(who,galaxyId){
+  const p=state[who];if(!p)return;
+  const g=GALAXIES.find(x=>x.id===galaxyId);if(!g)return;
+  p.planetsBeaten=p.planetsBeaten||[];
+  p.planetStars=p.planetStars||{};
+  p.bossesBeaten=p.bossesBeaten||[];
+  g.planets.forEach((_,i)=>{
+    const k=g.id+'-'+i;
+    if(p.planetsBeaten.indexOf(k)<0)p.planetsBeaten.push(k);
+    p.planetStars[k]=3;
+  });
+  if(p.bossesBeaten.indexOf(g.id)<0)p.bossesBeaten.push(g.id);
+  // Recalcular estrellas totales
+  p.stars=Object.values(p.planetStars).reduce((a,b)=>a+(b||0),0);
+  save();
+  toast('✅ '+g.name+' marcada como conquistada para '+(who==='emmanuel'?'Emmanuel':'Emiliano'));
+  parentsRender();
+}
+function parentsCompleteAll(who){
+  if(!confirm('¿Marcar TODAS las 8 galaxias como conquistadas para '+(who==='emmanuel'?'Emmanuel':'Emiliano')+'? Cada planeta quedará con 3⭐.'))return;
+  GALAXIES.forEach(g=>parentsCompleteGalaxy(who,g.id));
+  toast('🎉 ¡Todas las galaxias marcadas como conquistadas!',2500);
+}
+function parentsClearChild(who){
+  if(!confirm('¿Reiniciar TODO el progreso de '+(who==='emmanuel'?'Emmanuel':'Emiliano')+'? Esta acción es irreversible (pero se guarda copia automática antes).'))return;
+  try{const currRaw=localStorage.getItem(STORAGE_KEY);if(currRaw)localStorage.setItem('aventura_espacial_backup_'+Date.now(),currRaw)}catch(_){}
+  state[who]=JSON.parse(JSON.stringify(initialPlayer));
+  state[who].grade=who==='emmanuel'?'cm1':'ce1';
+  save();
+  toast('Progreso de '+(who==='emmanuel'?'Emmanuel':'Emiliano')+' reiniciado');
+  parentsRender();
 }
 function parentsSetGrade(playerKey,gradeId){
   if(!state[playerKey])return;
