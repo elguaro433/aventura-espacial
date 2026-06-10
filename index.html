@@ -1008,7 +1008,7 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
     <div class="question-box" id="qText"></div>
     <div class="row">
       <button class="btn btn-blue btn-small" onclick="speakCurrentQuestion()" id="speakBtn" title="Leer en voz alta">🔊 Escuchar</button>
-      <button class="btn btn-purple btn-small" onclick="useHint()" id="hintBtn">💡 Pista (5💰)</button>
+      <button class="btn btn-green btn-small" onclick="useHint()" id="hintBtn">💡 Pedir ayuda</button>
     </div>
     <div class="answers" id="answers"></div>
   </div>
@@ -1567,8 +1567,15 @@ function trackAnswer(galaxyId,planetIdx,correct,who){
     else state.analytics.dailyHistory[who][today].wrong++;
   }
   // Por galaxia (totales + por niño)
-  if(!state.analytics.questionsByGalaxy[galaxyId])state.analytics.questionsByGalaxy[galaxyId]={correct:0,wrong:0,em:{correct:0,wrong:0},el:{correct:0,wrong:0}};
-  const g=state.analytics.questionsByGalaxy[galaxyId];
+  // Defensivo: si el guardado viene de un formato antiguo (entrada inexistente,
+  // no-objeto, o sin las sub-estructuras em/el), la reparamos antes de usarla.
+  // Así un historial viejo NUNCA rompe el responder preguntas.
+  let g=state.analytics.questionsByGalaxy[galaxyId];
+  if(!g||typeof g!=='object'){g={correct:0,wrong:0,em:{correct:0,wrong:0},el:{correct:0,wrong:0}};state.analytics.questionsByGalaxy[galaxyId]=g;}
+  if(typeof g.correct!=='number')g.correct=0;
+  if(typeof g.wrong!=='number')g.wrong=0;
+  if(!g.em||typeof g.em!=='object')g.em={correct:0,wrong:0};
+  if(!g.el||typeof g.el!=='object')g.el={correct:0,wrong:0};
   const ch=who==='emmanuel'?'em':who==='emiliano'?'el':null;
   if(correct){g.correct++;if(ch)g[ch].correct++}
   else{g.wrong++;if(ch)g[ch].wrong++}
@@ -2775,7 +2782,7 @@ ve:[
 {q:'¿Qué tepuy es el más famoso de Venezuela?',o:['Roraima','Auyán-Tepui','Ambos','Ninguno'],a:2,level:'cm1'},
 {q:'¿Cuál es la isla más grande de Venezuela?',o:['Margarita','La Tortuga','Coche','Cubagua'],a:0,level:'ce2'},
 {q:'¿Con qué tres países tiene frontera Venezuela?',o:['Brasil, Colombia y Guyana','Perú, Ecuador y Brasil','Argentina, Chile y Uruguay','México, Cuba y Haití'],a:0,level:'cm1'},
-{q:'¿Cuál es el segundo lago más grande de Sudamérica que está en Venezuela?',o:['Titicaca','Maracaibo','Valencia','Guri'],a:1,level:'cm1'},
+{q:'¿Cuál es el lago más grande de Venezuela?',o:['Titicaca','Maracaibo','Valencia','Guri'],a:1,level:'cm1'},
 {q:'¿Cómo se llama la cordillera que cruza el oeste de Venezuela?',o:['Andina','Costanera','Pirineos','Cordillera Central'],a:0,level:'cm2'},
 {q:'¿Qué estado venezolano está en el extremo occidental?',o:['Sucre','Zulia','Amazonas','Bolívar'],a:1,level:'cm1'},
 {q:'¿Cuál es la altura del Salto Ángel?',o:['979 metros','500 metros','1500 metros','200 metros'],a:0,level:'cm2'}
@@ -3086,7 +3093,7 @@ const SHOP=[
 {id:'shield',emoji:'🛡️',name:'Escudo galáctico',price:150,effect:'extraLife',desc:'+1 vida extra al iniciar cada planeta (permanente)'},
 {id:'dragon',emoji:'🟠',name:'Bola de Dragón',price:175,effect:'reviveOnce',desc:'Te salva del PRIMER fallo en cada planeta (permanente)'},
 {id:'mushroom',emoji:'🍄',name:'Champiñón Mario',price:125,effect:'doubleXP',desc:'Doble XP durante 24h tras comprarlo (consumible)'},
-{id:'fireball',emoji:'🔥',name:'Bola de Fuego',price:100,effect:'freeHint',desc:'Próximas 3 pistas son GRATIS (consumible)'},
+{id:'fireball',emoji:'❤️‍🔥',name:'Vida Extra',price:80,effect:'bonusLife',desc:'+1 vida para tu próximo planeta (consumible)'},
 {id:'pickaxe',emoji:'⛏️',name:'Pico de Diamante',price:175,effect:'megaCoin',desc:'Doble monedas en planetas durante 24h (consumible)'},
 {id:'star',emoji:'⭐',name:'Estrella Cósmica',price:500,effect:'comboBonus',desc:'+1 XP extra por cada acierto seguido (permanente)'}
 ];
@@ -3479,7 +3486,7 @@ function dailyChallengeStart(){
   if(pool.length<5){toast('Pocas preguntas');return}
   pool=pool.sort(()=>Math.random()-.5).slice(0,5);
   game.galaxy=0;game.planet=0;game.qIdx=0;game.lives=999;game.correct=0;game.wrong=[];
-  game.qPool=pool;game.hintsUsed=0;
+  game.qPool=pool;game.hintsUsed=0;game.helpedAtQ=-1;game.maxLives=3;game.answerLock=false;
   game.dailyChallengeMode=true; // flag para handler especial al final
   game.reviewMode=false;
   show('question');
@@ -3604,7 +3611,7 @@ function startSecretPlanet(){
   // Setup como planeta especial — usamos la galaxia 0 como contenedor lógico
   game.galaxy=0;game.planet=0;
   game.qIdx=0;game.lives=3+(hasItem('shield')?1:0);
-  game.correct=0;game.wrong=[];game.qPool=pool;game.hintsUsed=0;
+  game.correct=0;game.wrong=[];game.qPool=pool;game.hintsUsed=0;game.helpedAtQ=-1;game.maxLives=game.lives;game.answerLock=false;
   game.dragonBallReady=hasItem('dragon');
   // Cabecera especial
   show('question');
@@ -3721,9 +3728,14 @@ function startPlanet(galIdx,planetIdx){
   game.qIdx=0;
   // Vidas: 3 base + 1 si tiene Escudo Galáctico
   game.lives=3+(hasItem('shield')?1:0);
+  // Vida Extra comprada en tienda: +1 vida solo para este planeta (se consume)
+  const _pp=getPlayer();
+  if(_pp&&_pp.bonusLifeNext>0){game.lives+=_pp.bonusLifeNext;_pp.bonusLifeNext=0;}
   game.correct=0;game.wrong=[];
   game.qPool=[];
-  game.hintsUsed=0;game.perfectAnswers=0;
+  game.hintsUsed=0;game.perfectAnswers=0;game.helpedAtQ=-1;
+  game.answerLock=false; // por si se navegó rápido tras responder en otro planeta
+  game.maxLives=game.lives;
   // Bola de Dragón: salva del primer fallo en este planeta
   game.dragonBallReady=hasItem('dragon');
   // Reset racha actual al empezar planeta nuevo
@@ -3775,12 +3787,15 @@ function pickQuestions(galaxyId,planetIdx,who){
     if(!lvl)return true; // neutra
     return Math.abs(gradeIndex(lvl)-gIdx)<=delta;
   };
-  let filtered=pool.filter(q=>inRange(q,1));
+  // AJUSTE DE DIFICULTAD (más amable): preferimos preguntas del grado del niño
+  // y de hasta 2 grados por DEBAJO (repaso). Evitamos las del grado superior
+  // (preview del próximo curso), que eran las que resultaban demasiado difíciles.
+  // Solo subimos al grado +1 si no hay suficientes preguntas a nivel o más fáciles.
+  const rel=q=>{const l=eff(q);return l?gradeIndex(l)-gIdx:0}; // 0=neutra o exacta, <0 más fácil
+  let filtered=pool.filter(q=>{const d=rel(q);return d<=0&&d>=-2});
+  if(filtered.length<5)filtered=pool.filter(q=>{const d=rel(q);return d<=1&&d>=-2});
   if(filtered.length<5)filtered=pool.filter(q=>inRange(q,2));
   if(filtered.length<5)filtered=pool.slice();
-  // Prioriza ligeramente las preguntas del grado exacto (mayor proporción)
-  const exact=filtered.filter(q=>{const l=eff(q);return l&&gradeIndex(l)===gIdx});
-  if(exact.length>=8)filtered=exact;
   return filtered.slice().sort(()=>Math.random()-.5).slice(0,10);
 }
 function getQuestionsForCurrent(){
@@ -3816,15 +3831,16 @@ function renderQuestion(){
   }
   document.getElementById('qPlanet').textContent=`${g.emoji} ${g.planets[game.planet]}`;
   document.getElementById('qNum').textContent=`${game.qIdx+1}/${qs.length}`;
-  document.getElementById('lives').innerHTML=Array.from({length:3},(_,i)=>`<span class="heart${i>=game.lives?' lost':''}">❤️</span>`).join('');
+  document.getElementById('lives').innerHTML=Array.from({length:game.maxLives||3},(_,i)=>`<span class="heart${i>=game.lives?' lost':''}">❤️</span>`).join('');
   document.getElementById('qText').textContent=q.q;
-  // Botón pista: visible solo si quedan pistas Y el jugador puede pagar
+  // Botón de AYUDA: siempre visible y GRATIS. Una ayuda por pregunta.
+  // Si el niño no sabe la respuesta, puede pedir ayuda y le quitamos 2 opciones
+  // incorrectas (deja 50/50) y mostramos una pista de estudio si existe.
   const hintBtn=document.getElementById('hintBtn');
   if(hintBtn){
-    const hintsLeft=2-(game.hintsUsed||0);
-    const canAfford=getPlayer().coins>=5;
-    hintBtn.style.display=(hintsLeft>0&&canAfford)?'inline-block':'none';
-    hintBtn.title='Pistas restantes: '+hintsLeft;
+    const helped=game.helpedAtQ===game.qIdx;
+    hintBtn.style.display=helped?'none':'inline-block';
+    hintBtn.title='Te quita 2 respuestas incorrectas';
   }
   const ans=document.getElementById('answers');ans.innerHTML='';
   q._oShuf.forEach((opt,i)=>{
@@ -3838,37 +3854,45 @@ function renderQuestion(){
 
 function useHint(){
   const p=getPlayer();
-  if((game.hintsUsed||0)>=2){toast('Solo 2 pistas por planeta');return}
-  // Marca que en esta galaxia se usó pista (para logro "Mente brillante")
+  if(game.answerLock)return; // no pedir ayuda mientras se muestra el resultado
+  // Ayuda GRATIS, una vez por pregunta. Si ya se usó en esta pregunta, no hace nada.
+  if(game.helpedAtQ===game.qIdx)return;
+  game.helpedAtQ=game.qIdx;
+  game.hintsUsed=(game.hintsUsed||0)+1;
+  game.hintUsedInQuestion=true; // usar ayuda quita la opción a 3⭐ (perfecto = sin ayuda)
+  // Marca que en esta galaxia se pidió ayuda (para logro "Mente brillante")
   const galId=GALAXIES[game.galaxy]&&GALAXIES[game.galaxy].id;
   if(galId){p.usedHintsInGalaxy=p.usedHintsInGalaxy||{};p.usedHintsInGalaxy[galId]=true}
-  // Bola de Fuego: pistas gratis (3 por compra)
-  const hasFreeHint=(p.freeHints||0)>0;
-  if(!hasFreeHint&&p.coins<5)return;
-  game.hintsUsed=(game.hintsUsed||0)+1;
-  if(hasFreeHint){p.freeHints--;toast('🔥 Pista GRATIS (te quedan '+p.freeHints+')',2000)}
-  else{p.coins-=5}
-  save();
-  document.getElementById('hudCoins').textContent=p.coins;
-  game.hintUsedInQuestion=true; // marca que esta pregunta no cuenta como "perfecta"
   const qs=getQuestionsForCurrent();
   const q=qs[game.qIdx];
   const buttons=document.querySelectorAll('#answers .answer-btn');
-  let removed=0;
   const correctIdx=q._aShuf!=null?q._aShuf:q.a;
+  // Quita 2 opciones incorrectas (deja la correcta + 1 → 50/50) y las desactiva
+  let removed=0;
   for(let i=0;i<buttons.length&&removed<2;i++){
     if(i!==correctIdx&&!buttons[i].classList.contains('hint-eliminated')){
-      buttons[i].classList.add('hint-eliminated');removed++;
+      buttons[i].classList.add('hint-eliminated');
+      buttons[i].disabled=true;
+      removed++;
     }
   }
-  // Refrescar visibilidad del botón
+  // Oculta el botón de ayuda hasta la siguiente pregunta
   const hintBtn=document.getElementById('hintBtn');
-  if(hintBtn){
-    const hintsLeft=2-game.hintsUsed;
-    hintBtn.style.display=(hintsLeft>0&&p.coins>=5)?'inline-block':'none';
-    hintBtn.title='Pistas restantes: '+hintsLeft;
+  if(hintBtn)hintBtn.style.display='none';
+  // Pista de estudio: muestra la explicación pedagógica si la pregunta la tiene
+  attachExplanation(q);
+  if(q.explanation){
+    let expl=document.querySelector('.question-explanation');
+    if(!expl){
+      expl=document.createElement('div');
+      expl.className='question-explanation';
+      const ans=document.getElementById('answers');
+      if(ans)ans.parentNode.insertBefore(expl,ans.nextSibling);
+    }
+    expl.innerHTML='💡 <b>Pista:</b> '+q.explanation;
   }
-  toast('Pista usada -5💰 ('+(2-game.hintsUsed)+' restantes)');
+  save();
+  toast('💡 Te ayudé: ahora elige entre 2');
 }
 
 // Mensajes variados para evitar monotonía y reforzar positivamente
@@ -3943,11 +3967,14 @@ function answer(idx,q,btn){
     feedback(failMsg,'fail');
     // Si la pregunta tiene explicación, mostrarla bajo el feedback (más tiempo de lectura)
     if(q.explanation){
-      const expl=document.createElement('div');
-      expl.className='question-explanation';
+      let expl=document.querySelector('.question-explanation');
+      if(!expl){
+        expl=document.createElement('div');
+        expl.className='question-explanation';
+        const ans=document.getElementById('answers');
+        if(ans)ans.parentNode.insertBefore(expl,ans.nextSibling);
+      }
       expl.innerHTML='💡 <b>Explicación:</b> '+q.explanation;
-      const ans=document.getElementById('answers');
-      if(ans)ans.parentNode.insertBefore(expl,ans.nextSibling);
       delay=3500; // más tiempo para leer
     }
     // Si es Emiliano (TTS auto), leer la respuesta correcta
@@ -3968,8 +3995,7 @@ function answer(idx,q,btn){
   game.answerTimeout=setTimeout(()=>{
     game.answerTimeout=null;game.answerLock=false;
     // Limpiar explicación al pasar
-    const oldExpl=document.querySelector('.question-explanation');
-    if(oldExpl)oldExpl.remove();
+    document.querySelectorAll('.question-explanation').forEach(e=>e.remove());
     if(game.screen!=='question')return;
     // En modo repaso, al acabar las preguntas → mostrar resumen y volver al mapa
     if(game.reviewMode){
@@ -4013,8 +4039,8 @@ function endPlanet(failed=false){
     document.getElementById('resultText').textContent='Te quedaste sin vidas, pero puedes intentarlo de nuevo. ¡Vamos!';
     document.getElementById('nextBtn').style.display='none';
   }else{
-    const passed=game.correct>=Math.ceil(total*.6);
-    // 3⭐ requiere TODAS correctas Y sin pistas. 2⭐ con 80%. 1⭐ con 60%.
+    const passed=game.correct>=Math.ceil(total*.5);
+    // 3⭐ requiere TODAS correctas Y sin ayuda. 2⭐ con 80%. 1⭐ con 50%.
     const usedHints=(game.hintsUsed||0)>0;
     let newStars=0;
     if(game.correct>=total&&!usedHints)newStars=3;
@@ -4051,13 +4077,13 @@ function endPlanet(failed=false){
       const starStr='⭐'.repeat(newStars)+'☆'.repeat(3-newStars);
       const flavor=newStars===3?'¡Perfecto absoluto!':newStars===2?'¡Genial!':'¡Bien!';
       const coinMsg=coinReward>0?` · +${coinReward}💰`:' · sin recompensa hoy';
-      const hintNote=usedHints&&newStars<3?' (sin pistas = posibilidad 3⭐)':'';
+      const hintNote=usedHints&&newStars<3?' (sin ayuda = posibilidad 3⭐)':'';
       document.getElementById('resultText').textContent=`${starStr} ${flavor} · Aciertos: ${game.correct}/${total}${coinMsg}${improved&&!isFirst?' · ¡Mejoraste tu récord!':''}${hintNote}`;
     }else{
       sndLose();
       document.getElementById('resultEmoji').textContent='😅';
       document.getElementById('resultTitle').textContent='Intenta otra vez';
-      document.getElementById('resultText').textContent=`Aciertos: ${game.correct}/${total}. Necesitas al menos ${Math.ceil(total*.6)} para conquistarlo.`;
+      document.getElementById('resultText').textContent=`Aciertos: ${game.correct}/${total}. Necesitas al menos ${Math.ceil(total*.5)} para conquistarlo.`;
     }
     document.getElementById('nextBtn').style.display='inline-block';
   }
@@ -4092,7 +4118,7 @@ function startReviewRound(){
   // Reset de las preguntas para que se barajen de nuevo
   game.qPool.forEach(q=>{delete q._shuffled;delete q._oShuf;delete q._aShuf});
   game.wrong=[]; // si vuelves a fallar, se acumulan otra vez
-  game.qIdx=0;game.lives=999;game.correct=0; // sin vidas en modo repaso
+  game.qIdx=0;game.lives=999;game.correct=0;game.helpedAtQ=-1;game.maxLives=3;game.answerLock=false; // sin vidas en modo repaso
   game.reviewMode=true;
   show('question');
   toast('📚 Modo repaso · sin vidas, aprende sin presión',3000);
@@ -4141,8 +4167,8 @@ function startBoss(galIdx){
   const savedPct=p0.bossProgress&&p0.bossProgress[g.id];
   game.bossHp=savedPct?Math.round(baseBossHp*savedPct/100):baseBossHp;
   game.bossInitialHp=baseBossHp;
-  game.bossDmgPerHit=young?10:13; // daño que recibe el jefe por acierto
-  game.bossDmgToPlayer=young?12:15; // daño del jefe por fallo
+  game.bossDmgPerHit=young?12:14; // daño que recibe el jefe por acierto (sube un poco: se vence antes)
+  game.bossDmgToPlayer=young?9:11; // daño del jefe por fallo (baja: el niño aguanta más fallos)
   // Mix questions from ALL planets de la galaxia (no hardcoded 5)
   let pool=[];
   for(let i=0;i<g.planets.length;i++){
@@ -4171,7 +4197,11 @@ function pickBossPool(pool,who){
   const gIdx=gradeIndex(grade);
   const eff=q=>q.level||(q.easy?'ce1':null);
   const inRange=(q,delta)=>{const lvl=eff(q);if(!lvl)return true;return Math.abs(gradeIndex(lvl)-gIdx)<=delta};
-  let f=pool.filter(q=>inRange(q,1));
+  // Mismo ajuste amable que en planetas: grado del niño y repaso por debajo,
+  // evitando el grado superior salvo que falten preguntas.
+  const rel=q=>{const l=eff(q);return l?gradeIndex(l)-gIdx:0};
+  let f=pool.filter(q=>{const d=rel(q);return d<=0&&d>=-2});
+  if(f.length<12)f=pool.filter(q=>{const d=rel(q);return d<=1&&d>=-2});
   if(f.length<12)f=pool.filter(q=>inRange(q,2));
   if(f.length<12)f=pool.slice();
   return f;
@@ -4185,7 +4215,7 @@ function renderBossQ(){
   if(game.bossQIdx>=game.bossQs.length){
     // Fin de preguntas: gana quien tenga más HP relativo o más aciertos
     const correctRatio=game.bossCorrectCount/game.bossQs.length;
-    if(correctRatio>=0.6)bossWin(); else bossLose();
+    if(correctRatio>=0.5)bossWin(); else bossLose();
     return;
   }
   const q=game.bossQs[game.bossQIdx];
@@ -4300,7 +4330,7 @@ function renderShop(){
   const buffs=[];
   if(isDoubleXPActive())buffs.push('🍄 Doble XP activo: '+timeLeft(p.doubleXPUntil));
   if(isMegaCoinActive())buffs.push('⛏️ Doble monedas: '+timeLeft(p.megaCoinUntil));
-  if(p.freeHints>0)buffs.push('🔥 Pistas gratis restantes: '+p.freeHints);
+  if(p.bonusLifeNext>0)buffs.push('❤️‍🔥 Vida extra para el próximo planeta: '+p.bonusLifeNext);
   if(hasItem('shield'))buffs.push('🛡️ +1 vida cada planeta');
   if(hasItem('dragon'))buffs.push('🟠 Bola de Dragón activa');
   if(hasItem('star'))buffs.push('⭐ +1 XP por racha');
@@ -4311,7 +4341,7 @@ function renderShop(){
     grid.appendChild(bf);
   }
   SHOP.forEach(it=>{
-    const consumibles=['doubleXP','freeHint','megaCoin'];
+    const consumibles=['doubleXP','bonusLife','megaCoin'];
     const isConsumible=it.effect&&consumibles.includes(it.effect);
     const owned=p.items.includes(it.id);
     // Cosméticos/permanentes: bloquean re-compra. Consumibles: siempre disponibles.
@@ -4349,7 +4379,7 @@ function buyItem(it){
   // Activar efecto del item — con sonido power-up si es de gameplay
   if(it.effect)sndPowerUp();
   if(it.effect==='doubleXP'){p.doubleXPUntil=Date.now()+24*3600*1000;toast('🍄 ¡Doble XP activado 24h!',3000)}
-  else if(it.effect==='freeHint'){p.freeHints=(p.freeHints||0)+3;toast('🔥 3 pistas gratis añadidas',3000)}
+  else if(it.effect==='bonusLife'){p.bonusLifeNext=(p.bonusLifeNext||0)+1;toast('❤️‍🔥 +1 vida para tu próximo planeta',3000)}
   else if(it.effect==='megaCoin'){p.megaCoinUntil=Date.now()+24*3600*1000;toast('⛏️ ¡Doble monedas 24h!',3000)}
   else if(it.effect==='extraLife')toast('🛡️ +1 vida extra en cada planeta!',3000);
   else if(it.effect==='reviveOnce')toast('🟠 ¡Te salva del primer fallo en cada planeta!',3000);
@@ -4569,9 +4599,9 @@ function snakeOver(){
 }
 
 // ========== TIC TAC TOE (con minimax y 3 dificultades) ==========
-let tttBoard=[],tttGameOver=false,tttScores={human:0,comp:0,draws:0},tttDifficulty='medium';
+let tttBoard=[],tttGameOver=false,tttScores={human:0,comp:0,draws:0},tttDifficulty='medium',tttBusy=false;
 function tttStart(){
-  tttBoard=Array(9).fill(null);tttGameOver=false;
+  tttBoard=Array(9).fill(null);tttGameOver=false;tttBusy=false;
   document.getElementById('tttHuman').textContent=tttScores.human;
   document.getElementById('tttComp').textContent=tttScores.comp;
   document.getElementById('tttDraws').textContent=tttScores.draws;
@@ -4589,14 +4619,17 @@ function tttCycleDifficulty(){
   tttStart();
 }
 function tttClick(i){
-  if(tttGameOver||tttBoard[i])return;
+  // tttBusy bloquea toques mientras la PC "piensa" (evita doble jugada por toque rápido)
+  if(tttGameOver||tttBoard[i]||tttBusy)return;
   tttBoard[i]='X';tttUpdate();sndCoin();
   if(tttCheck('X')){tttEnd('¡Ganaste! 🎉','human');return}
   if(tttBoard.every(c=>c)){tttEnd('Empate','draws');return}
   document.getElementById('tttStatus').textContent='Pensando...';
+  tttBusy=true;
   setTimeout(tttCompMove,400);
 }
 function tttCompMove(){
+  tttBusy=false; // la PC ya juega; al terminar (síncrono) vuelve el turno del niño
   let move;
   if(tttDifficulty==='easy'){
     // 80% aleatorio, 20% mejor
