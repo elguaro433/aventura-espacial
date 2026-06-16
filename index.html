@@ -159,7 +159,7 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .classic-card.game-dino{--card-glow:rgba(139,195,74,.6);background:linear-gradient(135deg,rgba(139,195,74,.22),rgba(46,125,50,.08))}
 #snake-canvas,#memory-canvas{display:block;margin:10px auto;background:rgba(0,0,0,.5);border:3px solid #ffd700;border-radius:14px;max-width:100%;touch-action:none}
 .tictac-board{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:min(300px,80vw);height:min(300px,80vw);margin:14px auto;background:rgba(255,215,0,.2);border-radius:14px;padding:6px}
-.tictac-cell{background:rgba(255,255,255,.08);border:2px solid rgba(255,215,0,.4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:60px;font-weight:bold;cursor:pointer;transition:all .2s;color:#fff}
+.tictac-cell{background:rgba(255,255,255,.08);border:2px solid rgba(255,215,0,.4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:bold;cursor:pointer;transition:all .2s;color:#fff;min-height:80px}
 .tictac-cell:active{background:rgba(255,255,255,.2)}
 .tictac-cell.x{color:#2196f3;text-shadow:0 0 15px #2196f3}
 .tictac-cell.o{color:#f44336;text-shadow:0 0 15px #f44336}
@@ -197,11 +197,11 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .planet-dot.s3{background:linear-gradient(135deg,#ffd700,#ff8c00);border-color:#fff;box-shadow:0 0 10px #ffd700}
 /* CONECTA 4 */
 .c4-board{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;background:linear-gradient(135deg,#1565c0,#0d47a1);padding:10px;border-radius:14px;margin:14px auto;width:min(90vw,420px);box-shadow:0 0 20px rgba(33,150,243,.4)}
-.c4-cell{aspect-ratio:1;background:rgba(0,0,0,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0;cursor:pointer;transition:transform .15s,background .2s;border:2px solid rgba(255,255,255,.1);position:relative}
+.c4-cell{aspect-ratio:1;background:rgba(0,0,0,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0;cursor:pointer;transition:transform .15s,background .2s;border:2px solid rgba(255,255,255,.1);position:relative;min-width:35px;min-height:35px}
 .c4-cell:hover{transform:scale(1.08)}
 .c4-cell.col-hover{background:rgba(255,215,0,.18);box-shadow:inset 0 0 0 1px rgba(255,215,0,.35)}
 .c4-cell.r{background:radial-gradient(circle at 30% 30%,#ff6b6b,#c62828);box-shadow:inset -2px -4px 6px rgba(0,0,0,.4),0 0 8px rgba(255,107,107,.5)}
-.c4-cell.y{background:radial-gradient(circle at 30% 30%,#ffeb3b,#f57f17);box-shadow:inset -2px -4px 6px rgba(0,0,0,.4),0 0 8px rgba(255,235,59,.5)}
+.c4-cell.y{background:radial-gradient(circle at 30% 30%,#a78bfa,#7c3aed);box-shadow:inset -2px -4px 6px rgba(0,0,0,.4),0 0 8px rgba(167,139,250,.6)}
 .c4-cell.win{animation:c4Win 1s infinite;outline:3px solid #fff;outline-offset:1px}
 .c4-cell.ghost{opacity:.35!important;animation:none}
 .c4-cell.drop{animation:c4Drop .35s cubic-bezier(.5,0,.5,1.4)}
@@ -227,7 +227,7 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 @keyframes tilePop{from{transform:scale(.3);opacity:.3}to{transform:scale(1);opacity:1}}
 /* BUSCAMINAS */
 .mines-board{display:grid;gap:2px;background:rgba(0,0,0,.4);padding:6px;border-radius:10px;margin:14px auto;width:min(95vw,420px)}
-.mine-cell{aspect-ratio:1;background:linear-gradient(135deg,#9c27b0,#673ab7);border:1px solid rgba(255,255,255,.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:clamp(11px,2.8vw,16px);font-weight:bold;cursor:pointer;color:#fff;user-select:none;-webkit-user-select:none}
+.mine-cell{aspect-ratio:1;background:linear-gradient(135deg,#9c27b0,#673ab7);border:1px solid rgba(255,255,255,.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:clamp(13px,2.8vw,16px);font-weight:bold;cursor:pointer;color:#fff;user-select:none;-webkit-user-select:none;min-width:40px;min-height:40px}
 .mine-cell.open{background:rgba(255,255,255,.08);border-color:rgba(255,215,0,.3)}
 .mine-cell.flag{background:linear-gradient(135deg,#f44336,#c62828)}
 .mine-cell.boom{background:#f44336;animation:shake .4s}
@@ -444,7 +444,7 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
   .avatar-container{width:75px;height:75px}
   h1{font-size:20px}
   .btn{padding:9px 12px;font-size:12px;min-width:80px}
-  .dpad-btn{width:38px;height:38px;font-size:16px}
+  .dpad-btn{width:50px;height:50px;font-size:18px}
 }
 /* Touch optimizations */
 @media (pointer:coarse){
@@ -623,6 +623,19 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
 .galaxy-card .info-btn:hover{transform:scale(1.15);box-shadow:0 4px 14px rgba(0,0,0,.6),0 0 20px rgba(33,150,243,.8)}
 @keyframes infoPulse{0%,100%{box-shadow:0 3px 10px rgba(0,0,0,.5),0 0 12px rgba(33,150,243,.5)}50%{box-shadow:0 3px 10px rgba(0,0,0,.5),0 0 22px rgba(33,150,243,.95)}}
 .galaxy-card{position:relative}
+/* ========== MODAL "CÓMO JUGAR" ========== */
+.game-modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:999;backdrop-filter:blur(4px);animation:fadeIn .3s ease-out}
+.game-modal.active{display:flex}
+.game-modal-content{background:linear-gradient(135deg,#1a0033,#0a0020);border:3px solid #ffd700;border-radius:24px;padding:32px;max-width:500px;width:90vw;max-height:80vh;overflow-y:auto;box-shadow:0 10px 50px rgba(0,0,0,.8),0 0 40px rgba(255,215,0,.5);animation:slideUp .3s cubic-bezier(.34,1.56,.64,1)}
+.game-modal h2{color:#ffd700;font-size:28px;margin-bottom:16px;text-align:center}
+.game-modal p{color:#fff;font-size:16px;line-height:1.6;margin-bottom:14px}
+.game-modal ul{color:#fff;font-size:15px;line-height:1.8;margin-left:20px;margin-bottom:14px}
+.game-modal li{margin-bottom:10px}
+.game-modal-close{position:absolute;top:12px;right:16px;width:36px;height:36px;background:linear-gradient(135deg,#f44336,#c62828);border:none;border-radius:50%;color:#fff;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.game-modal-close:hover{transform:rotate(90deg) scale(1.1)}
+.game-modal-btn{display:inline-block;background:linear-gradient(135deg,#4caf50,#2e7d32);border:none;border-radius:12px;padding:12px 24px;color:#fff;font-size:14px;font-weight:bold;cursor:pointer;transition:transform .2s}
+.game-modal-btn:hover{transform:scale(1.05)}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
 </style>
 </head>
 <body>
@@ -1087,9 +1100,10 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
     <div class="hud" style="max-width:380px;width:100%">
       <div class="hud-stat">Pts: <span id="dinoScore">0</span></div>
       <div class="hud-stat">Récord: <span id="dinoBest">0</span></div>
+      <button class="btn-small" onclick="showGameTutorial('dino')" style="padding:4px 8px;font-size:11px;background:#2196f3;color:#fff;border:none;border-radius:6px;cursor:pointer">❓ Cómo jugar</button>
     </div>
     <canvas id="dino-canvas" width="900" height="320"></canvas>
-    <div id="dinoStatus" style="text-align:center;font-size:14px;margin:6px 0;opacity:.85">Espacio o ▲ para saltar · ▼ para agacharse</div>
+    <div id="dinoStatus" style="text-align:center;font-size:14px;margin:6px 0;font-weight:bold">▲ Salta | ▼ Agáchate | Evita obstáculos</div>
     <div class="dpad" style="grid-template-areas:'. up .' '. down .'">
       <button class="dpad-btn dpad-up" onclick="dinoJump()" title="Saltar">▲ Saltar</button>
       <button class="dpad-btn dpad-down" onmousedown="dinoCrouch(true)" onmouseup="dinoCrouch(false)" ontouchstart="dinoCrouch(true)" ontouchend="dinoCrouch(false)">▼ Agachar</button>
@@ -1098,6 +1112,24 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
       <button class="btn btn-green" onclick="dinoStart()">🔄 Nueva partida</button>
       <button class="btn btn-purple" onclick="goBack()">← Volver</button>
     </div>
+  </div>
+</div>
+
+<!-- Modal Tutorial Dino Runner -->
+<div class="game-modal" id="modal-dino">
+  <div class="game-modal-content" style="position:relative">
+    <button class="game-modal-close" onclick="closeGameTutorial('dino')">✕</button>
+    <h2>🦖 Cómo jugar Dino Runner</h2>
+    <p><strong>🎯 Objetivo:</strong> El dinosaurio corre automáticamente. ¡Evita obstáculos el mayor tiempo posible!</p>
+    <p><strong>📋 Controles:</strong></p>
+    <ul>
+      <li>▲ o Espacio ➜ Salta sobre obstáculos</li>
+      <li>▼ ➜ Agáchate bajo pájaros voladores</li>
+      <li>Recoge 🛡️ escudos para protegerte 10 segundos</li>
+    </ul>
+    <p><strong>⚠️ Cuidado:</strong> La velocidad aumenta cada 100 puntos. ¡Se pone difícil!</p>
+    <p><strong>💡 Combos:</strong> Esquiva 5 seguidas para bonus.</p>
+    <button class="game-modal-btn" onclick="closeGameTutorial('dino')">Entendido ✓</button>
   </div>
 </div>
 
@@ -1117,7 +1149,7 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
         <canvas id="tetris-next-canvas" width="80" height="80" style="background:#0a0020;border:2px solid #ffd700;border-radius:6px"></canvas>
       </div>
     </div>
-    <div id="tetrisStatus" style="text-align:center;font-size:14px;margin:6px 0;opacity:.85">Flechas o botones</div>
+    <div id="tetrisStatus" style="text-align:center;font-size:14px;margin:6px 0;font-weight:bold">🔄 Rotar | ← Izq | Der → | ⬇⬇ Drop <button class="btn-small" onclick="showGameTutorial('tetris')" style="padding:4px 8px;font-size:11px;background:#2196f3;color:#fff;border:none;border-radius:6px;cursor:pointer;display:inline-block;margin-left:8px">❓ Cómo jugar</button></div>
     <div class="dpad" style="grid-template-areas:'rot up rot2' 'left down right'">
       <button class="dpad-btn" style="grid-area:rot" onclick="tetrisRotate()" title="Rotar">🔄</button>
       <button class="dpad-btn dpad-up" onclick="tetrisDrop()" title="Caída rápida (hard drop)">⬇⬇</button>
@@ -1133,17 +1165,59 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
   </div>
 </div>
 
+<!-- Modal Tutorial Tetris -->
+<div class="game-modal" id="modal-tetris">
+  <div class="game-modal-content" style="position:relative">
+    <button class="game-modal-close" onclick="closeGameTutorial('tetris')">✕</button>
+    <h2>🧱 Cómo jugar Tetris</h2>
+    <p><strong>🎯 Objetivo:</strong> Completa líneas horizontales para sumarlas y ganar puntos.</p>
+    <p><strong>📋 Controles:</strong></p>
+    <ul>
+      <li>← → Mueve la pieza</li>
+      <li>🔄 Rotar la pieza</li>
+      <li>⬇ Baja lentamente (soft drop)</li>
+      <li>⬇⬇ Caída rápida (hard drop)</li>
+    </ul>
+    <p><strong>💡 Reglas:</strong></p>
+    <ul>
+      <li>La pieza cae automáticamente</li>
+      <li>Línea completa = se elimina = puntos</li>
+      <li>Si una pieza llega arriba, Game Over</li>
+      <li>La velocidad aumenta cada nivel</li>
+    </ul>
+    <button class="game-modal-btn" onclick="closeGameTutorial('tetris')">Entendido ✓</button>
+  </div>
+</div>
+
 <!-- AJEDREZ -->
 <div class="screen" id="chess">
   <div class="center">
     <h2><span class="emoji">♟️</span> Ajedrez</h2>
     <div id="chess-turn" style="text-align:center;font-size:16px;margin:6px 0;color:#ffd700;font-weight:bold">Tu turno ⚪</div>
+    <div id="chess-status" style="text-align:center;font-size:13px;margin:6px 0;font-weight:bold">👆 1️⃣ Toca tu pieza | 👆 2️⃣ Toca destino <button class="btn-small" onclick="showGameTutorial('chess')" style="padding:4px 8px;font-size:11px;background:#2196f3;color:#fff;border:none;border-radius:6px;cursor:pointer;display:inline-block;margin-left:8px">❓ Cómo jugar</button></div>
     <div class="chess-board" id="chess-board"></div>
-    <div id="chess-status" style="text-align:center;font-size:13px;margin:6px 0;opacity:.85">Toca tu pieza, luego dónde quieres moverla</div>
     <div class="row">
       <button class="btn btn-green" onclick="chessStart()">🔄 Nueva partida</button>
       <button class="btn btn-purple" onclick="goBack()">← Volver</button>
     </div>
+  </div>
+</div>
+
+<!-- Modal Tutorial Ajedrez -->
+<div class="game-modal" id="modal-chess">
+  <div class="game-modal-content" style="position:relative">
+    <button class="game-modal-close" onclick="closeGameTutorial('chess')">✕</button>
+    <h2>♟️ Cómo jugar Ajedrez</h2>
+    <p><strong>🎯 Objetivo:</strong> Derrota al rey enemigo (jaque mate).</p>
+    <p><strong>📋 Cómo jugar:</strong></p>
+    <ul>
+      <li>Tú juegas con piezas blancas (⚪)</li>
+      <li>La computadora juga con piezas negras (⚫)</li>
+      <li>Toca una pieza blanca para seleccionarla</li>
+      <li>Toca dónde quieres moverla (lugares verdes)</li>
+    </ul>
+    <p><strong>💡 Movimientos básicos:</strong> Cada pieza se mueve diferente. Los peones avanzan, las torres en línea, los alfiles en diagonal, la reina en cualquier dirección, el caballo en L, el rey 1 casilla.</p>
+    <button class="game-modal-btn" onclick="closeGameTutorial('chess')">Entendido ✓</button>
   </div>
 </div>
 
@@ -1155,9 +1229,10 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
       <div class="hud-stat">⭐ <span id="marioScore">0</span></div>
       <div class="hud-stat">Nivel <span id="marioLevel">1/6</span></div>
       <div class="hud-stat">❤️ <span id="marioLives">3</span></div>
+      <button class="btn-small" onclick="showGameTutorial('mario')" style="padding:4px 8px;font-size:11px;background:#2196f3;color:#fff;border:none;border-radius:6px;cursor:pointer">❓ Cómo jugar</button>
     </div>
     <canvas id="mario-canvas" width="720" height="420"></canvas>
-    <div id="marioStatus" style="text-align:center;font-size:13px;margin:6px 0;opacity:.85">Flechas o botones · Salta a las plataformas y recoge estrellas</div>
+    <div id="marioStatus" style="text-align:center;font-size:13px;margin:6px 0;font-weight:bold">← → Mueve | ▲ Salta | Recoge ⭐ y alcanza la meta 🏁</div>
     <div class="dpad">
       <button class="dpad-btn dpad-up" onmousedown="marioPress('jump',1)" onmouseup="marioPress('jump',0)" onmouseleave="marioPress('jump',0)" ontouchstart="event.preventDefault();marioPress('jump',1)" ontouchend="marioPress('jump',0)" ontouchcancel="marioPress('jump',0)">▲ Saltar</button>
       <button class="dpad-btn dpad-left" onmousedown="marioPress('left',1)" onmouseup="marioPress('left',0)" onmouseleave="marioPress('left',0)" ontouchstart="event.preventDefault();marioPress('left',1)" ontouchend="marioPress('left',0)" ontouchcancel="marioPress('left',0)">◀</button>
@@ -1170,20 +1245,59 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
   </div>
 </div>
 
+<!-- Modal Tutorial Astro Bros -->
+<div class="game-modal" id="modal-mario">
+  <div class="game-modal-content" style="position:relative">
+    <button class="game-modal-close" onclick="closeGameTutorial('mario')">✕</button>
+    <h2>🚀 Cómo jugar Astro Bros</h2>
+    <p><strong>🎯 Objetivo:</strong> Salta por las plataformas, recoge todas las ⭐ estrellas, y alcanza la meta 🏁.</p>
+    <p><strong>📋 Controles:</strong></p>
+    <ul>
+      <li>← ➜ Mueve izquierda/derecha</li>
+      <li>▲ ➜ Salta para subir</li>
+      <li>Recoge ⭐ para sumar puntos</li>
+      <li>Alcanza 🏁 para completar el nivel</li>
+    </ul>
+    <p><strong>⚠️ Cuidado:</strong> ¡No caigas al vacío! Evita enemigos 👾.</p>
+    <p><strong>💡 Tip:</strong> Hay 6 niveles cada vez más difíciles.</p>
+    <button class="game-modal-btn" onclick="closeGameTutorial('mario')">Entendido ✓</button>
+  </div>
+</div>
+
 <!-- CONECTA 4 -->
 <div class="screen" id="c4">
   <div class="center">
     <h2><span class="emoji">🔴</span> Conecta 4</h2>
     <div class="hud" style="max-width:380px;width:100%">
       <div class="hud-stat">Tú 🔴: <span id="c4Human">0</span></div>
-      <div class="hud-stat">PC 🟡: <span id="c4Comp">0</span></div>
+      <div class="hud-stat">PC 🟣: <span id="c4Comp">0</span></div>
+      <button class="btn-small" onclick="showGameTutorial('c4')" style="padding:4px 8px;font-size:11px;background:#2196f3;color:#fff;border:none;border-radius:6px;cursor:pointer">❓ Cómo jugar</button>
     </div>
+    <div id="c4Status" style="text-align:center;font-size:16px;margin:8px 0;font-weight:bold">👆 Toca una columna para soltar tu ficha</div>
     <div class="c4-board" id="c4Board"></div>
-    <div id="c4Status" style="text-align:center;font-size:18px;margin:8px 0">Tu turno</div>
     <div class="row">
       <button class="btn btn-green" onclick="c4Start()">🔄 Nueva partida</button>
       <button class="btn btn-purple" onclick="goBack()">← Volver</button>
     </div>
+  </div>
+</div>
+
+<!-- Modal Tutorial Conecta 4 -->
+<div class="game-modal" id="modal-c4">
+  <div class="game-modal-content" style="position:relative">
+    <button class="game-modal-close" onclick="closeGameTutorial('c4')">✕</button>
+    <h2>🔴 Cómo jugar Conecta 4</h2>
+    <p><strong>🎯 Objetivo:</strong> Conecta 4 fichas tuyas en línea (horizontal, vertical o diagonal) antes que la computadora.</p>
+    <p><strong>📋 Reglas:</strong></p>
+    <ul>
+      <li>Tú juegas con fichas 🔴 rojas</li>
+      <li>La computadora juega con fichas 🟣 púrpuras</li>
+      <li>Toca una columna para soltar tu ficha</li>
+      <li>Las fichas caen hasta el fondo</li>
+      <li>Primero en hacer 4 en línea gana</li>
+    </ul>
+    <p><strong>💡 Estrategia:</strong> Crea oportunidades de ganar y bloquea las del contrario.</p>
+    <button class="game-modal-btn" onclick="closeGameTutorial('c4')">Entendido ✓</button>
   </div>
 </div>
 
@@ -1194,9 +1308,10 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
     <div class="hud" style="max-width:340px;width:100%">
       <div class="hud-stat">Puntos: <span id="g2048Score">0</span></div>
       <div class="hud-stat">Récord: <span id="g2048Best">0</span></div>
+      <button class="btn-small" onclick="showGameTutorial('g2048')" style="padding:4px 8px;font-size:11px;background:#2196f3;color:#fff;border:none;border-radius:6px;cursor:pointer">❓ Cómo jugar</button>
     </div>
+    <div id="g2048Status" style="text-align:center;font-size:14px;margin:6px 0;font-weight:bold">Presiona ↑↓←→ o usa controles</div>
     <div class="g2048-board" id="g2048Board"></div>
-    <div id="g2048Status" style="text-align:center;font-size:14px;margin:6px 0;opacity:.85">Desliza con flechas o gestos</div>
     <div class="dpad">
       <button class="dpad-btn dpad-up" onclick="g2048Move('up')">▲</button>
       <button class="dpad-btn dpad-left" onclick="g2048Move('left')">◀</button>
@@ -1211,6 +1326,25 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
   </div>
 </div>
 
+<!-- Modal Tutorial 2048 -->
+<div class="game-modal" id="modal-g2048">
+  <div class="game-modal-content" style="position:relative">
+    <button class="game-modal-close" onclick="closeGameTutorial('g2048')">✕</button>
+    <h2>🧮 Cómo jugar 2048</h2>
+    <p><strong>🎯 Objetivo:</strong> Combina números para crear una ficha con el valor 2048.</p>
+    <p><strong>📋 Cómo jugar:</strong></p>
+    <ul>
+      <li>Presiona flechas (↑↓←→) para mover fichas</li>
+      <li>Las fichas con números iguales se combinan</li>
+      <li>2 + 2 = 4, 4 + 4 = 8, 8 + 8 = 16, etc.</li>
+      <li>Una nueva ficha aparece después de cada movimiento</li>
+      <li>Si no hay movimientos posibles, Game Over</li>
+    </ul>
+    <p><strong>💡 Estrategia:</strong> Crea números grandes en las esquinas.</p>
+    <button class="game-modal-btn" onclick="closeGameTutorial('g2048')">Entendido ✓</button>
+  </div>
+</div>
+
 <!-- BUSCAMINAS -->
 <div class="screen" id="mines">
   <div class="center">
@@ -1219,18 +1353,37 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
       <button class="dict-cat-btn" onclick="minesSetDifficulty('facil')">🟢 Fácil 8×8</button>
       <button class="dict-cat-btn" onclick="minesSetDifficulty('medio')">🟡 Medio 10×10</button>
       <button class="dict-cat-btn" onclick="minesSetDifficulty('dificil')">🔴 Difícil 12×12</button>
-      <button class="dict-cat-btn" id="minesFlagModeBtn" onclick="minesToggleFlagMode()">🚩 Modo bandera</button>
+      <button class="btn-small" onclick="showGameTutorial('mines')" style="padding:4px 8px;font-size:11px;background:#2196f3;color:#fff;border:none;border-radius:6px;cursor:pointer">❓ Cómo jugar</button>
     </div>
     <div class="hud" style="max-width:340px;width:100%">
       <div class="hud-stat">Minas: <span id="minesLeft">10</span></div>
       <div class="hud-stat">⏱ <span id="minesTime">0</span>s</div>
+      <div class="hud-stat">Modo: <span id="minesModeDisplay">Descubrir</span></div>
     </div>
     <div class="mines-board" id="minesBoard"></div>
-    <div id="minesStatus" style="text-align:center;font-size:14px;margin:6px 0;opacity:.85">Toca para descubrir · 2 toques rápidos = 🚩</div>
+    <div id="minesStatus" style="text-align:center;font-size:14px;margin:6px 0;font-weight:bold">👆 Toca para descubrir | 🔘 Presiona 0.5s para bandera</div>
     <div class="row">
       <button class="btn btn-green" onclick="minesStart()">🔄 Nueva partida</button>
       <button class="btn btn-purple" onclick="goBack()">← Volver</button>
     </div>
+  </div>
+</div>
+
+<!-- Modal Tutorial Buscaminas -->
+<div class="game-modal" id="modal-mines">
+  <div class="game-modal-content" style="position:relative">
+    <button class="game-modal-close" onclick="closeGameTutorial('mines')">✕</button>
+    <h2>💣 Cómo jugar Buscaminas</h2>
+    <p><strong>🎯 Objetivo:</strong> Descubre todas las casillas sin minas sin pisar ninguna bomba.</p>
+    <p><strong>📋 Cómo jugar:</strong></p>
+    <ul>
+      <li><strong>Descubrir:</strong> 👆 Toca rápido una casilla</li>
+      <li><strong>Marcar mina:</strong> 🔘 Presiona largo (0.5 segundos) para poner bandera</li>
+      <li>Los números indican minas adyacentes</li>
+      <li>Primero descubre una esquina (siempre segura)</li>
+    </ul>
+    <p><strong>💡 Estrategia:</strong> Usa los números para deducir dónde están las minas.</p>
+    <button class="game-modal-btn" onclick="closeGameTutorial('mines')">Entendido ✓</button>
   </div>
 </div>
 
@@ -1241,7 +1394,9 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
     <div class="hud" style="max-width:340px;width:100%">
       <div class="hud-stat">Puntos: <span id="snakeScore">0</span></div>
       <div class="hud-stat">Récord: <span id="snakeBest">0</span></div>
+      <button class="btn-small" onclick="showGameTutorial('snake')" style="padding:4px 8px;font-size:11px;background:#2196f3;color:#fff;border:none;border-radius:6px;cursor:pointer">❓ Cómo jugar</button>
     </div>
+    <div style="text-align:center;font-size:13px;margin:6px 0;color:#ffe88a">🍎 Roja = 1 pt | 🟡 Dorada = 3 pts</div>
     <canvas id="snake-canvas" width="320" height="320"></canvas>
     <div class="dpad">
       <button class="dpad-btn dpad-up" onclick="snakeDir(0,-1)">▲</button>
@@ -1256,6 +1411,25 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
   </div>
 </div>
 
+<!-- Modal Tutorial Snake -->
+<div class="game-modal" id="modal-snake">
+  <div class="game-modal-content" style="position:relative">
+    <button class="game-modal-close" onclick="closeGameTutorial('snake')">✕</button>
+    <h2>🐍 Cómo jugar Snake</h2>
+    <p><strong>🎯 Objetivo:</strong> Come frutas, crece, y evita golpearte con paredes y tu cola.</p>
+    <p><strong>📋 Cómo jugar:</strong></p>
+    <ul>
+      <li>Usa flechas (↑↓←→) o botones para moverte</li>
+      <li>Come manzanas 🍎 rojas = 1 punto</li>
+      <li>Come manzanas 🟡 doradas = 3 puntos (⏱ 8 segundos)</li>
+      <li>Cada vez que comes, la serpiente crece</li>
+      <li>Si golpeas una pared o tu cola, Game Over</li>
+    </ul>
+    <p><strong>💡 Tip:</strong> La velocidad aumenta cada 5 manzanas. ¡Cuidado!</p>
+    <button class="game-modal-btn" onclick="closeGameTutorial('snake')">Entendido ✓</button>
+  </div>
+</div>
+
 <!-- TIC TAC TOE -->
 <div class="screen" id="tictac">
   <div class="center">
@@ -1264,13 +1438,33 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
       <div class="hud-stat">Tú (X): <span id="tttHuman">0</span></div>
       <div class="hud-stat">PC (O): <span id="tttComp">0</span></div>
       <div class="hud-stat">Empates: <span id="tttDraws">0</span></div>
+      <button class="btn-small" onclick="showGameTutorial('ttt')" style="padding:4px 8px;font-size:11px;background:#2196f3;color:#fff;border:none;border-radius:6px;cursor:pointer">❓ Cómo jugar</button>
     </div>
+    <div id="tttStatus" style="text-align:center;font-size:16px;margin:8px 0;font-weight:bold;min-height:24px"></div>
     <div class="tictac-board" id="tttBoard"></div>
-    <div id="tttStatus" style="text-align:center;font-size:18px;margin:8px 0"></div>
     <div class="row">
       <button class="btn btn-green" onclick="tttStart()">🔄 Nueva Partida</button>
       <button class="btn btn-purple" onclick="goBack()">← Volver</button>
     </div>
+  </div>
+</div>
+
+<!-- Modal Tutorial 3 en Raya -->
+<div class="game-modal" id="modal-ttt">
+  <div class="game-modal-content" style="position:relative">
+    <button class="game-modal-close" onclick="closeGameTutorial('ttt')">✕</button>
+    <h2>⭕ Cómo jugar 3 en Raya</h2>
+    <p><strong>🎯 Objetivo:</strong> Coloca 3 símbolos tuyos en línea (horizontal, vertical o diagonal) antes que la computadora.</p>
+    <p><strong>📋 Reglas:</strong></p>
+    <ul>
+      <li>Tú juegas con ❌ (X)</li>
+      <li>La computadora juega con ⭕ (O)</li>
+      <li>Toca una casilla vacía para colocar tu marca</li>
+      <li>Primero en hacer 3 en línea gana</li>
+      <li>Si se llenan todas las casillas sin ganador, es empate</li>
+    </ul>
+    <p><strong>💡 Dificultades:</strong> Fácil (más errores), Medio (equilibrado), Imposible (nunca pierde).</p>
+    <button class="game-modal-btn" onclick="closeGameTutorial('ttt')">Entendido ✓</button>
   </div>
 </div>
 
@@ -1281,12 +1475,32 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
     <div class="hud" style="max-width:340px;width:100%">
       <div class="hud-stat">Movs: <span id="memMoves">0</span></div>
       <div class="hud-stat">Parejas: <span id="memPairs">0</span>/12</div>
+      <button class="btn-small" onclick="showGameTutorial('memo')" style="padding:4px 8px;font-size:11px;background:#2196f3;color:#fff;border:none;border-radius:6px;cursor:pointer">❓ Cómo jugar</button>
     </div>
     <div class="memory-grid" id="memGrid"></div>
     <div class="row">
       <button class="btn btn-green" onclick="memStart()">🔄 Nueva Partida</button>
       <button class="btn btn-purple" onclick="goBack()">← Volver</button>
     </div>
+  </div>
+</div>
+
+<!-- Modal Tutorial Memorama -->
+<div class="game-modal" id="modal-memo">
+  <div class="game-modal-content" style="position:relative">
+    <button class="game-modal-close" onclick="closeGameTutorial('memo')">✕</button>
+    <h2>🃏 Cómo jugar Memorama</h2>
+    <p><strong>🎯 Objetivo:</strong> Encuentra todas las parejas de emojis iguales en el menor número de movimientos.</p>
+    <p><strong>📋 Cómo jugar:</strong></p>
+    <ul>
+      <li>Toca una carta para revelarla</li>
+      <li>Toca otra carta para encontrar su pareja</li>
+      <li>Si son iguales, se quedan visibles</li>
+      <li>Si no son iguales, se voltean</li>
+      <li>Encuentra todas las parejas</li>
+    </ul>
+    <p><strong>💡 Tip:</strong> Recuerda dónde estaban los emojis para encontrar parejas más rápido.</p>
+    <button class="game-modal-btn" onclick="closeGameTutorial('memo')">Entendido ✓</button>
   </div>
 </div>
 
@@ -3367,6 +3581,17 @@ function show(id){
   if(id!=='mario'&&marioLoop){cancelAnimationFrame(marioLoop);marioLoop=null}
   if(id!=='dino'&&dinoLoop){cancelAnimationFrame(dinoLoop);dinoLoop=null}
 }
+
+// ========== MODAL TUTORIALES ==========
+function showGameTutorial(gameId){
+  const modal=document.getElementById('modal-'+gameId);
+  if(modal)modal.classList.add('active');
+}
+function closeGameTutorial(gameId){
+  const modal=document.getElementById('modal-'+gameId);
+  if(modal)modal.classList.remove('active');
+}
+
 function goBack(){
   // Si estás a mitad de una partida con vidas restantes, pide confirmación
   if((game.screen==='question'||game.screen==='boss')&&game.lives>0&&game.qIdx>0&&game.qIdx<(game.qPool||[]).length){
@@ -5176,7 +5401,8 @@ function minesStart(){
     if(minesGameOver){clearInterval(minesTimer);return}
     document.getElementById('minesTime').textContent=Math.floor((Date.now()-minesStartTime)/1000);
   },1000);
-  document.getElementById('minesStatus').textContent='😀 Toca para descubrir · doble-tap o 🚩 = bandera';
+  document.getElementById('minesStatus').textContent='👆 Toca rápido = Descubrir | 🔘 Presiona 0.5s = Bandera';
+  document.getElementById('minesModeDisplay').textContent=minesFlagMode?'🚩 Bandera':'Descubrir';
   minesRender();
 }
 function minesRender(){
@@ -6651,6 +6877,17 @@ function marioPhysicsStep(p,W){
   // Cámara
   const target=Math.max(0,Math.min(W.width-MARIO_VW,p.x-MARIO_VW/2+12));
   marioCam.x+=(target-marioCam.x)*0.18;
+  // LÍMITE INFERIOR: Si el jugador cae muy profundo, muere
+  if(p.y>MARIO_GROUND_Y+200){
+    marioLives--;sndLose();
+    document.getElementById('marioLives').textContent=marioLives;
+    if(marioLives<=0){marioFail();return}
+    toast('💔 ¡Caíste!');
+    p.invincible=80;p.vy=-5;p.vx=p.facing*-2;
+    // Respawn al checkpoint o inicio
+    if(p.checkpointReached){p.x=p.checkpointX-100;p.y=MARIO_GROUND_Y-30}
+    else{p.x=60;p.y=MARIO_GROUND_Y-30}
+  }
   // Meta
   if(p.x+24>W.goal.x&&p.x<W.goal.x+30){marioNextLevel();return}
   // Render y RAF están en marioStep (antes era aquí, ahora movidos al wrapper con delta-time)
