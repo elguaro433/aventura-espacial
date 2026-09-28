@@ -148,6 +148,7 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 .classic-card .title{font-size:16px;font-weight:bold;color:#ffd700;text-shadow:0 2px 4px rgba(0,0,0,.6),0 0 12px var(--card-glow,rgba(255,215,0,.5));letter-spacing:.3px}
 .classic-card .desc{font-size:11px;opacity:.85;margin-top:5px}
 /* Color temático por juego — usado por --card-glow + acento de borde inferior */
+.classic-card.game-duelo{--card-glow:rgba(255,215,0,.6);background:linear-gradient(135deg,rgba(66,165,245,.2),rgba(255,112,67,.2));border-color:rgba(255,215,0,.5)}
 .classic-card.game-snake{--card-glow:rgba(76,175,80,.55);background:linear-gradient(135deg,rgba(76,175,80,.18),rgba(46,125,50,.08))}
 .classic-card.game-tictac{--card-glow:rgba(244,67,54,.5);background:linear-gradient(135deg,rgba(244,67,54,.18),rgba(183,28,28,.08))}
 .classic-card.game-memo{--card-glow:rgba(156,39,176,.55);background:linear-gradient(135deg,rgba(156,39,176,.2),rgba(74,20,140,.08))}
@@ -1080,6 +1081,7 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
     <h1><span class="emoji">🎮</span> Juegos Clásicos</h1>
     <div class="classic-grid">
       <div class="classic-card game-shooter" onclick="show('shooter')"><div class="emoji">🚀</div><div class="title">Batalla Espacial</div><div class="desc">¡Vuela y dispara!</div></div>
+      <div class="classic-card game-duelo" onclick="duelStart()"><div class="emoji">👦🆚👦</div><div class="title">Duelo de Hermanos</div><div class="desc">Emmanuel vs Emiliano</div></div>
       <div class="classic-card game-snake" onclick="show('snake')"><div class="emoji">🐍</div><div class="title">Snake</div><div class="desc">Culebrita clásica</div></div>
       <div class="classic-card game-tictac" onclick="show('tictac')"><div class="emoji">⭕</div><div class="title">3 en Raya</div><div class="desc">vs Computadora</div></div>
       <div class="classic-card game-memo" onclick="show('memo')"><div class="emoji">🃏</div><div class="title">Memorama</div><div class="desc">12 parejas</div></div>
@@ -1391,16 +1393,23 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
 <!-- SNAKE -->
 <div class="screen" id="shooter">
   <div class="center">
-    <h2>🚀 Batalla Espacial</h2>
+    <h2 id="shTitle">🚀 Batalla Espacial</h2>
+    <div id="shDuelBar" style="max-width:360px;width:100%;display:none;justify-content:space-between;align-items:center;background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(156,39,176,.15));border:2px solid #ffd700;border-radius:14px;padding:8px 14px;margin-bottom:6px;font-weight:bold">
+      <span id="shDuelWho">👦 Emmanuel</span>
+      <span id="shDuelTime" style="font-size:20px;color:#ffd700">⏱️ 45</span>
+    </div>
     <div class="hud" style="max-width:360px;width:100%">
       <div class="hud-stat">Pts: <span id="shScore">0</span></div>
-      <div class="hud-stat">Récord: <span id="shBest">0</span></div>
+      <div class="hud-stat" id="shBestBox">Récord: <span id="shBest">0</span></div>
       <div class="hud-stat">❤️ <span id="shLives">3</span></div>
       <div class="hud-stat">Nivel: <span id="shLevel">1</span></div>
     </div>
     <div style="text-align:center;font-size:13px;margin:6px 0;color:#ffe88a">Mueve con el dedo o ◀ ▶ · dispara sola · recoge ⭐ 🛡️ ⚡</div>
-    <canvas id="shooter-canvas" width="360" height="520" style="display:block;margin:8px auto;background:#05010f;border:3px solid #ffd700;border-radius:14px;max-width:100%;touch-action:none"></canvas>
-    <div class="row">
+    <div style="position:relative;max-width:360px;margin:0 auto">
+      <canvas id="shooter-canvas" width="360" height="520" style="display:block;margin:8px auto;background:#05010f;border:3px solid #ffd700;border-radius:14px;max-width:100%;touch-action:none"></canvas>
+      <div id="duelOverlay" style="position:absolute;inset:8px 0;background:rgba(10,0,32,.94);border-radius:14px;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px;gap:12px;z-index:5"></div>
+    </div>
+    <div class="row" id="shButtons">
       <button class="btn btn-green" onclick="shooterStart()">🔄 Empezar</button>
       <button class="btn btn-purple" onclick="goBack()">← Volver</button>
     </div>
@@ -3571,6 +3580,8 @@ function shooterStart(){
        bullets:[],enemies:[],stars:[],pu:[],parts:[],bg:[],
        shield:0,rapid:0,fire:0,spawn:600,starT:1500,puT:9000,shake:0,over:false};
   for(let i=0;i<48;i++)shS.bg.push({x:Math.random()*360,y:Math.random()*520,s:Math.random()*2+.5,v:Math.random()*1.6+.4});
+  if(duel&&duel.active&&!duel.waiting){ shS.duel=true; shS.timeLeft=duel.dur; duel._ending=false; }
+  else { duelBar(false); duelHideOverlay(); }
   updShHud();
   if(!shooterInputReady){
     shooterInputReady=true;
@@ -3596,6 +3607,14 @@ function shooterStart(){
 }
 function shStep(dt){
   const f=dt/16.67, s=shS;
+  // Duelo: cuenta atrás de 45 s por turno
+  if(s.duel){
+    s.timeLeft-=dt;
+    const secs=Math.max(0,Math.ceil(s.timeLeft/1000));
+    const te=document.getElementById('shDuelTime');
+    if(te){te.textContent='⏱️ '+secs; te.style.color=secs<=10?'#ff5a4d':'#ffd700';}
+    if(s.timeLeft<=0){ shDuelTurnEnd(); return; }
+  }
   s.ship.x+=(s.ship.tx-s.ship.x)*0.25;
   if(s.shield>0)s.shield-=dt; if(s.rapid>0)s.rapid-=dt; if(s.shake>0)s.shake-=dt;
   // disparo automático
@@ -3649,8 +3668,119 @@ function shStep(dt){
 }
 function shGameOver(){
   shS.over=true;
-  if(shS.score>shS.best){ shS.best=shS.score; try{localStorage.setItem('av_shooterBest',shS.score)}catch(e){} }
+  if(!shS.duel && shS.score>shS.best){ shS.best=shS.score; try{localStorage.setItem('av_shooterBest',shS.score)}catch(e){} }
   updShHud(); sndLose();
+  if(shS.duel)shDuelTurnEnd();
+}
+
+// ========== DUELO DE HERMANOS (Emmanuel 🆚 Emiliano) ==========
+let duel=null;
+const DUEL_PLAYERS=[
+  {key:'emmanuel',name:'Emmanuel',ico:'⚡'},
+  {key:'emiliano',name:'Emiliano',ico:'⛏️'}
+];
+function duelStart(){
+  duel={active:true,turn:0,scores:[0,0],dur:45000,waiting:true};
+  show('shooter');
+  duelShowIntro();
+}
+function duelBar(show,who){
+  const bar=document.getElementById('shDuelBar');
+  if(bar)bar.style.display=show?'flex':'none';
+  const bb=document.getElementById('shBestBox');
+  if(bb)bb.style.display=show?'none':'';
+  if(show&&who!=null){
+    const w=document.getElementById('shDuelWho');
+    if(w)w.textContent=DUEL_PLAYERS[who].ico+' '+DUEL_PLAYERS[who].name;
+    const te=document.getElementById('shDuelTime');
+    if(te){te.textContent='⏱️ '+Math.round(duel.dur/1000); te.style.color='#ffd700';}
+  }
+}
+function duelOverlay(html){
+  const o=document.getElementById('duelOverlay');
+  if(!o)return;
+  o.innerHTML=html; o.style.display='flex';
+  const btns=document.getElementById('shButtons');
+  if(btns)btns.style.visibility='hidden';
+}
+function duelHideOverlay(){
+  const o=document.getElementById('duelOverlay');
+  if(o){o.style.display='none';o.innerHTML='';}
+  const btns=document.getElementById('shButtons');
+  if(btns)btns.style.visibility='';
+}
+function duelShowIntro(){
+  duel.waiting=true; duelBar(false);
+  duelOverlay(
+    '<div style="font-size:44px">👦🆚👦</div>'+
+    '<h2 style="margin:0">Duelo de Hermanos</h2>'+
+    '<div style="font-size:16px;line-height:1.5">'+
+      '<b style="color:#42a5f5">⚡ Emmanuel</b> &nbsp;🆚&nbsp; <b style="color:#ff7043">⛏️ Emiliano</b></div>'+
+    '<div style="font-size:14px;opacity:.9;line-height:1.5">Cada uno pilota <b>45 segundos</b>.<br>¡Gana quien haga más puntos! 🏆<br>Turnáos el aparato.</div>'+
+    '<button class="btn btn-green" onclick="duelBeginTurn()">▶ ¡Empieza Emmanuel!</button>'+
+    '<button class="btn btn-purple" onclick="duelQuit()">← Salir</button>'
+  );
+}
+function duelBeginTurn(){
+  duel.waiting=false;
+  duelHideOverlay();
+  duelBar(true,duel.turn);
+  shooterStart();
+}
+function shDuelTurnEnd(){
+  if(!duel||!duel.active||duel._ending)return;
+  duel._ending=true;
+  shS.over=true;
+  if(shooterLoop){cancelAnimationFrame(shooterLoop);shooterLoop=null;}
+  duel.scores[duel.turn]=shS.score;
+  sndLevelUp();
+  if(duel.turn===0){
+    duel.turn=1; duel._ending=false;
+    duelBar(false);
+    duelOverlay(
+      '<div style="font-size:40px">⏱️</div>'+
+      '<h2 style="margin:0">¡Tiempo!</h2>'+
+      '<div style="font-size:16px;line-height:1.5"><b style="color:#42a5f5">⚡ Emmanuel</b> hizo<br><span style="font-size:34px;color:#ffd700;font-weight:bold">'+duel.scores[0]+'</span> puntos</div>'+
+      '<div style="font-size:14px;opacity:.9">Ahora le toca a <b style="color:#ff7043">⛏️ Emiliano</b> 👦</div>'+
+      '<button class="btn btn-green" onclick="duelBeginTurn()">▶ ¡Vamos Emiliano!</button>'
+    );
+  }else{
+    duelShowResults();
+  }
+}
+function duelShowResults(){
+  duelBar(false);
+  const a=duel.scores[0], b=duel.scores[1];
+  let title, sub, cE=20, cL=20;
+  if(a>b){ title='🏆 ¡Gana Emmanuel!'; sub='<b style="color:#42a5f5">⚡ Emmanuel</b>'; cE=40; cL=15; }
+  else if(b>a){ title='🏆 ¡Gana Emiliano!'; sub='<b style="color:#ff7043">⛏️ Emiliano</b>'; cL=40; cE=15; }
+  else { title='🤝 ¡Empate!'; sub='los dos'; cE=30; cL=30; }
+  // Premio en monedas a cada jugador
+  try{ if(state.emmanuel)state.emmanuel.coins=(state.emmanuel.coins||0)+cE;
+       if(state.emiliano)state.emiliano.coins=(state.emiliano.coins||0)+cL; save(); }catch(e){}
+  sndWin(); confetti(70);
+  duelOverlay(
+    '<div style="font-size:42px">🏆</div>'+
+    '<h2 style="margin:0">'+title+'</h2>'+
+    '<div style="display:flex;gap:18px;justify-content:center;font-size:15px;margin:4px 0">'+
+      '<div><div style="color:#42a5f5;font-weight:bold">⚡ Emmanuel</div><div style="font-size:30px;color:#ffd700;font-weight:bold">'+a+'</div><div style="font-size:12px;opacity:.8">+'+cE+' 💰</div></div>'+
+      '<div style="align-self:center;font-size:22px">🆚</div>'+
+      '<div><div style="color:#ff7043;font-weight:bold">⛏️ Emiliano</div><div style="font-size:30px;color:#ffd700;font-weight:bold">'+b+'</div><div style="font-size:12px;opacity:.8">+'+cL+' 💰</div></div>'+
+    '</div>'+
+    '<button class="btn btn-green" onclick="duelReset()">🔁 Revancha</button>'+
+    '<button class="btn btn-purple" onclick="duelQuit()">← Volver</button>'
+  );
+}
+function duelReset(){
+  duel={active:true,turn:0,scores:[0,0],dur:45000,waiting:true};
+  duelShowIntro();
+}
+function duelQuit(){
+  duel=null;
+  duelHideOverlay();
+  duelBar(false);
+  if(shooterLoop){cancelAnimationFrame(shooterLoop);shooterLoop=null;}
+  show('classic');
 }
 function shDraw(ctx,dt){
   const s=shS, W=s.W, H=s.H;
@@ -3675,7 +3805,9 @@ function shDraw(ctx,dt){
   ctx.globalAlpha=1;
   // nave + escudo
   if(s.shield>0){ ctx.beginPath(); ctx.arc(s.ship.x,s.ship.y,26,0,Math.PI*2); ctx.strokeStyle='rgba(77,182,255,'+(0.5+0.4*Math.sin(Date.now()/120))+')'; ctx.lineWidth=3; ctx.stroke(); }
-  ctx.font='34px serif'; ctx.fillText('🚀',s.ship.x,s.ship.y);
+  // 🚀 girado -45° para que la punta apunte recto hacia arriba (el emoji va en diagonal)
+  ctx.save(); ctx.translate(s.ship.x,s.ship.y); ctx.rotate(-Math.PI/4);
+  ctx.font='34px serif'; ctx.fillText('🚀',0,0); ctx.restore();
   ctx.restore();
   // fin de partida
   if(s.over){
@@ -3715,7 +3847,7 @@ function show(id){
   // Tracking de juego clásico (lista de IDs que cuentan como "juego")
   const trackedGames=['snake','tictac','memo','c4','g2048','mines','tetris','chess','mario','dino','shooter'];
   if(trackedGames.includes(id))trackGame(id);
-  if(id==='shooter')shooterStart();
+  if(id==='shooter'&&!(duel&&duel.active&&duel.waiting))shooterStart();
   if(id==='snake')snakeStart();
   if(id==='tictac')tttStart();
   if(id==='memo')memStart();
@@ -3739,6 +3871,7 @@ function show(id){
   if(id!=='mario'&&marioLoop){cancelAnimationFrame(marioLoop);marioLoop=null}
   if(id!=='dino'&&dinoLoop){cancelAnimationFrame(dinoLoop);dinoLoop=null}
   if(id!=='shooter'&&shooterLoop){cancelAnimationFrame(shooterLoop);shooterLoop=null}
+  if(id!=='shooter'&&duel&&duel.active){duel=null;duelHideOverlay();duelBar(false)}
 }
 
 // ========== MODAL TUTORIALES ==========
