@@ -19,7 +19,7 @@ const HTML = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 
 // === Niveles válidos (sincronizar con GRADES en index.html) ===
 const VALID_GRADES = new Set(['cp','ce1','ce2','cm1','cm2','6e','5e','4e','3e']);
-const VALID_DICT_CATS = new Set(['animales','colores','numeros','familia','cuerpo','comida','casa','escuela','verbos','frases','naturaleza','tiempo','andorra']);
+const VALID_DICT_CATS = new Set(['animales','colores','numeros','familia','cuerpo','comida','casa','escuela','verbos','frases','naturaleza','tiempo','ropa','transporte','deportes','profesiones','andorra']);
 
 let errors = 0, warnings = 0, totalQuestions = 0, totalDictWords = 0;
 

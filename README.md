@@ -1,6 +1,6 @@
 # 🚀 La Gran Aventura Espacial de los Hermanos Díaz
 
-Juego educativo para **Emiliano** (7 años) y **Emmanuel** (10 años) - hijos de Emmanuel Díaz, residentes en Andorra.
+Juego educativo para **Emiliano** (8 años) y **Emmanuel** (10 años) - hijos de Emmanuel Díaz, residentes en Andorra.
 
 ## 🌐 URL pública
 
@@ -93,3 +93,5 @@ Repo: `elguaro433/aventura-espacial`.
 - **v4**: Avatares SVG personalizados + juegos clásicos (Snake, 3 en raya, Memorama).
 - **v5**: PWA (manifest + service worker) + persistencia en localStorage + deploy a GitHub Pages.
 - **v6**: Ajustes de aprendizaje para hacerlo más amable — botón "💡 Pedir ayuda" **gratis y siempre visible** (quita 2 opciones incorrectas + muestra pista de estudio, 1 vez por pregunta), preguntas sesgadas al nivel del niño y repaso (se evita el curso siguiente), aprobar un planeta baja del 60% al 50%, jefes menos duros (menos daño al niño, ganar con 50%), corazones dinámicos (se ve el del Escudo) y el item "Bola de Fuego" reconvertido en "❤️‍🔥 Vida Extra". Corregida la pregunta del lago de Venezuela. Además se blindó la analítica (`trackAnswer`) para que un historial guardado en formato antiguo no rompa el responder preguntas, y se resetea `answerLock` al iniciar cada modo para que ningún planeta quede sin responder a los toques. **El progreso guardado de cada niño se conserva** (verificada la carga y migración desde v1/v2/v3 sin pérdidas).
+
+- **v7** (oct 2026): revisión de fallos. Ajedrez: el mensaje de "Ganaste / La PC ganó" ya no se borra. Buscaminas: cabe en pantallas estrechas, la bandera con pulsación larga ya no se quita sola y el premio de victoria se da una sola vez. Jefes: las barras de vida son un % del HP máximo (se salían del cuadro). Preguntas corregidas (adivinanza de la noche, antónimos ambiguos, y varios datos de Venezuela y Colombia). Diccionario: sin palabras repetidas, categorías nuevas (Ropa, Transporte, Deportes, Profesiones) y las categorías ya muestran también el diccionario ampliado. Por defecto Emiliano empieza en CE2 (8 años); los niños que ya tienen partida conservan su curso (se cambia en Modo Padres).

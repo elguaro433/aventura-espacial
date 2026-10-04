@@ -228,7 +228,8 @@ h3{font-size:clamp(16px,3vw,22px);color:#fff;margin-bottom:10px}
 @keyframes tilePop{from{transform:scale(.3);opacity:.3}to{transform:scale(1);opacity:1}}
 /* BUSCAMINAS */
 .mines-board{display:grid;gap:2px;background:rgba(0,0,0,.4);padding:6px;border-radius:10px;margin:14px auto;width:min(95vw,420px)}
-.mine-cell{aspect-ratio:1;background:linear-gradient(135deg,#9c27b0,#673ab7);border:1px solid rgba(255,255,255,.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:clamp(13px,2.8vw,16px);font-weight:bold;cursor:pointer;color:#fff;user-select:none;-webkit-user-select:none;min-width:40px;min-height:40px}
+.mine-cell{aspect-ratio:1;background:linear-gradient(135deg,#9c27b0,#673ab7);border:1px solid rgba(255,255,255,.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:clamp(13px,2.8vw,16px);font-weight:bold;cursor:pointer;color:#fff;user-select:none;-webkit-user-select:none;min-width:0;min-height:0}
+#minesBoard{max-width:100%}
 .mine-cell.open{background:rgba(255,255,255,.08);border-color:rgba(255,215,0,.3)}
 .mine-cell.flag{background:linear-gradient(135deg,#f44336,#c62828)}
 .mine-cell.boom{background:#f44336;animation:shake .4s}
@@ -940,7 +941,7 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
         <div class="avatar-container" id="ava-eli-big"></div>
         <div class="player-name">Emiliano</div>
         <div class="player-nick">⛏️ El Constructor</div>
-        <div class="player-age">7 años</div>
+        <div class="player-age">8 años</div>
       </div>
     </div>
     <button class="btn btn-purple btn-small" onclick="show('intro')">← Volver</button>
@@ -1648,7 +1649,7 @@ const GRADES=[
 function gradeIndex(g){const i=GRADES.findIndex(x=>x.id===g);return i<0?1:i}
 function gradeOf(playerKey){
   const p=state[playerKey]||{};
-  return p.grade||(playerKey==='emmanuel'?'cm1':'ce1');
+  return p.grade||(playerKey==='emmanuel'?'cm1':'ce2');
 }
 
 // ========== STATE + VERSIONING ==========
@@ -1659,7 +1660,7 @@ const STATE_VERSION=3;
 const initialPlayer={stars:0,coins:0,xp:0,grade:'ce1',planetsBeaten:[],planetStars:{},bossesBeaten:[],items:[],achievements:[],totalCorrect:0,totalAnswered:0,bestStreak:0,currentStreak:0,welcomed:false,dailyDate:'',dailyCorrect:0,dailyStreak:0};
 function freshState(){
   const em=JSON.parse(JSON.stringify(initialPlayer));em.grade='cm1';
-  const el=JSON.parse(JSON.stringify(initialPlayer));el.grade='ce1';
+  const el=JSON.parse(JSON.stringify(initialPlayer));el.grade='ce2';
   return{
     version:STATE_VERSION,
     currentPlayer:null,
@@ -1687,14 +1688,14 @@ function migrateState(s){
     // v2 → v3: añadir campo `grade` a cada jugador (sistema escolar francés CP→3ème)
     if(s.version<3){
       if(s.emmanuel&&!s.emmanuel.grade)s.emmanuel.grade='cm1';
-      if(s.emiliano&&!s.emiliano.grade)s.emiliano.grade='ce1';
+      if(s.emiliano&&!s.emiliano.grade)s.emiliano.grade='ce2';
       s.version=3;
     }
     // Asegurar campos de jugadores (compat con v1 y migra player fields)
     ['emmanuel','emiliano'].forEach(k=>{
       if(!s[k]){
         s[k]=JSON.parse(JSON.stringify(initialPlayer));
-        s[k].grade=k==='emmanuel'?'cm1':'ce1';
+        s[k].grade=k==='emmanuel'?'cm1':'ce2';
       }
       const p=s[k];
       if(typeof p.xp!=='number'||!isFinite(p.xp))p.xp=0;
@@ -1704,7 +1705,7 @@ function migrateState(s){
       if(!Array.isArray(p.bossesBeaten))p.bossesBeaten=[];
       if(!Array.isArray(p.items))p.items=[];
       if(!Array.isArray(p.achievements))p.achievements=[];
-      if(!p.grade)p.grade=k==='emmanuel'?'cm1':'ce1';
+      if(!p.grade)p.grade=k==='emmanuel'?'cm1':'ce2';
       if(!p.planetStars||typeof p.planetStars!=='object')p.planetStars={};
       if(!p.replayLog||typeof p.replayLog!=='object')p.replayLog={};
       if(!p.dailyDate)p.dailyDate='';
@@ -2742,12 +2743,12 @@ es:[
 {q:'Sinónimo de AMIGO:',o:['Enemigo','Compañero','Profesor','Hermano'],a:1,easy:true}
 ],[ // Antónimos
 {q:'Antónimo de ALTO:',o:['Largo','Bajo','Grande','Lejos'],a:1,easy:true},
-{q:'Antónimo de FRÍO:',o:['Caliente','Cálido','Templado','Helado'],a:0,easy:true},
+{q:'Antónimo de FRÍO:',o:['Caliente','Fresco','Helado','Nevado'],a:0,easy:true},
 {q:'Antónimo de DÍA:',o:['Sol','Noche','Luna','Tarde'],a:1,easy:true},
 {q:'Antónimo de ENTRAR:',o:['Bajar','Salir','Subir','Volar'],a:1,easy:true},
 {q:'Antónimo de RICO:',o:['Pobre','Caro','Grande','Sucio'],a:0,easy:true},
-{q:'Antónimo de DULCE:',o:['Salado','Amargo','Picante','Soso'],a:1},
-{q:'Antónimo de LUZ:',o:['Sombra','Oscuridad','Sol','Lámpara'],a:1},
+{q:'Antónimo de DULCE:',o:['Fresco','Amargo','Blando','Líquido'],a:1},
+{q:'Antónimo de LUZ:',o:['Rayo','Oscuridad','Sol','Lámpara'],a:1},
 {q:'Antónimo de ABRIR:',o:['Cerrar','Tocar','Buscar','Quitar'],a:0,easy:true},
 {q:'Antónimo de RECORDAR:',o:['Saber','Olvidar','Pensar','Aprender'],a:1},
 {q:'Antónimo de SEGURO:',o:['Tranquilo','Peligroso','Bueno','Listo'],a:1}
@@ -2765,7 +2766,7 @@ es:[
 ],[ // Adivinanzas
 {q:'Verde fui de mi nacer, amarillo del crecer y blanco al envejecer. ¿Qué soy?',o:['Una flor','Un puerro','Una manzana','Un huevo'],a:1},
 {q:'Tengo cuello pero no cabeza. ¿Qué soy?',o:['Una camisa','Una botella','Un libro','Una mesa'],a:1},
-{q:'Salgo de noche y me escondo de día. ¿Qué soy?',o:['El sol','Las estrellas','La luna','Todas'],a:3},
+{q:'Salgo de noche y me escondo de día. ¿Qué soy?',o:['El sol','Las estrellas','Un río','Una flor'],a:1},
 {q:'Tengo hojas pero no soy árbol. ¿Qué soy?',o:['Un libro','Una flor','Una rama','Un pino'],a:0,easy:true},
 {q:'No soy mar pero traigo olas. ¿Qué soy?',o:['Río','Cabello','Lago','Lluvia'],a:1},
 {q:'Te miro pero no te veo. ¿Qué soy?',o:['Cámara','Espejo','Foto','Reloj'],a:0},
@@ -3056,7 +3057,7 @@ ve:[
 {q:'¿Cuál es la bebida nacional?',o:['Té','Café','Coca','Vino'],a:1,level:'ce1'},
 {q:'¿Qué fruta es muy típica de Venezuela?',o:['Mango','Manzana','Pera','Uva'],a:0,level:'cp'},
 {q:'¿Qué festividad religiosa atrae miles de peregrinos a Mérida cada año?',o:['Día de los Muertos','Paradura del Niño','Carnaval','Semana Santa Rusa'],a:1,level:'cm2'},
-{q:'¿Qué tipo de música se canta a la Virgen del Valle?',o:['Reggaeton','Gaitas zulianas y galerones','Flamenco','Tango'],a:1,level:'cm1'},
+{q:'¿Qué música navideña típica es famosa en el Zulia (Maracaibo)?',o:['Reggaeton','Gaitas zulianas y galerones','Flamenco','Tango'],a:1,level:'cm1'},
 {q:'¿Qué baile afro-venezolano se acompaña con tambores?',o:['Vals','San Juan / Tambor','Mambo','Cumbia'],a:1,level:'cm1'},
 {q:'¿Qué deporte es el más popular en Venezuela?',o:['Fútbol americano','Béisbol','Cricket','Hockey'],a:1,level:'ce1'},
 {q:'¿Qué se acostumbra comer el Día de la Cruz de Mayo?',o:['Hallacas','Sancocho y sopa','Pizza','Hamburguesas'],a:1,level:'cm2'}
@@ -3156,7 +3157,7 @@ co:[
 {q:'¿Cuál es la región más lluviosa de Colombia (y del mundo)?',o:['Pacífica (Chocó)','Andina','Caribe','Llanos'],a:0,level:'cm2'},
 {q:'¿Qué río separa a Colombia de Venezuela en parte de su frontera?',o:['Amazonas','Orinoco / Arauca','Magdalena','Cauca'],a:1,level:'cm2'}
 ],[ // Planeta 2 — Historia
-{q:'¿En qué año se independizó Colombia?',o:['1810','1819','1821','1825'],a:1,level:'ce2'},
+{q:'¿En qué año ganó Bolívar la Batalla de Boyacá, que selló la independencia de Colombia?',o:['1810','1819','1821','1825'],a:1,level:'ce2'},
 {q:'¿Qué se celebra el 20 de julio en Colombia?',o:['Día de la independencia','Día del trabajador','Día de la madre','Día del idioma'],a:0,level:'cp'},
 {q:'¿Quién fue el "Hombre de las Leyes" (vicepresidente con Bolívar)?',o:['Antonia Santos','Francisco de Paula Santander','Camilo Torres','Policarpa Salavarrieta'],a:1,level:'cm1'},
 {q:'¿Quién fue Policarpa Salavarrieta ("La Pola")?',o:['Una espía heroína de la independencia','Una reina','Una pintora','Una poeta'],a:0,level:'cm1'},
@@ -3170,7 +3171,7 @@ co:[
 {q:'¿Cuál fue la primera capital del Virreinato de la Nueva Granada?',o:['Cartagena','Santafé de Bogotá','Lima','Quito'],a:1,level:'cm2'},
 {q:'¿Quién fue el primer presidente de la Gran Colombia?',o:['Santander','Simón Bolívar','Páez','Sucre'],a:1,level:'cm1'},
 {q:'¿En qué año Panamá se separó de Colombia?',o:['1819','1830','1903','1948'],a:2,level:'cm2'},
-{q:'¿Quién pintó la obra "La balsa muisca" simbólica de la leyenda de El Dorado?',o:['Lo creó la cultura muisca prehispánica','Botero','Doris Salcedo','Picasso'],a:0,level:'cm2'}
+{q:'¿Quién hizo la "Balsa Muisca" de oro, símbolo de la leyenda de El Dorado?',o:['La cultura muisca prehispánica','Botero','Doris Salcedo','Picasso'],a:0,level:'cm2'}
 ],[ // Planeta 3 — Cultura
 {q:'¿Qué baile colombiano es famoso en todo el mundo?',o:['Tango','Cumbia','Flamenco','Samba'],a:1,level:'cp'},
 {q:'¿Qué otra música típica nació en la costa caribe?',o:['Vallenato','Bachata','Salsa','Reggaeton'],a:0,level:'ce1'},
@@ -3184,9 +3185,9 @@ co:[
 {q:'¿Qué se celebra el 7 de diciembre (Día de las velitas)?',o:['Independencia','La Inmaculada Concepción (con velas y faroles)','Año nuevo','Día de la madre'],a:1,level:'cm1'},
 {q:'¿Qué instrumento de origen indígena se usa en la cumbia?',o:['Gaita y tambor','Piano','Trompeta','Violín'],a:0,level:'cm1'},
 {q:'¿Qué famoso ciclista colombiano ganó el Tour de Francia 2019?',o:['Nairo Quintana','Egan Bernal','Rigoberto Urán','Fernando Gaviria'],a:1,level:'cm1'},
-{q:'¿Qué cantante reciente colombiana es famosa por "Despechá" y otras?',o:['Karol G','Shakira','Greeicy','Todas las anteriores'],a:3,level:'ce2'},
+{q:'¿Qué cantante colombiano de Medellín es famoso por "Felices los 4"?',o:['Maluma','Bad Bunny','Daddy Yankee','Ozuna'],a:0,level:'ce2'},
 {q:'¿Cómo se llama el carnaval de las flores en Medellín?',o:['Feria de las Flores','Carnaval de Río','Festival del Sol','Fiesta Brava'],a:0,level:'cm1'},
-{q:'¿Qué actor colombiano fue premiado por "El Olvido que Seremos"?',o:['Sebastián Yatra','Juan Pablo Urrego','Juancho Cardona','Javier Cámara (español, en la peli)'],a:3,level:'cm2'}
+{q:'¿Qué película animada de Disney está ambientada en Colombia?',o:['Moana','Encanto','Coco','Frozen'],a:1,level:'cm2'}
 ],[ // Planeta 4 — Comida típica
 {q:'¿Cuál es el plato más famoso de Colombia?',o:['Pizza','Bandeja paisa','Paella','Tacos'],a:1,level:'ce1'},
 {q:'¿Qué lleva la "bandeja paisa"?',o:['Frijol, arroz, carne, chorizo, huevo, plátano y aguacate','Solo carne','Pasta','Sopa'],a:0,level:'ce2'},
@@ -3194,7 +3195,7 @@ co:[
 {q:'¿Qué se hace con maíz molido en Colombia?',o:['Pan','Arepa','Pizza','Tortilla'],a:1,level:'cp'},
 {q:'¿Cuál es el dulce típico colombiano hecho de leche?',o:['Arequipe (dulce de leche)','Chocolate','Helado','Torta'],a:0,level:'ce2'},
 {q:'¿Qué bebida caliente es típica con queso?',o:['Café','Chocolate caliente con queso','Té','Mate'],a:1,level:'cm1'},
-{q:'¿Qué fruta exótica colombiana es amarilla y dulce?',o:['Lulo','Maracuyá','Mangostino','Curuba'],a:1,level:'cm1'},
+{q:'¿Qué fruta amarilla de pulpa aromática y ácida se usa mucho para jugos en Colombia?',o:['Sandía','Maracuyá','Fresa','Uva'],a:1,level:'cm1'},
 {q:'¿Qué se sirve dentro de una arepa rellena?',o:['Solo queso','Carne, queso, huevo, aguacate (de todo)','Mermelada','Pasta'],a:1,level:'ce1'},
 {q:'¿Cuál es el plato típico de la costa caribe?',o:['Sancocho de pescado','Pizza','Sushi','Pasta'],a:0,level:'ce2'},
 {q:'¿Qué fruta tropical es el "rey" en Colombia?',o:['Manzana','Mango','Pera','Cereza'],a:1,level:'cp'},
@@ -3208,13 +3209,13 @@ co:[
 {q:'¿Qué río colorido (5 colores) es famoso en Colombia?',o:['Magdalena','Caño Cristales','Amazonas','Cauca'],a:1,level:'cm1'},
 {q:'¿En qué región se cultiva el café colombiano?',o:['Costa','Eje cafetero (zona andina)','Amazonía','Llanos'],a:1,level:'ce2'},
 {q:'¿Qué isla colombiana es famosa por playas blancas?',o:['Margarita','San Andrés','Galápagos','Tortuga'],a:1,level:'cm1'},
-{q:'¿Qué desierto colombiano queda en La Guajira?',o:['Atacama','Tatacoa','Sahara','Gobi'],a:1,level:'cm2'},
+{q:'¿Cómo se llama el desierto colombiano que está en el departamento del Huila?',o:['Atacama','Tatacoa','Sahara','Gobi'],a:1,level:'cm2'},
 {q:'¿Qué ciudad es famosa por la salsa?',o:['Bogotá','Cali','Medellín','Cartagena'],a:1,level:'ce1'},
 {q:'¿Qué montaña sagrada está cerca de Santa Marta?',o:['Sierra Nevada de Santa Marta','Pico Bolívar','Nevado del Ruiz','Galeras'],a:0,level:'cm1'},
 {q:'¿Qué parque arqueológico es famoso por sus estatuas?',o:['Tikal','San Agustín','Machu Picchu','Tulum'],a:1,level:'cm2'},
 {q:'¿Qué deporte de aventura se practica mucho en San Gil?',o:['Surf','Rafting y deportes extremos','Esquí','Golf'],a:1,level:'cm1'},
 {q:'¿Qué catedral está construida dentro de una mina de sal?',o:['Catedral Primada','Catedral de Sal de Zipaquirá','Catedral de Cali','Catedral de Sevilla'],a:1,level:'cm1'},
-{q:'¿Qué famoso peñón se sube por una escalera de 740 escalones cerca de Medellín?',o:['Peñol de Guatapé','Roca Galera','Roca Mágica','Cerro de Monserrate'],a:0,level:'cm1'},
+{q:'¿Qué famoso peñón se sube por una larga escalera de cientos de escalones cerca de Medellín?',o:['Peñol de Guatapé','Roca Galera','Roca Mágica','Cerro de Monserrate'],a:0,level:'cm1'},
 {q:'¿Qué cerro famoso está sobre Bogotá con un santuario?',o:['Pan de Azúcar','Monserrate','Volcán Galeras','El Ávila'],a:1,level:'ce2'},
 {q:'¿Qué ciudad colombiana es Patrimonio de la Humanidad por su centro histórico colonial?',o:['Bogotá','Cartagena de Indias','Cali','Bucaramanga'],a:1,level:'cm1'},
 {q:'¿Qué ciudad colombiana es la "puerta de entrada al Amazonas"?',o:['Leticia','Florencia','Mocoa','Mitú'],a:0,level:'cm2'}
@@ -4684,6 +4685,7 @@ function startBoss(galIdx){
   const savedPct=p0.bossProgress&&p0.bossProgress[g.id];
   game.bossHp=savedPct?Math.round(baseBossHp*savedPct/100):baseBossHp;
   game.bossInitialHp=baseBossHp;
+  game.playerMaxHp=game.playerHp;
   game.bossDmgPerHit=young?12:14; // daño que recibe el jefe por acierto (sube un poco: se vence antes)
   game.bossDmgToPlayer=young?9:11; // daño del jefe por fallo (baja: el niño aguanta más fallos)
   // Mix questions from ALL planets de la galaxia (no hardcoded 5)
@@ -4724,6 +4726,13 @@ function pickBossPool(pool,who){
   return f;
 }
 
+// Las barras son un % del HP máximo (antes se usaba el HP absoluto: con 110-130 HP la barra
+// se salía de su contenedor y nunca se veía "llena" de forma correcta).
+function updateBossBars(){
+  const pct=(hp,max)=>Math.max(0,Math.min(100,Math.round(hp/(max||100)*100)))+'%';
+  document.getElementById('bossHp').style.width=pct(game.bossHp,game.bossInitialHp);
+  document.getElementById('playerHp').style.width=pct(game.playerHp,game.playerMaxHp);
+}
 function renderBossQ(){
   if(game.bossAnswerTimeout){clearTimeout(game.bossAnswerTimeout);game.bossAnswerTimeout=null}
   if(game.screen!=='boss')return;
@@ -4744,8 +4753,7 @@ function renderBossQ(){
     q._bossShuffled=true;
   }
   game.bossAnswerLock=false;
-  document.getElementById('bossHp').style.width=Math.max(0,game.bossHp)+'%';
-  document.getElementById('playerHp').style.width=Math.max(0,game.playerHp)+'%';
+  updateBossBars();
   document.getElementById('bossQText').textContent=q.q;
   const ans=document.getElementById('bossAnswers');ans.innerHTML='';
   q._bossOShuf.forEach((opt,i)=>{
@@ -4779,8 +4787,7 @@ function bossAnswer(idx,q,btn){
     feedback('💥 Te golpearon -'+game.bossDmgToPlayer,'fail');
   }
   // Actualizar barras inmediatamente para feedback visual
-  document.getElementById('bossHp').style.width=Math.max(0,game.bossHp)+'%';
-  document.getElementById('playerHp').style.width=Math.max(0,game.playerHp)+'%';
+  updateBossBars();
   save();
   game.bossAnswerTimeout=setTimeout(()=>{game.bossAnswerTimeout=null;if(game.screen!=='boss')return;game.bossQIdx++;renderBossQ()},1300);
 }
@@ -5651,6 +5658,7 @@ let minesFirstClick=true; // primera celda nunca es mina
 let minesFlagMode=false; // toggle bandera con un solo tap
 let minesFlagsCount=0; // contador incremental, no recalculado
 let minesLastTap={}; // {r_c: timestamp} sobrevive a re-renders
+let minesSuppressUntil=0; // ignora clic/menú contextual justo después de una pulsación larga
 const MINES_DIFFS={facil:{r:8,c:8,m:10},medio:{r:10,c:10,m:15},dificil:{r:12,c:12,m:25}};
 function minesSetDifficulty(d){minesDifficulty=d;minesStart()}
 function minesToggleFlagMode(){minesFlagMode=!minesFlagMode;const b=document.getElementById('minesFlagModeBtn');if(b){b.classList.toggle('active',minesFlagMode);b.textContent=minesFlagMode?'🚩 Modo bandera ON':'🚩 Modo bandera'}}
@@ -5713,6 +5721,7 @@ function minesRender(){
     let pressTimer=null;
     cell.onclick=()=>{
       if(minesGameOver)return;
+      if(Date.now()<minesSuppressUntil)return; // venimos de una pulsación larga (ya puso la bandera)
       if(minesFlagMode){minesToggleFlag(r,c);return}
       const now=Date.now();
       if(minesLastTap[key]&&(now-minesLastTap[key])<350){minesToggleFlag(r,c);minesLastTap[key]=0;return}
@@ -5721,9 +5730,11 @@ function minesRender(){
       if(minesRevealed[r][c]&&minesGrid[r][c]>0){if(minesChord(r,c))return}
       minesReveal(r,c);
     };
-    cell.oncontextmenu=e=>{e.preventDefault();if(!minesGameOver)minesToggleFlag(r,c)};
+    // En móvil la pulsación larga dispara primero nuestro temporizador (420ms) y luego el
+    // menú contextual del navegador (~500ms): sin esta guarda la bandera se ponía y se quitaba sola.
+    cell.oncontextmenu=e=>{e.preventDefault();if(!minesGameOver&&Date.now()>=minesSuppressUntil)minesToggleFlag(r,c)};
     // long-press para móvil (400ms)
-    cell.ontouchstart=e=>{pressTimer=setTimeout(()=>{if(!minesGameOver){minesToggleFlag(r,c);if(navigator.vibrate)navigator.vibrate(40)}},420)};
+    cell.ontouchstart=e=>{pressTimer=setTimeout(()=>{if(!minesGameOver){minesSuppressUntil=Date.now()+900;minesToggleFlag(r,c);if(navigator.vibrate)navigator.vibrate(40)}},420)};
     cell.ontouchend=()=>{if(pressTimer)clearTimeout(pressTimer)};
     cell.ontouchmove=()=>{if(pressTimer)clearTimeout(pressTimer)};
     b.appendChild(cell);
@@ -5763,18 +5774,26 @@ function minesReveal(r,c){
     return;
   }
   sndCoin();
-  // si es 0, expandir vecinos
+  // si es 0, expandir vecinos (iterativo: antes era recursivo y repintaba el tablero
+  // entero en cada celda, y el premio de victoria podía darse varias veces)
   if(minesGrid[r][c]===0){
-    for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
-      const nr=r+dr,nc=c+dc;
-      if(nr>=0&&nr<minesRows&&nc>=0&&nc<minesCols&&!minesRevealed[nr][nc])minesReveal(nr,nc);
+    const stack=[[r,c]];
+    while(stack.length){
+      const [cr,cc]=stack.pop();
+      for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+        const nr=cr+dr,nc=cc+dc;
+        if(nr<0||nr>=minesRows||nc<0||nc>=minesCols)continue;
+        if(minesRevealed[nr][nc]||minesFlagged[nr][nc])continue;
+        minesRevealed[nr][nc]=true;
+        if(minesGrid[nr][nc]===0)stack.push([nr,nc]);
+      }
     }
   }
   minesRender();
   // ganar?
   let openCount=0;
   for(let rr=0;rr<minesRows;rr++)for(let cc=0;cc<minesCols;cc++)if(minesRevealed[rr][cc])openCount++;
-  if(openCount===minesRows*minesCols-minesCount){
+  if(!minesGameOver&&openCount===minesRows*minesCols-minesCount){
     minesGameOver=true;
     sndWin();confetti(40);
     document.getElementById('minesStatus').textContent='🎉 ¡Ganaste! Sin tocar minas';
@@ -6026,9 +6045,11 @@ function chessRender(){
     cell.onclick=()=>chessClick(r,c);
     b.appendChild(cell);
   }
+  // Al terminar la partida NO se toca el texto: lo escribe quien declara el final
+  // (antes se borraba el mensaje de "Ganaste / La PC ganó" al repintar el tablero).
+  if(chessDone)return;
   let status='';
-  if(chessDone){status=''}
-  else if(chessTurn==='w'){status=wInCheck?'⚠️ ¡Jaque! Mueve tu rey a salvo':'Tu turno ⚪'}
+  if(chessTurn==='w'){status=wInCheck?'⚠️ ¡Jaque! Mueve tu rey a salvo':'Tu turno ⚪'}
   else{status=bInCheck?'⚠️ ¡Jaque! La PC piensa…':'Turno PC ⚫'}
   document.getElementById('chess-turn').textContent=status;
 }
@@ -8408,6 +8429,10 @@ const DICT_CATS=[
   {id:'frases',name:'Frases',emoji:'💬'},
   {id:'naturaleza',name:'Naturaleza',emoji:'🌳'},
   {id:'tiempo',name:'Tiempo',emoji:'⏰'},
+  {id:'ropa',name:'Ropa',emoji:'👕'},
+  {id:'transporte',name:'Transporte',emoji:'🚗'},
+  {id:'deportes',name:'Deportes',emoji:'⚽'},
+  {id:'profesiones',name:'Profesiones',emoji:'👩‍🚀'},
   {id:'andorra',name:'Andorra',emoji:'🏔️'}
 ];
 const DICT_FLAGS={es:'🇪🇸',fr:'🇫🇷',en:'🇬🇧',ca:'🎗️'};
@@ -8423,7 +8448,8 @@ function dictFilterCat(id){
   dictActiveCat=id;dictRenderCats();
   // Sugerir palabras de esa categoría
   const sugg=document.getElementById('dictSuggestions');
-  const list=id==='all'?DICT.slice(0,12):DICT.filter(w=>w.cat===id).slice(0,18);
+  // Antes solo miraba el diccionario interno: las categorías nuevas (ropa, transporte...) salían vacías
+  const list=id==='all'?dictAll().slice(0,12):dictAll().filter(w=>w.cat===id).slice(0,30);
   sugg.innerHTML=`<div class="dict-suggestion-title">${id==='all'?'💡 Palabras populares':'💡 Categoría '+(DICT_CATS.find(c=>c.id===id)||{}).name}</div><div class="dict-sugg-list">${list.map(w=>`<span class="dict-sugg" onclick="dictPick('${w.es.replace(/'/g,'&apos;')}')">${w.es}</span>`).join('')}</div>`;
 }
 function dictPick(word){
@@ -8447,8 +8473,14 @@ async function loadOfflineData(){
   }
 }
 function dictAll(){
-  // Combina diccionario inline + diccionario expandido (offline) + custom del usuario
-  return DICT.concat(DICT_EXTRA).concat(state.customDict||[]);
+  // Combina diccionario inline + diccionario expandido (offline) + custom del usuario,
+  // sin palabras repetidas (la primera gana: león, oso, río... salían dos veces)
+  const seen=new Set();
+  return DICT.concat(DICT_EXTRA).concat(state.customDict||[]).filter(w=>{
+    const k=dictNorm(w.es)+'|'+w.cat;
+    if(seen.has(k))return false;
+    seen.add(k);return true;
+  });
 }
 // Cache de traducciones online (sesión actual + localStorage 24h)
 let DICT_ONLINE_CACHE={};
@@ -8574,13 +8606,13 @@ function dictRenderEntry(entry){
     <div class="dict-row">
       <span class="dict-flag">${DICT_FLAGS[l]}</span>
       <span class="dict-lang">${DICT_LANGS[l]}</span>
-      <span class="dict-word">${entry[l]}</span>
+      <span class="dict-word">${escapeHtml(entry[l])}</span>
       <button class="dict-tts" onclick="dictSpeak('${(entry[l]||'').replace(/'/g,'&apos;')}','${DICT_TTSLANGS[l]}')" title="Escuchar">🔊</button>
     </div>`).join('');
   const examples=langs.map(l=>`
     <div class="dict-example">
       <span class="dict-flag">${DICT_FLAGS[l]}</span>
-      <span class="dict-example-text">${entry.ex[l]}</span>
+      <span class="dict-example-text">${escapeHtml(entry.ex[l])}</span>
       <button class="dict-tts" style="width:30px;height:30px;font-size:13px" onclick="dictSpeak('${(entry.ex[l]||'').replace(/'/g,'&apos;')}','${DICT_TTSLANGS[l]}')">🔊</button>
     </div>`).join('');
   const cat=DICT_CATS.find(c=>c.id===entry.cat);

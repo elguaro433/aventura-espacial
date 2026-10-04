@@ -13,7 +13,7 @@ $ErrorActionPreference = 'Stop'
 $html = Get-Content "$PSScriptRoot\index.html" -Raw
 
 $validGrades = @('cp','ce1','ce2','cm1','cm2','6e','5e','4e','3e')
-$validDictCats = @('animales','colores','numeros','familia','cuerpo','comida','casa','escuela','verbos','frases','naturaleza','tiempo','andorra')
+$validDictCats = @('animales','colores','numeros','familia','cuerpo','comida','casa','escuela','verbos','frases','naturaleza','tiempo','ropa','transporte','deportes','profesiones','andorra')
 
 $errors = 0
 $warnings = 0
