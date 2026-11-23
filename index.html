@@ -44,6 +44,17 @@
     f.style.transform='translate(-50%,-50%) rotate('+rot+'deg)';
   }
   ajustar();
+  // v8.8 · En una pestaña de Chrome gira toda la ventana. Al primer toque dentro del juego (el iframe avisa),
+  // se pone PANTALLA COMPLETA y se bloquea en vertical: así Android sí deja de girar la pantalla.
+  function fijar(){
+    var lock=function(){try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('portrait').catch(function(){})}catch(_){}};
+    if(document.fullscreenElement){lock();return}
+    var el=document.documentElement,rq=el.requestFullscreen||el.webkitRequestFullscreen;
+    if(!rq)return;
+    try{var p=rq.call(el,{navigationUI:'hide'});if(p&&p.then)p.then(lock).catch(function(){})}catch(_){}
+  }
+  window.addEventListener('message',function(e){if(e.origin===location.origin&&e.data==='av-fijar')fijar()});
+  document.addEventListener('fullscreenchange',function(){setTimeout(ajustar,150)});
   window.addEventListener('resize',ajustar);
   window.addEventListener('orientationchange',function(){setTimeout(ajustar,150)});
   if(screen.orientation&&screen.orientation.addEventListener)screen.orientation.addEventListener('change',function(){setTimeout(ajustar,150)});
@@ -9762,7 +9773,9 @@ init();
    documento aventura-informe-<emmanuel|emiliano>. Solo sube el perfil que se está usando en ESTA
    tablet, así una tablet nunca pisa el informe del otro niño con un perfil vacío.
    Como mucho cada hora, al abrir y al salir. Lo lee Claude con _utiles/leer_informes_aventura.sh. */
-const AV_VERSION='8.7';
+const AV_VERSION='8.8';
+// v8.8 · dentro del marco: cada toque avisa a la página de fuera para que ponga pantalla completa + vertical
+if(window.top!==window){document.addEventListener('pointerdown',()=>{try{if(!window.top.document.fullscreenElement)window.top.postMessage('av-fijar',location.origin)}catch(_){}},true)}
 // v8.6 · SOLO VERTICAL (lo pidió Emmanuel). En tablets/móviles: se intenta bloquear el giro y, si la
 // giran en horizontal, un aviso a pantalla completa tapa el juego hasta que la vuelvan a poner de pie.
 // En un PC (ratón, sin pantalla táctil) no sale nunca.
