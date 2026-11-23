@@ -12,6 +12,43 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=2">
 <link rel="apple-touch-icon" href="icon-192.png?v=2">
+<script>
+/* v8.7 · LA APP NO GIRA (lo pidió Emmanuel: «aunque la tablet se gire, que no se gire la aplicación»).
+   Android no deja a una web bloquear el giro, así que en tablets/móviles la página se convierte en un
+   MARCO: un iframe con el juego (index.html?dentro=1) que siempre mide como la tablet de pie y que, si
+   la giran, rota en sentido contrario. Dentro del marco todo funciona igual (medidas, toques, gestos). */
+(function(){
+  var q=location.search||'';
+  if(/[?&]dentro=1/.test(q)||window.top!==window)return;                       // ya estamos dentro del marco
+  // Solo tablets/móviles (un PC con pantalla táctil, como el de casa, NO: allí saldría girado)
+  var ua=navigator.userAgent||'';
+  var tablet=/Android|iPad|iPhone/.test(ua)||(/Macintosh/.test(ua)&&(navigator.maxTouchPoints||0)>1);
+  if(!tablet)return;                                                            // en un PC: normal
+  window.stop();
+  var src='index.html'+(q?q+'&':'?')+'dentro=1';
+  document.documentElement.innerHTML='<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'+
+    '<title>La Gran Aventura Espacial - Hermanos Díaz</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#ffd700">'+
+    '<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=2">'+
+    '<style>html,body{margin:0;height:100%;overflow:hidden;background:#1a0033}#avMarco{position:fixed;top:50%;left:50%;border:0;transform-origin:50% 50%;background:#1a0033}</style>'+
+    '</head><body><iframe id="avMarco" allow="autoplay; fullscreen; screen-wake-lock" src="'+src+'"></iframe></body>';
+  function ang(){var a=(screen.orientation&&typeof screen.orientation.angle==='number')?screen.orientation.angle:(window.orientation||0);return ((a%360)+360)%360}
+  function ajustar(){
+    var f=document.getElementById('avMarco');if(!f)return;
+    var W=window.innerWidth,H=window.innerHeight,tumbada=W>H,a=ang(),rot=0;
+    if(!tumbada){try{localStorage.setItem('av_angulo_pie',String(a))}catch(_){}}
+    else{
+      var pie=null;try{var s=localStorage.getItem('av_angulo_pie');if(s!==null)pie=+s}catch(_){}
+      if(pie!==null){var d=((pie-a)%360+360)%360;rot=d===90?90:d===270?-90:-90}else rot=-90;
+    }
+    f.style.width=(tumbada?H:W)+'px';f.style.height=(tumbada?W:H)+'px';
+    f.style.transform='translate(-50%,-50%) rotate('+rot+'deg)';
+  }
+  ajustar();
+  window.addEventListener('resize',ajustar);
+  window.addEventListener('orientationchange',function(){setTimeout(ajustar,150)});
+  if(screen.orientation&&screen.orientation.addEventListener)screen.orientation.addEventListener('change',function(){setTimeout(ajustar,150)});
+})();
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 /* Permitir copiar texto en zonas de contenido (diccionario, wiki, enciclopedia) */
@@ -9725,22 +9762,12 @@ init();
    documento aventura-informe-<emmanuel|emiliano>. Solo sube el perfil que se está usando en ESTA
    tablet, así una tablet nunca pisa el informe del otro niño con un perfil vacío.
    Como mucho cada hora, al abrir y al salir. Lo lee Claude con _utiles/leer_informes_aventura.sh. */
-const AV_VERSION='8.6';
+const AV_VERSION='8.7';
 // v8.6 · SOLO VERTICAL (lo pidió Emmanuel). En tablets/móviles: se intenta bloquear el giro y, si la
 // giran en horizontal, un aviso a pantalla completa tapa el juego hasta que la vuelvan a poner de pie.
 // En un PC (ratón, sin pantalla táctil) no sale nunca.
+// v8.7: el aviso «¡Pon la tablet de pie!» se quitó; ahora el marco del <head> contra-gira el juego.
 (function(){
-  const st=document.createElement('style');
-  st.textContent='#avGira{display:none;position:fixed;inset:0;z-index:99999;background:#14002b;color:#fff;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:inherit;padding:20px}'+
-    '#avGira .ico{font-size:90px;animation:avGiraAnim 1.6s ease-in-out infinite}'+
-    '#avGira .t{font-size:26px;font-weight:bold;margin-top:14px;color:#ffd700}#avGira .s{font-size:17px;opacity:.85;margin-top:6px}'+
-    '@keyframes avGiraAnim{0%,20%{transform:rotate(-90deg)}60%,100%{transform:rotate(0)}}'+
-    '@media (orientation:landscape) and (pointer:coarse){#avGira{display:flex}}';
-  document.head.appendChild(st);
-  const d=document.createElement('div');d.id='avGira';
-  d.innerHTML='<div class="ico">📱</div><div class="t">¡Pon la tablet de pie!</div><div class="s">Este juego solo funciona en vertical 🚀</div>';
-  const pon=()=>{if(!document.getElementById('avGira'))document.body.appendChild(d)};
-  if(document.body)pon();else document.addEventListener('DOMContentLoaded',pon);
   const bloquear=()=>{try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('portrait').catch(()=>{})}catch(_){}};
   bloquear();document.addEventListener('click',bloquear,{once:true});
 })();
@@ -9754,7 +9781,7 @@ async function avBuscarActualizacion(){
       toast('🚀 Hay versión nueva ('+nueva+'). Actualizando…',2500);
       try{for(const r of await navigator.serviceWorker.getRegistrations())await r.unregister()}catch(_){}
       try{for(const k of await caches.keys())await caches.delete(k)}catch(_){}
-      save();setTimeout(()=>location.reload(),1200);return;
+      save();setTimeout(()=>{try{window.top.location.reload()}catch(_){location.reload()}},1200);return;
     }
     toast(nueva?'✅ Ya tienes la última versión ('+AV_VERSION+')':'⚠️ No se pudo comprobar. ¿Hay internet?',3000);
   }catch(e){toast('⚠️ Sin internet: no se puede buscar ahora',3000)}
