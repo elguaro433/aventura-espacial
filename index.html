@@ -1020,7 +1020,17 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
     <div class="lives" id="lives"></div>
   </div>
   <div class="center" style="flex:1">
+    <style>
+      .golden-tag{display:none;margin:0 auto 6px;padding:4px 14px;border-radius:20px;font-weight:bold;color:#3a2600;background:linear-gradient(135deg,#ffe259,#ffa751);box-shadow:0 0 18px #ffd54f;animation:pulse 1s infinite;width:max-content}
+      .question-box.golden{border-color:#ffd54f!important;box-shadow:0 0 28px #ffd54f,inset 0 0 18px rgba(255,213,79,.35)}
+      .speed-bar{display:none;width:min(420px,80%);height:8px;margin:8px auto 2px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden}
+      .speed-bar>div{height:100%;width:100%;border-radius:6px;background:linear-gradient(90deg,#ffeb3b,#00e5ff)}
+      .speed-hint{font-size:.75em;opacity:.75;margin-bottom:4px}
+    </style>
+    <div class="golden-tag" id="goldenTag">⭐ ¡PREGUNTA DORADA! · +10 💰</div>
     <div class="question-box" id="qText"></div>
+    <div class="speed-bar" id="speedBar"><div></div></div>
+    <div class="speed-hint" id="speedHint" style="display:none">⚡ Responde antes de que se acabe la barra = monedas extra</div>
     <div class="row">
       <button class="btn btn-blue btn-small" onclick="speakCurrentQuestion()" id="speakBtn" title="Leer en voz alta">🔊 Escuchar</button>
       <button class="btn btn-green btn-small" onclick="useHint()" id="hintBtn">💡 Pedir ayuda</button>
@@ -4253,6 +4263,8 @@ function startPlanet(galIdx,planetIdx){
   game.qPool=[];
   game.hintsUsed=0;game.perfectAnswers=0;game.helpedAtQ=-1;
   game.answerLock=false; // por si se navegó rápido tras responder en otro planeta
+  // Emoción: una pregunta dorada al azar (de la 3.ª a la 8.ª) y contadores de premios extra
+  game.goldenIdx=2+Math.floor(Math.random()*6);game.fastCount=0;game.bestCombo=0;game.bonusCoins=0;game.goldenHit=false;
   game.maxLives=game.lives;
   // Bola de Dragón: salva del primer fallo en este planeta
   game.dragonBallReady=hasItem('dragon');
@@ -4351,6 +4363,21 @@ function renderQuestion(){
   document.getElementById('qNum').textContent=`${game.qIdx+1}/${qs.length}`;
   document.getElementById('lives').innerHTML=Array.from({length:game.maxLives||3},(_,i)=>`<span class="heart${i>=game.lives?' lost':''}">❤️</span>`).join('');
   document.getElementById('qText').textContent=q.q;
+  // EMOCIÓN (nov 2026, «me aburre»): pregunta dorada + rayo de velocidad. Solo suman, nunca quitan.
+  const special=!game.reviewMode&&!game.dailyChallengeMode;
+  if(game.goldenIdx>=qs.length)game.goldenIdx=Math.max(1,qs.length-2); // planetas de 5-7 preguntas también tienen dorada
+  game.isGolden=special&&game.qIdx===game.goldenIdx;
+  document.getElementById('qText').classList.toggle('golden',game.isGolden);
+  const gTag=document.getElementById('goldenTag');if(gTag)gTag.style.display=game.isGolden?'block':'none';
+  if(game.isGolden)sndStreak();
+  game.speedMs=isYoung()?15000:10000;game.qStart=Date.now();
+  const sBar=document.getElementById('speedBar'),sHint=document.getElementById('speedHint');
+  if(sHint)sHint.style.display=special&&game.qIdx===0?'block':'none';
+  if(sBar){
+    sBar.style.display=special?'block':'none';
+    const f=sBar.firstElementChild;f.style.transition='none';f.style.width='100%';void f.offsetWidth;
+    if(special){f.style.transition='width '+game.speedMs+'ms linear';f.style.width='0%'}
+  }
   // Botón de AYUDA: siempre visible y GRATIS. Una ayuda por pregunta.
   // Si el niño no sabe la respuesta, puede pedir ayuda y le quitamos 2 opciones
   // incorrectas (deja 50/50) y mostramos una pista de estudio si existe.
@@ -4422,6 +4449,7 @@ function answer(idx,q,btn){
   if(game.answerLock)return; // anti doble-tap
   game.answerLock=true;
   document.querySelectorAll('#answers .answer-btn').forEach(b=>b.disabled=true);
+  const sbF=document.querySelector('#speedBar>div');if(sbF){sbF.style.width=getComputedStyle(sbF).width;sbF.style.transition='none'}
   const p=getPlayer();
   // En modo repaso NO contamos en analytics ni damos XP/monedas
   if(!game.reviewMode)p.totalAnswered++;
@@ -4444,7 +4472,17 @@ function answer(idx,q,btn){
       if(isDoubleXPActive())xpEarn*=2;
       if(hasItem('star')&&p.currentStreak>=3)xpEarn+=1; // bonus por racha
       addXP(xpEarn);
-    }
+      // Extras: combo (x2 desde 3 seguidas, x3 desde 6), rayo de velocidad y pregunta dorada
+      let bonus=0;const extra=[];
+      const mult=p.currentStreak>=6?3:p.currentStreak>=3?2:1;
+      // Premios pequeños a propósito: la tienda entera vale ~2.800💰 y no debe vaciarse en dos días
+      if(mult>1){bonus+=mult===3?2:1;extra.push('🔥x'+mult)}
+      if(!game.dailyChallengeMode&&game.qStart&&Date.now()-game.qStart<=game.speedMs){bonus+=1;game.fastCount=(game.fastCount||0)+1;extra.push('⚡¡Rápido!')}
+      if(game.isGolden){bonus+=10;game.goldenHit=true;extra.push('⭐¡Dorada!');confetti(35);setTimeout(sndWin,200)}
+      p.coins+=bonus;game.bonusCoins=(game.bonusCoins||0)+bonus;
+      game.bestCombo=Math.max(game.bestCombo||0,p.currentStreak);
+      game.extraMsg=extra.length?' '+extra.join(' ')+' +'+(coinsEarn+bonus)+'💰':'';
+    }else{game.extraMsg=''}
     game.correct++;
     if(!game.hintUsedInQuestion&&!game.reviewMode)game.perfectAnswers=(game.perfectAnswers||0)+1;
     // Mensaje variado, prioriza racha si es ≥3
@@ -4458,7 +4496,7 @@ function answer(idx,q,btn){
     }else{
       msg=ENCOURAGEMENT_OK[Math.floor(Math.random()*ENCOURAGEMENT_OK.length)]+xpStr;
     }
-    feedback(msg,'success');
+    feedback(msg+(game.extraMsg||''),'success');
     // Confetti + sonido de racha en hitos clave (no en repaso)
     if(!game.reviewMode){
       if(p.currentStreak===5){confetti(20);sndStreak()}
@@ -4506,7 +4544,7 @@ function answer(idx,q,btn){
   // Actualiza HUD de racha en vivo
   const streakEl=document.getElementById('liveStreak');
   if(streakEl){
-    if(p.currentStreak>=2){streakEl.style.display='inline-block';streakEl.textContent='🔥 '+p.currentStreak}
+    if(p.currentStreak>=2){streakEl.style.display='inline-block';const m=p.currentStreak>=6?3:p.currentStreak>=3?2:1;streakEl.textContent='🔥 '+p.currentStreak+(m>1?' · x'+m:'')}
     else{streakEl.style.display='none'}
   }
   game.hintUsedInQuestion=false;
@@ -4604,6 +4642,11 @@ function endPlanet(failed=false){
       document.getElementById('resultText').textContent=`Aciertos: ${game.correct}/${total}. Necesitas al menos ${Math.ceil(total*.5)} para conquistarlo.`;
     }
     document.getElementById('nextBtn').style.display='inline-block';
+  }
+  // Resumen de premios extra de la partida
+  if((game.bonusCoins||0)>0){
+    const rt=document.getElementById('resultText');
+    rt.textContent+=' · Extra: +'+game.bonusCoins+'💰 (⚡ '+(game.fastCount||0)+' rápidas · 🔥 combo '+(game.bestCombo||0)+(game.goldenHit?' · ⭐ dorada':'')+')';
   }
   // RONDA DE REVISIÓN: si hay preguntas falladas, mostrar botón para repasarlas
   setupReviewButton();
