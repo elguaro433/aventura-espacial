@@ -9714,7 +9714,24 @@ init();
    documento aventura-informe-<emmanuel|emiliano>. Solo sube el perfil que se está usando en ESTA
    tablet, así una tablet nunca pisa el informe del otro niño con un perfil vacío.
    Como mucho cada hora, al abrir y al salir. Lo lee Claude con _utiles/leer_informes_aventura.sh. */
-const AV_VERSION='8.1';
+const AV_VERSION='8.2';
+// v8.2 · versión visible al pie + botón «Buscar actualización» (lo pidió Emmanuel)
+async function avBuscarActualizacion(){
+  const b=document.getElementById('avUpdBtn');if(b){b.disabled=true;b.textContent='Buscando…'}
+  try{
+    const t=await (await fetch('./index.html?nc='+Date.now(),{cache:'no-store'})).text();
+    const m=t.match(/const AV_VERSION='([\d.]+)'/);const nueva=m?m[1]:'';
+    if(nueva&&nueva!==AV_VERSION){
+      toast('🚀 Hay versión nueva ('+nueva+'). Actualizando…',2500);
+      try{for(const r of await navigator.serviceWorker.getRegistrations())await r.unregister()}catch(_){}
+      try{for(const k of await caches.keys())await caches.delete(k)}catch(_){}
+      save();setTimeout(()=>location.reload(),1200);return;
+    }
+    toast(nueva?'✅ Ya tienes la última versión ('+AV_VERSION+')':'⚠️ No se pudo comprobar. ¿Hay internet?',3000);
+  }catch(e){toast('⚠️ Sin internet: no se puede buscar ahora',3000)}
+  if(b){b.disabled=false;b.textContent='🔄 Buscar actualización'}
+}
+document.addEventListener('DOMContentLoaded',()=>{try{document.getElementById('avVer').textContent='Versión '+AV_VERSION}catch(_){}});
 const AV_NUBE='https://firestore.googleapis.com/v1/projects/familia-diaz-gonzalez/databases/(default)/documents/familias/e286dfd771d061a73ea5fea178f57585acc9653ff165f17bec2a7f7f488352ef/appdata/';
 const AV_KEY='AIzaSyCi0cdF5VqJjcsHibnLg6kvPGVN-f2b_DY';
 // Errores de la app: se guardan los últimos 30 para el informe
@@ -9811,6 +9828,7 @@ async function avSubirInforme(forzar){
 setTimeout(()=>avSubirInforme(false),8000);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)avSubirInforme(false)});
 </script>
-<footer style="text-align:center;padding:16px;font-size:12px;opacity:.6;font-family:system-ui,Segoe UI,sans-serif;">🍀 Propiedad de la Familia Díaz González · Creador: Emmanuel Díaz</footer>
+<footer style="text-align:center;padding:16px;font-size:12px;opacity:.6;font-family:system-ui,Segoe UI,sans-serif;">🍀 Propiedad de la Familia Díaz González · Creador: Emmanuel Díaz
+<div style="margin-top:6px;font-size:11px;display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap"><span id="avVer">Versión</span><button id="avUpdBtn" onclick="avBuscarActualizacion()" style="font-size:11px;padding:3px 9px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:transparent;color:inherit;cursor:pointer">🔄 Buscar actualización</button></div></footer>
 </body>
 </html>
