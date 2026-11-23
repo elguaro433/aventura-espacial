@@ -3948,7 +3948,11 @@ function switchTab(id,event){
 }
 
 // ========== GAME FLOW ==========
+function avPerfilFijo(){let p='';try{p=localStorage.getItem('av_perfil')||''}catch(_){}return p==='emmanuel'||p==='emiliano'?p:''}
 function startGame(){
+  // Tablet fijada a un niño (enlace propio): entra directo en su perfil
+  const fijo=avPerfilFijo();
+  if(fijo){choosePlayer(fijo);return}
   show('select');
   document.getElementById('ava-em-big').innerHTML=AVATAR_EMMANUEL;
   document.getElementById('ava-eli-big').innerHTML=AVATAR_EMILIANO;
@@ -9524,6 +9528,11 @@ function init(){
   // Pensadas para que tú entres directo desde la barra del navegador.
   try{
     const params=new URLSearchParams(location.search);
+    // v8.3 · enlace propio por niño: ?p=emiliano / ?p=emmanuel deja ESTA tablet fijada a ese niño
+    // (se recuerda aunque luego se abra desde el icono). ?p=todos la vuelve a dejar para los dos.
+    const pp=params.get('p');
+    if(pp==='emmanuel'||pp==='emiliano'){try{localStorage.setItem('av_perfil',pp)}catch(_){}}
+    else if(pp==='todos'){try{localStorage.removeItem('av_perfil')}catch(_){}}
     if(params.get('admin')==='padres')setTimeout(()=>show('admin'),50);
     else if(params.get('padres'))setTimeout(()=>show('parents'),50);
   }catch(e){}
@@ -9714,7 +9723,7 @@ init();
    documento aventura-informe-<emmanuel|emiliano>. Solo sube el perfil que se está usando en ESTA
    tablet, así una tablet nunca pisa el informe del otro niño con un perfil vacío.
    Como mucho cada hora, al abrir y al salir. Lo lee Claude con _utiles/leer_informes_aventura.sh. */
-const AV_VERSION='8.2';
+const AV_VERSION='8.3';
 // v8.2 · versión visible al pie + botón «Buscar actualización» (lo pidió Emmanuel)
 async function avBuscarActualizacion(){
   const b=document.getElementById('avUpdBtn');if(b){b.disabled=true;b.textContent='Buscando…'}
@@ -9731,7 +9740,7 @@ async function avBuscarActualizacion(){
   }catch(e){toast('⚠️ Sin internet: no se puede buscar ahora',3000)}
   if(b){b.disabled=false;b.textContent='🔄 Buscar actualización'}
 }
-document.addEventListener('DOMContentLoaded',()=>{try{document.getElementById('avVer').textContent='Versión '+AV_VERSION}catch(_){}});
+document.addEventListener('DOMContentLoaded',()=>{try{const f=avPerfilFijo();document.getElementById('avVer').textContent='Versión '+AV_VERSION+(f?' · Tablet de '+(f==='emmanuel'?'Emmanuel':'Emiliano'):'')}catch(_){}});
 const AV_NUBE='https://firestore.googleapis.com/v1/projects/familia-diaz-gonzalez/databases/(default)/documents/familias/e286dfd771d061a73ea5fea178f57585acc9653ff165f17bec2a7f7f488352ef/appdata/';
 const AV_KEY='AIzaSyCi0cdF5VqJjcsHibnLg6kvPGVN-f2b_DY';
 // Errores de la app: se guardan los últimos 30 para el informe
@@ -9752,7 +9761,8 @@ function avTableta(){
   const modelo=mod?mod:m&&m[1].trim()!=='K'?m[1].trim():(/Android/.test(ua)?'Android (modelo oculto)':/iPad|iPhone/.test(ua)?'iPad/iPhone':/Windows/.test(ua)?'PC Windows':'desconocido');
   // ¿De quién es esta tablet? Del niño que más ha respondido en ella
   const n=k=>((state[k]||{}).totalAnswered||0);
-  const duenio=n('emmanuel')===0&&n('emiliano')===0?'sin usar':n('emmanuel')>=n('emiliano')?'Emmanuel':'Emiliano';
+  const fijo=avPerfilFijo();
+  const duenio=fijo?(fijo==='emmanuel'?'Emmanuel':'Emiliano')+' (enlace propio)':n('emmanuel')===0&&n('emiliano')===0?'sin usar':(n('emmanuel')>=n('emiliano')?'Emmanuel':'Emiliano')+' (calculado)';
   return{id,modelo,duenio,ua};
 }
 function avTextoInforme(who){
