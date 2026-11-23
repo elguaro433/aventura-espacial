@@ -9725,7 +9725,25 @@ init();
    documento aventura-informe-<emmanuel|emiliano>. Solo sube el perfil que se está usando en ESTA
    tablet, así una tablet nunca pisa el informe del otro niño con un perfil vacío.
    Como mucho cada hora, al abrir y al salir. Lo lee Claude con _utiles/leer_informes_aventura.sh. */
-const AV_VERSION='8.5';
+const AV_VERSION='8.6';
+// v8.6 · SOLO VERTICAL (lo pidió Emmanuel). En tablets/móviles: se intenta bloquear el giro y, si la
+// giran en horizontal, un aviso a pantalla completa tapa el juego hasta que la vuelvan a poner de pie.
+// En un PC (ratón, sin pantalla táctil) no sale nunca.
+(function(){
+  const st=document.createElement('style');
+  st.textContent='#avGira{display:none;position:fixed;inset:0;z-index:99999;background:#14002b;color:#fff;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:inherit;padding:20px}'+
+    '#avGira .ico{font-size:90px;animation:avGiraAnim 1.6s ease-in-out infinite}'+
+    '#avGira .t{font-size:26px;font-weight:bold;margin-top:14px;color:#ffd700}#avGira .s{font-size:17px;opacity:.85;margin-top:6px}'+
+    '@keyframes avGiraAnim{0%,20%{transform:rotate(-90deg)}60%,100%{transform:rotate(0)}}'+
+    '@media (orientation:landscape) and (pointer:coarse){#avGira{display:flex}}';
+  document.head.appendChild(st);
+  const d=document.createElement('div');d.id='avGira';
+  d.innerHTML='<div class="ico">📱</div><div class="t">¡Pon la tablet de pie!</div><div class="s">Este juego solo funciona en vertical 🚀</div>';
+  const pon=()=>{if(!document.getElementById('avGira'))document.body.appendChild(d)};
+  if(document.body)pon();else document.addEventListener('DOMContentLoaded',pon);
+  const bloquear=()=>{try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('portrait').catch(()=>{})}catch(_){}};
+  bloquear();document.addEventListener('click',bloquear,{once:true});
+})();
 // v8.2 · versión visible al pie + botón «Buscar actualización» (lo pidió Emmanuel)
 async function avBuscarActualizacion(){
   const b=document.getElementById('avUpdBtn');if(b){b.disabled=true;b.textContent='Buscando…'}

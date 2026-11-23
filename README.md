@@ -107,3 +107,5 @@ Repo: `elguaro433/aventura-espacial`.
 - **v8.4** (23 nov 2026): la versión y el botón «Buscar actualización» pasan del pie (en la tablet quedaba fuera de la pantalla, por debajo del borde) a la pantalla de inicio, **justo debajo de «De los Hermanos Díaz»**, visibles sin bajar.
 
 - **v8.5** (23 nov 2026): la versión y «Buscar actualización» van **abajo a la derecha** de la pantalla de inicio, pequeñitos (`#avVerBox`, fijo en la esquina). A Emmanuel no le gustaba en el medio, bajo el título. Solo se ve en la pantalla de inicio.
+
+- **v8.6** (23 nov 2026): **solo en vertical**. En tablets/móviles (`pointer:coarse`) se intenta bloquear el giro (`screen.orientation.lock('portrait')`; el manifest ya decía `portrait`) y, si la ponen en horizontal, un aviso a pantalla completa (`#avGira`, «¡Pon la tablet de pie!») tapa el juego. En un PC no sale nunca.
