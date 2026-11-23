@@ -828,6 +828,8 @@ body.pajama *,body.pajama *::before,body.pajama *::after{animation-duration:3s!i
   <div class="center">
     <h1><span class="emoji">🚀</span> LA GRAN AVENTURA ESPACIAL</h1>
     <h2>De los Hermanos Díaz</h2>
+    <!-- v8.4: versión visible SIN bajar (en el pie quedaba fuera de la pantalla de la tablet) -->
+    <div style="margin:-4px 0 2px;font-size:12px;opacity:.8;display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap"><span id="avVer">Versión</span><button id="avUpdBtn" onclick="avBuscarActualizacion()" style="font-size:12px;padding:4px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.4);background:transparent;color:inherit;cursor:pointer">🔄 Buscar actualización</button></div>
     <div class="hero-rocket">🚀</div>
     <p style="text-align:center;max-width:600px;line-height:1.5;font-size:14px;opacity:.9">
       Una aventura de matemáticas, lógica e idiomas para Emiliano y Emmanuel.<br>
@@ -9723,7 +9725,7 @@ init();
    documento aventura-informe-<emmanuel|emiliano>. Solo sube el perfil que se está usando en ESTA
    tablet, así una tablet nunca pisa el informe del otro niño con un perfil vacío.
    Como mucho cada hora, al abrir y al salir. Lo lee Claude con _utiles/leer_informes_aventura.sh. */
-const AV_VERSION='8.3';
+const AV_VERSION='8.4';
 // v8.2 · versión visible al pie + botón «Buscar actualización» (lo pidió Emmanuel)
 async function avBuscarActualizacion(){
   const b=document.getElementById('avUpdBtn');if(b){b.disabled=true;b.textContent='Buscando…'}
@@ -9838,7 +9840,6 @@ async function avSubirInforme(forzar){
 setTimeout(()=>avSubirInforme(false),8000);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)avSubirInforme(false)});
 </script>
-<footer style="text-align:center;padding:16px;font-size:12px;opacity:.6;font-family:system-ui,Segoe UI,sans-serif;">🍀 Propiedad de la Familia Díaz González · Creador: Emmanuel Díaz
-<div style="margin-top:6px;font-size:11px;display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap"><span id="avVer">Versión</span><button id="avUpdBtn" onclick="avBuscarActualizacion()" style="font-size:11px;padding:3px 9px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:transparent;color:inherit;cursor:pointer">🔄 Buscar actualización</button></div></footer>
+<footer style="text-align:center;padding:16px;font-size:12px;opacity:.6;font-family:system-ui,Segoe UI,sans-serif;">🍀 Propiedad de la Familia Díaz González · Creador: Emmanuel Díaz</footer>
 </body>
 </html>

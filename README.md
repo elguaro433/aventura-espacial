@@ -103,3 +103,5 @@ Repo: `elguaro433/aventura-espacial`.
 - **v8.2** (23 nov 2026): al pie de la pantalla de inicio, pequeñito, sale **«Versión X.Y»** y un botón **«🔄 Buscar actualización»**: mira la versión publicada (`AV_VERSION` del index.html de GitHub Pages) y, si es distinta, borra la caché, quita el service worker y recarga; si no, dice «Ya tienes la última versión». **Cada cambio: subir `AV_VERSION` en index.html y `RAW_BUILD_TIME` en sw.js.**
 
 - **v8.3** (23 nov 2026): **enlace propio por niño**. `…/aventura-espacial/?p=emiliano` y `?p=emmanuel` dejan esa tablet fijada a ese niño (`localStorage.av_perfil`, se recuerda aunque se abra desde el icono): EMPEZAR entra directo en su perfil, al pie sale «Tablet de …» y el informe dice «(enlace propio)». `?p=todos` la vuelve a dejar para los dos.
+
+- **v8.4** (23 nov 2026): la versión y el botón «Buscar actualización» pasan del pie (en la tablet quedaba fuera de la pantalla, por debajo del borde) a la pantalla de inicio, **justo debajo de «De los Hermanos Díaz»**, visibles sin bajar.
